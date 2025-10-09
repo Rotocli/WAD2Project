@@ -1,8 +1,8 @@
-# 🐠 FishBit - Gamified Habit Tracker
+## FishBit - Gamified Habit Tracker
 
-A habit tracking web app where your consistency keeps virtual fish happy and healthy!
+A habit tracking web app where your consistency keeps virtual fish happy and healthy
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you start, make sure you have these installed:
 1. **Node.js** (version 16 or higher)
@@ -17,7 +17,7 @@ Before you start, make sure you have these installed:
 3. **A code editor** (recommended: VS Code)
    - Download from: https://code.visualstudio.com/
 
-## 🚀 Getting Started (First Time Setup)
+## Getting Started (First Time Setup)
 
 ### Step 1: Clone the Repository
 
@@ -52,7 +52,7 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123:web:abc
 ```
 
-**⚠️ IMPORTANT:** Never commit the `.env` file to Git! It contains secret keys.
+** IMPORTANT:** Never commit the `.env` file to Git! It contains secret keys.
 
 ### Step 4: Run the Development Server
 
@@ -62,7 +62,7 @@ npm run dev
 
 The app should open at: http://localhost:5173
 
-## 🔄 Daily Workflow
+## Daily Workflow
 
 Every time you work on the project:
 
@@ -77,7 +77,7 @@ npm install
 npm run dev
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 fishbit/
@@ -92,24 +92,6 @@ fishbit/
 ├── .env.example       # Template for environment variables
 └── package.json       # Project dependencies
 ```
-
-## 🐛 Troubleshooting
-
-### "Module not found" error
-Solution: Run `npm install`
-
-### Changes not showing up
-Solution: Hard refresh browser (Ctrl+Shift+R) or restart dev server
-
-### "Firebase: Error (auth/invalid-api-key)"
-Solution: Check your `.env` file has correct values and restart dev server
-
-## 📞 Need Help?
-
-1. Check this README first
-2. Ask in the team group chat
-3. Check the [Vue.js docs](https://vuejs.org/)
-
 ---
 
 ### Quick Start Checklist
@@ -119,4 +101,3 @@ Solution: Check your `.env` file has correct values and restart dev server
 - [ ] `.env` file created with Firebase credentials
 - [ ] Dev server running (`npm run dev`)
 
-Good luck! 🚀
