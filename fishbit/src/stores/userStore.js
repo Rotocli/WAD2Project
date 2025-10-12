@@ -9,6 +9,7 @@ import {
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../services/firebase'
 
+
 export const useUserStore = defineStore('user', () => {
   // State
   const user = ref(null)
@@ -129,6 +130,11 @@ export const useUserStore = defineStore('user', () => {
       user.value = firebaseUser
       if (firebaseUser) {
         await fetchUserProfile(firebaseUser.uid)
+        const { useHabitStore } = await import('./habitStore.js')
+        const habitStore = useHabitStore()
+
+      
+        await habitStore.fetchHabits()
       } else {
         userProfile.value = null
       }

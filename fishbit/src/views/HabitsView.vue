@@ -8,7 +8,62 @@
           <h4>Add Habit</h4>
         </div>
         <div class="card-body">
-          <form @submit.prevent="handleCreate" class="d-flex align-items-center gap-2 flex-wrap">
+          <form @submit.prevent="handleCreate">
+            <div class="d-flex align-items-center mb-3">
+              <label for="name" class="form-label me-3 ">Habit Name</label>
+              <input v-model="newHabit.name" placeholder="" required class="form-control" id="name" style="max-width:250px"/>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+              <label for="repeat" class="form-label me-3 ">Repeat Habit?</label>
+              <input v-model="newHabit.repeat" placeholder=""  class="form-checkbox-input" type="checkbox" id="repeat" style="max-width:250px"/>
+
+
+            </div>
+            <div class="d-flex align-items-center mb-3" v-if="newHabit.repeat">
+              <label for="frequency" class="form-label me-3">Frequency</label>
+              <select v-model="newHabit.frequency" class="form-select me-3" id="frequency" style="max-width:150px;">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="custom">Custom</option>
+              </select>
+              <div class="d-flex align-items-center mx-3" v-if="newHabit.frequency === 'custom'"> 
+                <label for="customFrequency" class="form-label me-1">Every </label>
+                <input
+                  type="number"
+                  id="customFrequency"
+                  v-model="newHabit.customFrequency"
+                  placeholder="N"
+                  class="form-control"
+                  style="max-width:90px;
+                  "
+                  min="1"
+                  required
+                />
+                <label for="customFrequency" class="form-label ms-1">Days</label>
+              </div>
+              
+
+              
+
+            </div>
+            <div class="mb-3">
+              <label for="habitDescription" class="form-label">Habit Description</label>
+              <textarea
+                class="form-control"
+                id="habitDescription"
+                v-model="newHabit.description"
+                rows="3"
+                placeholder="Describe your habit...">
+              </textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Habit</button>
+            
+
+
+
+          </form>
+          
+          <!-- <form @submit.prevent="handleCreate" class="d-flex align-items-center gap-2 flex-wrap">
             <input v-model="newHabit.name" placeholder="Habit name" required class="form-control" style="max-width:250px"/>
             <select v-model="newHabit.frequency" class="form-select" style="max-width:150px;">
               <option value="daily">Daily</option>
@@ -23,7 +78,7 @@
               style="max-width:200px;"
             />
             <button type="submit" class="btn btn-primary">Add Habit</button>
-          </form>
+          </form> -->
         </div>
       </div>
       <!-- Habits List Card -->
@@ -35,13 +90,15 @@
           <div v-if="store.loading">Loading...</div>
           <div v-else>
             <ul class="habits-list">
-              <li v-for="habit in store.habits" :key="habit.id" class="habit-item">
+              <li v-for="habit in store.habits" :key="habit.id" class="habit-item ">
+
                 <template v-if="!editingId || editingId !== habit.id">
                   <div class="habit-info">
                     <span class="fw-bold">{{ habit.name }}</span>
-                    <span class="text-muted">
+                    <span v-if="habit.repeat===false" class="text-muted" >No repeat</span>
+                    <span v-else-if="habit.repeat===true" class="text-muted">
                       ({{ habit.frequency }}
-                      <span v-if="habit.frequency === 'custom' && habit.customFrequency">: {{ habit.customFrequency }}</span>
+                      <span v-if="habit.frequency === 'custom' && habit.customFrequency">: Every {{ habit.customFrequency }} Days</span>
                       )
                     </span>
                   </div>
@@ -51,19 +108,49 @@
                   </div>
                 </template>
                 <template v-else>
-                  <input v-model="editHabit.name" placeholder="Habit name" class="form-control d-inline-block me-2" style="max-width:150px;"/>
-                  <select v-model="editHabit.frequency" class="form-select d-inline-block me-2" style="max-width:100px;">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                  <input
+
+                  
+                  
+                    <input v-model="editHabit.name" placeholder="Habit name" class="form-control d-inline-block me-2" style="max-width:150px;"/>
+                    <div class="d-flex align-items-center">
+                      <label for="repeat" class="form-label me-3 ">Repeat Habit?</label>
+                      <input v-model="editHabit.repeat" placeholder=""  class="form-checkbox-input" type="checkbox" id="repeat" style="max-width:250px"/>
+
+
+                    </div>
+
+
+                    <select v-if='editHabit.repeat' v-model="editHabit.frequency" class="form-select d-inline-block me-2" style="max-width:100px;">
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="custom">Custom</option>
+                    </select>
+
+                    <div class="d-flex align-items-center mx-3" v-if="editHabit.frequency === 'custom'"> 
+                      <label for="customFrequency" class="form-label me-1">Every </label>
+                      <input
+                        type="number"
+                        id="customFrequency"
+                        v-model="editHabit.customFrequency"
+                        placeholder="N"
+                        class="form-control"
+                        style="max-width:90px;
+                        "
+                        min="1"
+                        required key=""
+                      />
+                      <label for="customFrequency" class="form-label ms-1">Days</label>
+
+                    </div>
+                  
+
+                  <!-- <input
                     v-if="editHabit.frequency === 'custom'"
                     v-model="editHabit.customFrequency"
                     placeholder="Custom frequency"
                     class="form-control d-inline-block me-2"
                     style="max-width:140px;"
-                  />
+                  /> -->
                   <button @click="handleUpdate(habit.id)" class="btn btn-sm btn-success me-2">Save</button>
                   <button @click="cancelEdit" class="btn btn-sm btn-outline-secondary">Cancel</button>
                 </template>
@@ -79,15 +166,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useHabitStore } from '../stores/HabitStore'
+import { useHabitStore } from '../stores/habitStore'
 
 const store = useHabitStore()
-const newHabit = ref({ name: '', frequency: 'daily', customFrequency: '' })
+const newHabit = ref({ name: '', frequency: '', customFrequency: '',repeat:false,description:''})
 const editingId = ref(null)
 const editHabit = ref({})
 
 onMounted(() => {
   store.fetchHabits()
+  console.log(store.habits)
 })
 
 const handleCreate = async () => {
@@ -96,10 +184,15 @@ const handleCreate = async () => {
   newHabit.value.name = ''
   newHabit.value.frequency = 'daily'
   newHabit.value.customFrequency = ''
+  newHabit.value.repeat=false
+  newHabit.value.description=''
 }
 const startEdit = (habit) => {
   editingId.value = habit.id
   editHabit.value = { ...habit }
+  if (editHabit.value.repeat!==false){
+    editHabit.value.repeat=true
+  }
 }
 const handleUpdate = async (id) => {
   await store.updateHabit(id, { ...editHabit.value })

@@ -2,110 +2,15 @@
   <div class="dashboard-view">
     <div class="container-fluid p-4">
       <!-- Welcome Section -->
-      <div class="row mb-4">
-        <div class="col-12">
-          <div class="welcome-card">
-            <h2>Welcome back, {{ username }}! 👋</h2>
-            <p class="text-muted mb-0">{{ motivationalQuote }}</p>
-          </div>
-        </div>
-      </div>
+      <WelcomeSection :motivationalQuote="motivationalQuote" :username="username"/>
+
+     
 
       <!-- Stats Cards -->
-      <div class="row g-4 mb-4">
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-              <i class="bi bi-fire"></i>
-            </div>
-            <div class="stat-content">
-              <p class="stat-label">Current Streak</p>
-              <h3 class="stat-value">{{ currentStreak }} days</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-              <i class="bi bi-coin"></i>
-            </div>
-            <div class="stat-content">
-              <p class="stat-label">Total Points</p>
-              <h3 class="stat-value">{{ totalPoints }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-              <i class="bi bi-check2-square"></i>
-            </div>
-            <div class="stat-content">
-              <p class="stat-label">Habits Active</p>
-              <h3 class="stat-value">{{ activeHabitsCount }}</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-              <i class="bi bi-heart"></i>
-            </div>
-            <div class="stat-content">
-              <p class="stat-label">Fish Owned</p>
-              <h3 class="stat-value">{{ fishCount }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      <StatCard :currentStreak="currentStreak" :totalPoints="totalPoints" :activeHabitsCount="activeHabitsCount" :fishCount="fishCount"/>
       <div class="row g-4">
         <!-- Today's Habits -->
-        <div class="col-lg-8">
-          <div class="dashboard-card">
-            <div class="card-header">
-              <h4>Today's Habits</h4>
-              <router-link to="/habits" class="btn btn-sm btn-outline-primary">
-                View All
-              </router-link>
-            </div>
-            <div class="card-body">
-              <div v-if="todaysHabits.length > 0" class="habits-list">
-                <div 
-                  v-for="habit in todaysHabits" 
-                  :key="habit.id"
-                  class="habit-item"
-                >
-                  <div class="habit-info">
-                    <div class="habit-check">
-                      <input 
-                        type="checkbox"
-                        :id="'habit-' + habit.id"
-                        :checked="habit.completedToday"
-                        @change="completeHabit(habit.id)"
-                        class="form-check-input"
-                      >
-                    </div>
-                    <div>
-                      <h6 class="mb-1">{{ habit.name }}</h6>
-                      <small class="text-muted">{{ habit.description }}</small>
-                    </div>
-                  </div>
-                  <div class="habit-streak">
-                    <i class="bi bi-fire"></i> {{ habit.currentStreak || 0 }}
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-center py-5">
-                <p class="text-muted">No habits for today!</p>
-                <router-link to="/habits" class="btn btn-primary">
-                  Add Your First Habit
-                </router-link>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <HabitDisplay :todaysHabits="todaysHabits"  />
         <!-- Fish Tank Preview -->
         <div class="col-lg-4">
           <div class="dashboard-card">
@@ -113,7 +18,7 @@
               <h4>Your Fish Tank</h4>
               <router-link to="/pets" class="btn btn-sm btn-outline-primary">
                 Visit Tank
-              </router-link>
+              </router-link> 
             </div>
             <div class="card-body">
               <div class="mini-tank">
@@ -143,12 +48,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted,watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
 import { useHabitStore } from '../stores/habitStore'
+import WelcomeSection from '../components/DashboardView/WelcomeSection.vue'
+import StatCard from '../components/DashboardView/StatCard.vue'
+import HabitDisplay from '../components/DashboardView/HabitDisplay.vue'
+
+
+
 
 const userStore = useUserStore()
 const habitStore = useHabitStore()
+
+//Fetch user habits
+watch(//Added this watch function to allow habits to load without needing to switch pages
+  () => userStore.currentUserId,
+  (uid) => {
+    if (uid) habitStore.fetchHabits(uid)
+  },
+  { immediate: true } 
+)
 
 // Computed properties
 const username = computed(() => userStore.userProfile?.username || 'Friend')
@@ -192,20 +112,21 @@ async function completeHabit(habitId) {
   }
 }
 
-onMounted(async () => {
-  // Set random motivational quote
-  motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
-  
-  // Fetch user's habits
-  await habitStore.fetchHabits()
-  
-  // TODO: Fetch user's fish when fishStore is implemented
-  // For now, using mock data
-  fish.value = [
-    { id: 1, name: 'Bubbles', species: 'goldfish', health: 85, level: 3 },
-    { id: 2, name: 'Nemo', species: 'tropical', health: 92, level: 2 }
-  ]
-})
+  onMounted(() => {
+    // Set random motivational quote
+    motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
+    
+    // Fetch user's habits
+   
+    
+    
+    // TODO: Fetch user's fish when fishStore is implemented
+    // For now, using mock data
+    fish.value = [
+      { id: 1, name: 'Bubbles', species: 'goldfish', health: 85, level: 3 },
+      { id: 2, name: 'Nemo', species: 'tropical', health: 92, level: 2 }
+    ]
+  })
 </script>
 
 <style scoped>

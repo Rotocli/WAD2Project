@@ -27,6 +27,7 @@ export const useHabitStore = defineStore('habit', () => {
     habits.value.filter(h => h.isActive)
   )
 
+
   const habitsByFrequency = computed(() => {
     const grouped = {
       daily: [],
@@ -45,9 +46,33 @@ export const useHabitStore = defineStore('habit', () => {
 
   const todaysHabits = computed(() => {
     const today = new Date().getDay()
+    const todayDate=new Date()
     return habits.value.filter(habit => {
+        
+      if (habit.repeat===false){
+        if (!habit.lastCompleted){
+          return true
+        }
+      }
       if (habit.frequency === 'daily') return true
       if (habit.frequency === 'weekly' && habit.daysOfWeek?.includes(today)) return true
+      if (habit.frequency==='custom'){
+        const createdAtDate = habit.createdAt.seconds 
+        ? new Date(habit.createdAt.seconds * 1000)
+        : new Date(habit.createdAt)
+
+        // Calculate number of days since creation
+        const diffTime = todayDate - createdAtDate
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+        // Check if today is a multiple of customFrequency
+        if (diffDays % habit.customFrequency === 0) return true
+
+
+
+
+      }
+      
       return false
     })
   })
