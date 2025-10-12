@@ -126,14 +126,18 @@ export const useUserStore = defineStore('user', () => {
 
   // Initialize auth listener
   function initAuthListener() {
+    console.log("🔐 userStore: Initializing auth listener...")
     onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log("🔐 userStore: Auth state changed:", firebaseUser ? firebaseUser.uid : "No user")
       user.value = firebaseUser
       if (firebaseUser) {
         await fetchUserProfile(firebaseUser.uid)
+        console.log("✅ userStore: User profile loaded for", firebaseUser.uid)
         const { useHabitStore } = await import('./habitStore.js')
         const habitStore = useHabitStore()
 
       
+        console.log("✅ userStore: Habits loaded")
         await habitStore.fetchHabits()
       } else {
         userProfile.value = null
@@ -141,16 +145,6 @@ export const useUserStore = defineStore('user', () => {
       loading.value = false
     })
   }
-  // TEMPORARY: Mock user for development
-  user.value = { uid: 'mock-user-123', email: 'test@example.com' }
-  userProfile.value = {
-    username: 'TestUser',
-    totalPoints: 250,
-    currentStreak: 5,
-    longestStreak: 15,
-    email: 'test@example.com'
-  }
-  loading.value = false
 
   return {
     // State

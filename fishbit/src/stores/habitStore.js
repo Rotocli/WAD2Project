@@ -131,6 +131,27 @@ export const useHabitStore = defineStore('habit', () => {
         id: docRef.id,
         ...newHabit
       })
+      
+    // AUTO-CREATE FISH FOR THIS HABIT
+      try {
+        const { useFishStore } = await import('./fishStore')
+        const fishStore = useFishStore()
+        
+        // Choose a random fish species for variety
+        const species = ['clownfish', 'blueTang', 'yellowTang', 'angelfish', 'neonTetra', 'goldfish', 'betta', 'guppy']
+        const randomSpecies = species[Math.floor(Math.random() * species.length)]
+        
+        await fishStore.createFish({
+          habitId: docRef.id,
+          habitName: habitData.name,
+          species: randomSpecies
+        })
+        
+        console.log('✅ Fish auto-created for new habit:', habitData.name)
+      } catch (fishErr) {
+        // Don't fail habit creation if fish creation fails
+        console.warn('⚠️ Could not create fish for habit:', fishErr)
+      }
 
       return docRef.id
     } catch (err) {
