@@ -28,6 +28,11 @@
             </router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/calendar">
+              <i class="bi bi-calendar"></i> Calendar
+            </router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" to="/pets">
               <i class="bi bi-heart"></i> Pets
             </router-link>

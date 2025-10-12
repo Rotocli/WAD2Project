@@ -5,6 +5,7 @@ import { useUserStore } from '../stores/userStore'
 const HomeView = () => import('../views/HomeView.vue')
 const DashboardView = () => import('../views/DashboardView.vue')
 const HabitsView = () => import('../views/HabitsView.vue')
+const CalendarView = () => import('../views/CalendarView.vue')
 const PetsView = () => import('../views/PetsView.vue')
 const ShopView = () => import('../views/ShopView.vue')
 const FriendsView = () => import('../views/FriendsView.vue')
@@ -36,6 +37,12 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: DashboardView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: CalendarView,
     meta: { requiresAuth: true }
   },
   {
