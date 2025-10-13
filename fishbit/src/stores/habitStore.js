@@ -21,6 +21,7 @@ export const useHabitStore = defineStore('habit', () => {
   const loading = ref(false)
   const error = ref(null)
   const selectedHabit = ref(null)
+  const progress = ref([]) // ← store all progress entries
 
   // Computed
   const activeHabits = computed(() => 
@@ -295,6 +296,13 @@ export const useHabitStore = defineStore('habit', () => {
         pointsEarned: 10
       })
 
+        addProgressEntry({
+        habitId,
+        userId: userStore.currentUserId,
+        date: today,
+        completed: true
+      })
+
       // Update habit stats
       const newStreak = calculateStreak(habit)
       await updateHabit(habitId, {
@@ -339,6 +347,24 @@ export const useHabitStore = defineStore('habit', () => {
     }
   }
 
+    async function fetchProgress(userId) {
+    if (!userId) return
+    try {
+      const q = query(collection(db, 'progress'), where('userId', '==', userId))
+      const snapshot = await getDocs(q)
+      progress.value = snapshot.docs.map(doc => doc.data())
+      console.log('✅ Progress fetched:', progress.value.length)
+    } catch (err) {
+      console.error('Error fetching progress:', err)
+    }
+  }
+
+  function addProgressEntry(entry) {
+    // simple local update to reflect completion immediately
+    progress.value.push(entry)
+  }
+
+
   return {
     // State
     habits,
@@ -359,6 +385,12 @@ export const useHabitStore = defineStore('habit', () => {
     deleteHabit,
     archiveHabit,
     unarchiveHabit,
-    completeHabit
+    completeHabit,
+
+    //progress
+    progress,
+    fetchProgress,
+    addProgressEntry
   }
 })
+
