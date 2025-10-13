@@ -7,7 +7,7 @@ const HomeView = () => import('../views/HomeView.vue')
 const DashboardView = () => import('../views/DashboardView.vue')
 const HabitsView = () => import('../views/HabitsView.vue')
 const CalendarView = () => import('../views/CalendarView.vue')
-const PetsView = () => import('../views/PetsView.vue')
+const FishtankView = () => import('../views/FishtankView.vue')
 const ShopView = () => import('../views/ShopView.vue')
 const FriendsView = () => import('../views/FriendsView.vue')
 const ProfileView = () => import('../views/ProfileView.vue')
@@ -53,9 +53,9 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/pets',
-    name: 'pets',
-    component: PetsView,
+    path: '/fishtank',
+    name: 'fishtank',
+    component: FishtankView,
     meta: { requiresAuth: true }
   },
   {

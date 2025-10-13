@@ -33,8 +33,8 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/pets">
-              <i class="bi bi-heart"></i> Pets
+            <router-link class="nav-link" to="/fishtank">
+              <i class="bi bi-heart"></i> Fishtank
             </router-link>
           </li>
           <li class="nav-item">
