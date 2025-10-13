@@ -274,6 +274,7 @@ export const useHabitStore = defineStore('habit', () => {
     if (!habit) return
 
     const today = new Date().toISOString().split('T')[0]
+    console.log(today)
     
     try {
       // Check if already completed today
@@ -338,6 +339,69 @@ export const useHabitStore = defineStore('habit', () => {
       return 1
     }
   }
+  async function getCompleted() {
+    const userStore = useUserStore()
+    if (!userStore.currentUserId) return
+
+    loading.value = true
+    error.value = null
+    const today = new Date().toISOString().split('T')[0]; 
+    console.log(userStore.currentUserId)
+    console.log(today)
+    console.log("hello3")
+
+    const q = query(
+        collection(db, 'progress'),
+        where('userId', '==', userStore.currentUserId),
+        where('completed','==',true)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+        console.log('No documents found for today:', today);}
+    console.log(querySnapshot.docs)
+    console.log("hello2 ")
+
+    // Filter only today's completed tasks
+    const todaysCompleted = querySnapshot.docs
+        .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
+        .filter(progress => {
+            // Since your date is stored as string "2025-10-13"
+            return progress.date == today;
+        });
+    console.log(todaysCompleted)
+    console.log("hello4")
+
+    return todaysCompleted; // array of completed tasks
+  }
+ async function undoHabit(habitId) {
+  const userStore = useUserStore();
+  if (!userStore.currentUserId) return;
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const progressRef = doc(db, 'progress', `${habitId}_${today}`);
+
+    const progressDoc = await getDoc(progressRef);
+    if (!progressDoc.exists()) {
+      console.log('No progress record found for today');
+      return;
+    }
+
+    // Update the 'completed' field to false
+    await updateDoc(progressRef, { completed: false });
+
+    console.log('Habit marked as undone for today!');
+  } catch (err) {
+    console.error('Error undoing habit:', err);
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+}
 
   return {
     // State
@@ -359,6 +423,8 @@ export const useHabitStore = defineStore('habit', () => {
     deleteHabit,
     archiveHabit,
     unarchiveHabit,
-    completeHabit
+    completeHabit,
+    getCompleted,
+    undoHabit
   }
 })

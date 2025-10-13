@@ -9,7 +9,7 @@
             </div>
             <div class="card-body">
               <div v-if="todaysHabits.length > 0" class="habits-list">
-                <div 
+                <div
                   v-for="habit in todaysHabits" 
                   :key="habit.id"
                   class="habit-item"
@@ -17,10 +17,12 @@
                   <div class="habit-info">
                     <div class="habit-check">
                       <input 
+                        
+          
                         type="checkbox"
                         :id="'habit-' + habit.id"
-                        :checked="habit.completedToday"
-                        @change="completeHabit(habit.id)"
+                        :checked="completedHabits.has(habit.id)"
+                        @change="toggleHabit(habit.id)"
                         class="form-check-input"
                       >
                     </div>
@@ -46,24 +48,70 @@
   
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '../../stores/userStore'
 import { useHabitStore } from '../../stores/habitStore'
+
 const userStore = useUserStore()
 const habitStore = useHabitStore()
+const completedHabits = ref(new Set())
+const loading = ref(false)
+const error = ref(null)
 
-export default {
-    props:['todaysHabits'],
-    methods: {
-        async completeHabit(habitId) {
-            try {
-            await habitStore.completeHabit(habitId)
-            // Show success message or animation
-            } catch (error) {
-            console.error('Error completing habit:', error)
-            }
-        }
-}}
+const props = defineProps({
+  todaysHabits: Array
+})
+
+async function toggleHabit(habitId) {
+  try {
+    if (completedHabits.value.has(habitId)) {
+      // Undo completion
+      completedHabits.value.delete(habitId)
+      await habitStore.undoHabit(habitId)
+      console.log('Habit undone:', habitId)
+    } else {
+      // Complete habit
+      completedHabits.value.add(habitId)
+      await habitStore.completeHabit(habitId)
+      console.log('Habit completed:', habitId)
+    }
+  } catch (err) {
+    console.error('Error toggling habit:', err)
+    error.value = err
+  }
+}
+
+const completeHabit = async (habitId) => {
+  try {
+    await habitStore.completeHabit(habitId)
+    await fetchComplete() // Refresh the completed list
+  } catch (err) {
+    console.error('Error completing habit:', err)
+    error.value = err
+  }
+}
+
+const fetchComplete = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    const completedArray = await habitStore.getCompleted()
+    completedHabits.value = new Set(completedArray.map(p => p.habitId))
+    console.log('Completed habits:', completedHabits.value)
+  } catch (err) {
+    console.error('Error fetching completed habits:', err)
+    error.value = err
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchComplete()
+  console.log('Initial completedHabits:', completedHabits.value) // This will show empty
+  // But in template it will update reactively when data loads!
+})
 </script>
 
 <style scoped>
