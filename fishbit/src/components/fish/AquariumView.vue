@@ -8,15 +8,19 @@
     <!-- Water Surface Effect -->
     <div class="water-surface"></div>
 
-    <!-- Background Layer (Decorations at back) -->
+    <!-- Background Layer (Fish and decorations at back) -->
     <div class="layer layer-back">
+      <FishSprite
+        v-for="fish in backLayerFish"
+        :key="fish.id"
+        :fish="fish"
+      />
       <DecorationSprite
         v-for="decoration in backDecorations"
         :key="decoration.id"
         :decoration="decoration"
       />
     </div>
-
     <!-- Mid Layer (Some fish) -->
     <div class="layer layer-mid">
       <FishSprite
@@ -102,9 +106,15 @@ const substrateStyle = computed(() => ({
 }))
 
 // Separate fish by layer for depth effect
-const backLayerFish = computed(() => 
-  fishStore.activeFish.filter(f => f.position.layer === 0)
-)
+// const backLayerFish = computed(() => 
+//   fishStore.activeFish.filter(f => f.position.layer === 0)
+// )
+
+const backLayerFish = computed(() => {
+  const filtered = fishStore.activeFish.filter(f => f.position.layer === 0)
+  console.log('🎯 backLayerFish computed:', filtered.map(f => f.customName))
+  return filtered
+})
 
 const midLayerFish = computed(() => 
   fishStore.activeFish.filter(f => f.position.layer === 1)
@@ -162,6 +172,12 @@ async function loadAquariumData() {
     ])
     
     console.log('✅ AquariumView: Data loaded. Fish count:', fishStore.fish.length, 'Active fish:', fishStore.activeFish.length)
+    console.log('🎨 Layer distribution:', {
+      back: fishStore.activeFish.filter(f => f.position.layer === 0).map(f => f.customName),
+      mid: fishStore.activeFish.filter(f => f.position.layer === 1).map(f => f.customName),
+      front: fishStore.activeFish.filter(f => f.position.layer === 2).map(f => f.customName),
+      other: fishStore.activeFish.filter(f => ![0,1,2].includes(f.position.layer)).map(f => ({name: f.customName, layer: f.position.layer}))
+    })
     createBubbles()
   } catch (error) {
     console.error('❌ AquariumView: Error loading aquarium:', error)

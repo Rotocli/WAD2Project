@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
 
 // Lazy load views for better performance
@@ -89,8 +90,20 @@ const router = createRouter({
 })
 
 // Navigation guard for protected routes
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+  
+  // Wait for auth to initialize if still loading
+  if (userStore.loading) {
+    await new Promise(resolve => {
+      const unwatch = watch(() => userStore.loading, (isLoading) => {
+        if (!isLoading) {
+          unwatch()
+          resolve()
+        }
+      })
+    })
+  }
   
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
     next('/login')

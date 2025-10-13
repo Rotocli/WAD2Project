@@ -81,6 +81,14 @@ watch(
   { immediate: true } 
 )
 
+watch(
+  () => userStore.currentUserId,
+  (uid) => {
+    if (uid) fishStore.fetchFish(uid)
+  },
+  { immediate: true }
+)
+
 // Computed properties
 const username = computed(() => userStore.userProfile?.username || 'Friend')
 const currentStreak = computed(() => userStore.currentStreak)

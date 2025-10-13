@@ -24,9 +24,12 @@ export const useHabitStore = defineStore('habit', () => {
 
   // Computed
   const activeHabits = computed(() => 
-    habits.value.filter(h => h.isActive)
+    habits.value.filter(h => h.isActive && !h.isArchived)
   )
 
+  const archivedHabits = computed(() =>
+    habits.value.filter(h => h.isArchived)
+  )
 
   const habitsByFrequency = computed(() => {
     const grouped = {
@@ -48,6 +51,8 @@ export const useHabitStore = defineStore('habit', () => {
     const today = new Date().getDay()
     const todayDate=new Date()
     return habits.value.filter(habit => {
+      // Don't show archived habits
+      if (habit.isArchived) return false
         
       if (habit.repeat===false){
         if (!habit.lastCompleted){
@@ -67,10 +72,6 @@ export const useHabitStore = defineStore('habit', () => {
 
         // Check if today is a multiple of customFrequency
         if (diffDays % habit.customFrequency === 0) return true
-
-
-
-
       }
       
       return false
@@ -118,6 +119,7 @@ export const useHabitStore = defineStore('habit', () => {
         userId: userStore.currentUserId,
         createdAt: new Date(),
         isActive: true,
+        isArchived: false,
         currentStreak: 0,
         bestStreak: 0,
         completedCount: 0,
@@ -148,6 +150,9 @@ export const useHabitStore = defineStore('habit', () => {
         })
         
         console.log('✅ Fish auto-created for new habit:', habitData.name)
+        
+        // Force refresh fish list to ensure UI updates immediately
+        await fishStore.fetchFish(userStore.currentUserId)
       } catch (fishErr) {
         // Don't fail habit creation if fish creation fails
         console.warn('⚠️ Could not create fish for habit:', fishErr)
@@ -186,8 +191,75 @@ export const useHabitStore = defineStore('habit', () => {
     error.value = null
 
     try {
+      // Delete from Firestore
       await deleteDoc(doc(db, 'habits', habitId))
+      
+      // Also delete associated fish
+      try {
+        const { useFishStore } = await import('./fishStore')
+        const fishStore = useFishStore()
+        const associatedFish = fishStore.fish.filter(f => f.habitId === habitId)
+        
+        for (const fish of associatedFish) {
+          await fishStore.deleteFish(fish.id)
+        }
+        console.log('✅ Deleted associated fish for habit:', habitId)
+      } catch (fishErr) {
+        console.warn('⚠️ Could not delete associated fish:', fishErr)
+      }
+      
+      // Remove from local state
       habits.value = habits.value.filter(h => h.id !== habitId)
+    } catch (err) {
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function archiveHabit(habitId) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await updateDoc(doc(db, 'habits', habitId), {
+        isArchived: true,
+        archivedAt: new Date()
+      })
+      
+      const index = habits.value.findIndex(h => h.id === habitId)
+      if (index !== -1) {
+        habits.value[index].isArchived = true
+        habits.value[index].archivedAt = new Date()
+      }
+      
+      console.log('✅ Habit archived:', habitId)
+    } catch (err) {
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function unarchiveHabit(habitId) {
+    loading.value = true
+    error.value = null
+
+    try {
+      await updateDoc(doc(db, 'habits', habitId), {
+        isArchived: false,
+        archivedAt: null
+      })
+      
+      const index = habits.value.findIndex(h => h.id === habitId)
+      if (index !== -1) {
+        habits.value[index].isArchived = false
+        habits.value[index].archivedAt = null
+      }
+      
+      console.log('✅ Habit unarchived:', habitId)
     } catch (err) {
       error.value = err.message
       throw err
@@ -276,6 +348,7 @@ export const useHabitStore = defineStore('habit', () => {
     
     // Computed
     activeHabits,
+    archivedHabits,
     habitsByFrequency,
     todaysHabits,
     
@@ -284,6 +357,8 @@ export const useHabitStore = defineStore('habit', () => {
     createHabit,
     updateHabit,
     deleteHabit,
+    archiveHabit,
+    unarchiveHabit,
     completeHabit
   }
 })
