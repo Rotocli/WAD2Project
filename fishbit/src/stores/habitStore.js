@@ -348,7 +348,7 @@ export const useHabitStore = defineStore('habit', () => {
     const today = new Date().toISOString().split('T')[0]; 
     console.log(userStore.currentUserId)
     console.log(today)
-    console.log("hello3")
+    
 
     const q = query(
         collection(db, 'progress'),
@@ -359,8 +359,7 @@ export const useHabitStore = defineStore('habit', () => {
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
         console.log('No documents found for today:', today);}
-    console.log(querySnapshot.docs)
-    console.log("hello2 ")
+    
 
     // Filter only today's completed tasks
     const todaysCompleted = querySnapshot.docs
@@ -369,8 +368,7 @@ export const useHabitStore = defineStore('habit', () => {
             // Since your date is stored as string "2025-10-13"
             return progress.date == today;
         });
-    console.log(todaysCompleted)
-    console.log("hello4")
+    
 
     return todaysCompleted; // array of completed tasks
   }
