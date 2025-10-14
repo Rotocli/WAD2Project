@@ -452,7 +452,7 @@ export const useHabitStore = defineStore('habit', () => {
     //progress
     progress,
     fetchProgress,
-    addProgressEntry
+    addProgressEntry,
     getCompleted,
     undoHabit
   }
