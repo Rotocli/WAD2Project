@@ -71,3 +71,9 @@ body {
     margin-bottom: 1rem;
   }
 }
+
+.calendar-view {
+  background: #fff; /* white background */
+  min-height: 100vh; /* ensures it fills the screen */
+  padding: 20px;
+}
