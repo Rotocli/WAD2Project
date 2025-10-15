@@ -52,20 +52,25 @@ export const useHabitStore = defineStore('habit', () => {
     const today = new Date().getDay()
     const todayDate=new Date()
     return habits.value.filter(habit => {
+      const createdAtDate = habit.createdAt.seconds 
+        ? new Date(habit.createdAt.seconds * 1000)
+        : new Date(habit.createdAt)
+
       // Don't show archived habits
       if (habit.isArchived) return false
         
       if (habit.repeat===false){
-        if (!habit.lastCompleted){
-          return true
-        }
+        const isSameDay =
+          createdAtDate.getFullYear() === todayDate.getFullYear() &&
+          createdAtDate.getMonth() === todayDate.getMonth() &&
+          createdAtDate.getDate() === todayDate.getDate();
+        return isSameDay
       }
+      else{
       if (habit.frequency === 'daily') return true
       if (habit.frequency === 'weekly' && habit.daysOfWeek?.includes(today)) return true
       if (habit.frequency==='custom'){
-        const createdAtDate = habit.createdAt.seconds 
-        ? new Date(habit.createdAt.seconds * 1000)
-        : new Date(habit.createdAt)
+        
 
         // Calculate number of days since creation
         const diffTime = todayDate - createdAtDate
@@ -76,7 +81,7 @@ export const useHabitStore = defineStore('habit', () => {
       }
       
       return false
-    })
+    }})
   })
 
   // Actions
@@ -283,6 +288,9 @@ export const useHabitStore = defineStore('habit', () => {
       )
       
       if (progressDoc.exists()) {
+        const progressRef = doc(db, 'progress', `${habitId}_${today}`);
+        await updateDoc(progressRef, { completed: true });
+        console.log(habitId)
         throw new Error('Habit already completed today!')
       }
 
@@ -311,6 +319,7 @@ export const useHabitStore = defineStore('habit', () => {
         bestStreak: Math.max(newStreak, habit.bestStreak || 0),
         completedCount: (habit.completedCount || 0) + 1
       })
+      
 
       // Award points
       await userStore.updatePoints(10)
@@ -364,6 +373,70 @@ export const useHabitStore = defineStore('habit', () => {
     progress.value.push(entry)
   }
 
+  async function getCompleted() {
+    const userStore = useUserStore()
+    if (!userStore.currentUserId) return
+
+    loading.value = true
+    error.value = null
+    const today = new Date().toISOString().split('T')[0]; 
+    console.log(userStore.currentUserId)
+    console.log(today)
+    
+
+    const q = query(
+        collection(db, 'progress'),
+        where('userId', '==', userStore.currentUserId),
+        where('completed','==',true)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+        console.log('No documents found for today:', today);}
+    console.log(querySnapshot.docs)
+    
+
+    // Filter only today's completed tasks
+    const todaysCompleted = querySnapshot.docs
+        .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
+        .filter(progress => {
+            // Since your date is stored as string "2025-10-13"
+            return progress.date == today;
+        });
+    console.log(todaysCompleted)
+    
+
+    return todaysCompleted; // array of completed tasks
+  }
+ async function undoHabit(habitId) {
+  const userStore = useUserStore();
+  if (!userStore.currentUserId) return;
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const progressRef = doc(db, 'progress', `${habitId}_${today}`);
+
+    const progressDoc = await getDoc(progressRef);
+    if (!progressDoc.exists()) {
+      console.log('No progress record found for today');
+      return;
+    }
+
+    // Update the 'completed' field to false
+    await updateDoc(progressRef, { completed: false });
+
+    console.log('Habit marked as undone for today!');
+  } catch (err) {
+    console.error('Error undoing habit:', err);
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+}
+
 
   return {
     // State
@@ -371,6 +444,7 @@ export const useHabitStore = defineStore('habit', () => {
     loading,
     error,
     selectedHabit,
+    progress,
     
     // Computed
     activeHabits,
@@ -386,9 +460,12 @@ export const useHabitStore = defineStore('habit', () => {
     archiveHabit,
     unarchiveHabit,
     completeHabit,
+    getCompleted,
+    undoHabit,
+    
 
     //progress
-    progress,
+    
     fetchProgress,
     addProgressEntry
   }

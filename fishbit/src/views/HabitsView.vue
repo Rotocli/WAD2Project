@@ -187,7 +187,7 @@ const newHabit = ref({
   name: '',
   frequency: 'daily',
   customFrequency: null,
-  repeat: true,
+  repeat: false,
   description: ''
 })
 
@@ -207,7 +207,7 @@ async function handleCreate() {
       name: '',
       frequency: 'daily',
       customFrequency: null,
-      repeat: true,
+      repeat: false,
       description: ''
     }
   } catch (err) {
