@@ -9,6 +9,7 @@ import {
 import { db } from '../services/firebase'
 import { useUserStore } from './userStore'
 
+
 export const useAquariumStore = defineStore('aquarium', () => {
   // State
   const settings = ref({
@@ -16,6 +17,8 @@ export const useAquariumStore = defineStore('aquarium', () => {
     lighting: 'bright',
     decorations: []
   })
+  // Grid always 12 cells - sync with decorations
+  const grid = ref(Array.from({ length: 12 }, () => ({})))
   const loading = ref(false)
   const error = ref(null)
 
@@ -91,6 +94,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     seaweed: {
       name: 'Seaweed',
       category: 'plant',
+      icon: '🌿',
       size: { width: 30, height: 120 },
       cost: 50,
       effect: 'oxygen' // For future health mechanics
@@ -98,6 +102,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     coral: {
       name: 'Coral',
       category: 'plant',
+      icon: '🪸',
       size: { width: 60, height: 70 },
       cost: 150,
       effect: 'hiding'
@@ -105,6 +110,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     kelp: {
       name: 'Kelp',
       category: 'plant',
+      icon:  '🍃',
       size: { width: 25, height: 150 },
       cost: 75,
       effect: 'oxygen'
@@ -114,6 +120,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     rock: {
       name: 'Rock',
       category: 'structure',
+      icon:  '🪨',
       size: { width: 80, height: 60 },
       cost: 100,
       effect: 'hiding'
@@ -121,6 +128,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     castle: {
       name: 'Castle',
       category: 'structure',
+      icon:  '🏰',
       size: { width: 100, height: 120 },
       cost: 300,
       effect: 'hiding'
@@ -128,6 +136,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     treasure: {
       name: 'Treasure Chest',
       category: 'structure',
+      icon:  '💰',
       size: { width: 70, height: 50 },
       cost: 200,
       effect: 'decoration'
@@ -137,6 +146,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     bubbler: {
       name: 'Bubble Stone',
       category: 'special',
+      icon:  '💧',
       size: { width: 40, height: 30 },
       cost: 100,
       effect: 'oxygen'
@@ -144,6 +154,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     shipwreck: {
       name: 'Shipwreck',
       category: 'structure',
+      icon:  '🚢',
       size: { width: 150, height: 100 },
       cost: 400,
       effect: 'hiding'
@@ -190,6 +201,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
         await setDoc(docRef, defaultSettings)
         settings.value = defaultSettings
       }
+      loadGridFromDecorations()
     } catch (err) {
       error.value = err.message
       console.error('Error fetching aquarium settings:', err)
@@ -238,84 +250,51 @@ export const useAquariumStore = defineStore('aquarium', () => {
     }
   }
 
-  async function addDecoration(decoration) {
-    const userStore = useUserStore()
-    const userId = userStore.currentUserId
-    if (!userId) throw new Error('User not authenticated')
-
-    loading.value = true
-    error.value = null
-
-    try {
-      const newDecoration = {
-        id: Date.now().toString(),
-        type: decoration.type,
-        x: decoration.x || 50, // Position as percentage
-        y: decoration.y || 80,
-        ...decoration
-      }
-
-      const updatedDecorations = [...settings.value.decorations, newDecoration]
-      
-      const docRef = doc(db, 'aquariumSettings', userId)
-      await updateDoc(docRef, { decorations: updatedDecorations })
-      settings.value.decorations = updatedDecorations
-      
-      return newDecoration.id
-    } catch (err) {
-      error.value = err.message
-      throw err
-    } finally {
-      loading.value = false
+  // Fill grid from decorations list
+  function loadGridFromDecorations() {
+    for (let i = 0; i < 12; i++) {
+      grid.value[i] = settings.value.decorations[i] ? { decoration: settings.value.decorations[i] } : {}
     }
   }
 
-  async function updateDecorationPosition(decorationId, x, y) {
-    const userStore = useUserStore()
-    const userId = userStore.currentUserId
-    if (!userId) throw new Error('User not authenticated')
+  // Sync grid cells to decorations list (strip cells without decorations)
+  function syncGridToDecorations() {
+    settings.value.decorations = grid.value.map(cell => cell.decoration).filter(Boolean)
+  }
 
+  async function updateGridCell(idx, decoration) {
     try {
-      const updatedDecorations = settings.value.decorations.map(dec => 
-        dec.id === decorationId ? { ...dec, x, y } : dec
-      )
-      
+      grid.value[idx].decoration = decoration
+      syncGridToDecorations()
+      const userStore = useUserStore()
+      const userId = userStore.currentUserId
       const docRef = doc(db, 'aquariumSettings', userId)
-      await updateDoc(docRef, { decorations: updatedDecorations })
-      settings.value.decorations = updatedDecorations
-    } catch (err) {
+      await updateDoc(docRef, { decorations: settings.value.decorations })
+    } catch(err) {
       error.value = err.message
       throw err
     }
   }
-
-  async function removeDecoration(decorationId) {
-    const userStore = useUserStore()
-    const userId = userStore.currentUserId
-    if (!userId) throw new Error('User not authenticated')
-
-    loading.value = true
-    error.value = null
-
+  
+  // Remove decoration similarly
+  async function removeDecoration(idx) {
     try {
-      const updatedDecorations = settings.value.decorations.filter(
-        dec => dec.id !== decorationId
-      )
-      
+      grid.value[idx].decoration = undefined
+      syncGridToDecorations()
+      const userStore = useUserStore()
+      const userId = userStore.currentUserId
       const docRef = doc(db, 'aquariumSettings', userId)
-      await updateDoc(docRef, { decorations: updatedDecorations })
-      settings.value.decorations = updatedDecorations
-    } catch (err) {
+      await updateDoc(docRef, { decorations: settings.value.decorations })
+    } catch(err) {
       error.value = err.message
       throw err
-    } finally {
-      loading.value = false
     }
   }
 
   return {
     // State
     settings,
+    grid,
     loading,
     error,
     
@@ -333,8 +312,9 @@ export const useAquariumStore = defineStore('aquarium', () => {
     fetchSettings,
     updateSubstrate,
     updateLighting,
-    addDecoration,
-    updateDecorationPosition,
+    updateGridCell,
+    loadGridFromDecorations,
+    syncGridToDecorations,
     removeDecoration
   }
 })
