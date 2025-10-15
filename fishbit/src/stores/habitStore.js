@@ -319,6 +319,42 @@ export const useHabitStore = defineStore('habit', () => {
         bestStreak: Math.max(newStreak, habit.bestStreak || 0),
         completedCount: (habit.completedCount || 0) + 1
       })
+          const progressTodaySnapshot = await getDocs(
+      query(
+        collection(db, 'progress'),
+        where('userId', '==', userStore.currentUserId),
+        where('completed', '==', true),
+        where('date', '==', today)
+      )
+    )
+
+      let newUserStreak = 1
+      if (progressTodaySnapshot.size > 1) {
+        // Already completed another habit today; don't increment
+        newUserStreak = userStore.userProfile.currentStreak || 1
+      } else {
+        // Check if user completed any habit yesterday
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+        const progressYesterdaySnapshot = await getDocs(
+          query(
+            collection(db, 'progress'),
+            where('userId', '==', userStore.currentUserId),
+            where('completed', '==', true),
+            where('date', '==', yesterdayStr)
+          )
+        )
+
+        newUserStreak =
+          progressYesterdaySnapshot.size > 0
+            ? (userStore.userProfile.currentStreak || 0) + 1
+            : 1
+      }
+
+      // Update user profile streak
+      await userStore.updateStreak(newUserStreak)
       
 
       // Award points

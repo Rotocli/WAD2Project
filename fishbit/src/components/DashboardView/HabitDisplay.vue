@@ -13,28 +13,54 @@
                   v-for="habit in todaysHabits" 
                   :key="habit.id"
                   class="habit-item"
+                  @click="togglePopup(habit.id,$event)"
                 >
                   <div class="habit-info">
+                  
                     <div class="habit-check">
-                      <input 
-                        
-          
+                      <input
                         type="checkbox"
                         :id="'habit-' + habit.id"
                         :checked="completedHabits.has(habit.id)"
-                        @change="toggleHabit(habit.id)"
+                        @click.stop="toggleHabit(habit.id)"
                         class="form-check-input"
                       >
                     </div>
                     <div>
                       <h6 class="mb-1">{{ habit.name }}</h6>
-                      <small class="text-muted">{{ habit.description }}</small>
+                      <!-- <small class="text-muted">{{ habit.description }}</small> -->
                     </div>
                   </div>
                   <div class="habit-streak">
                     <i class="bi bi-fire"></i> {{ habit.currentStreak || 0 }}
                   </div>
+                  
+                  <PopupPanel 
+                    v-if="activeHabitId === habit.id"
+                    :habitId="habit.id" 
+                    :top="popupTop"
+                    :left="popupLeft"
+                    @undo="undoHabit"
+                    @viewMore="viewMoreHabit"
+                    @delete="deleteHabit"
+                    
+                    
+                    >
+                  </PopupPanel>
+                  <Teleport to="body"> 
+                    <fishModal
+                      v-if="modalId === habit.id"
+                      :habit="habit"
+                      :fishList="fishStore.getFishByHabitId(habit.id)"
+                      :fishSpecies="fishStore.fishSpecies"
+                      @close="modalId = null"
+                    />
+                  </Teleport>
+
+                 
+                  
                 </div>
+
               </div>
               <div v-else class="text-center py-5">
                 <p class="text-muted">No habits for today!</p>
@@ -52,16 +78,77 @@
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '../../stores/userStore'
 import { useHabitStore } from '../../stores/habitStore'
+import PopupPanel from '../common/PopupPanel.vue'
+import fishModal from '../common/fishModal.vue'
+import {useFishStore} from '../../stores/fishStore'
 
+
+const fishStore=useFishStore()
 const userStore = useUserStore()
 const habitStore = useHabitStore()
 const completedHabits = ref(new Set())
 const loading = ref(false)
 const error = ref(null)
+const activeHabitId = ref(null)  // keeps track of which habit’s popup is open
+const popupWidth=180
+const modalId=ref(null)
 
+const popupTop=ref(0)
+const popupLeft=ref(0)
 const props = defineProps({
   todaysHabits: Array
 })
+
+
+function openModal(habitId){
+  modalId.value=habitId
+
+
+}
+function closeModal() {
+  modalId.value = null
+}
+
+
+async function deleteHabit(habitId) {
+  if (confirm('Permanently delete this habit? This will also delete the associated fish.')) {
+    try {
+      await habitStore.deleteHabit(habitId)
+      activeHabitId.value = null
+    } catch (err) {
+      console.error('Error deleting habit:', err)
+    }
+  }
+}
+function viewMoreHabit(habitId){
+  console.log(habitId.description)
+  activeHabitId.value = null
+  openModal(habitId)
+}
+
+const undoHabit = async (habitId) => {
+  try {
+    await habitStore.undoHabit(habitId)
+    // update completedHabits if needed
+    completedHabits.value.delete(habitId)
+    activeHabitId.value = null
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+
+
+const togglePopup = (habitId, event) => {
+  if (activeHabitId.value === habitId) {
+    activeHabitId.value = null
+  } else {
+    activeHabitId.value = habitId
+    const rect = event.currentTarget.getBoundingClientRect()
+    popupTop.value = rect.bottom + window.scrollY
+    popupLeft.value = rect.right + window.scrollX - popupWidth
+  }
+}
 
 async function toggleHabit(habitId) {
   try {
@@ -85,7 +172,8 @@ async function toggleHabit(habitId) {
 const completeHabit = async (habitId) => {
   try {
     await habitStore.completeHabit(habitId)
-    await fetchComplete() // Refresh the completed list
+    await fetchComplete()
+    activeHabitId.value = null // Refresh the completed list
   } catch (err) {
     console.error('Error completing habit:', err)
     error.value = err
@@ -153,6 +241,8 @@ onMounted(() => {
   background: #f8f9fa;
   border-radius: 10px;
   transition: all 0.3s ease;
+  position:relative;
+ 
 }
 
 .habit-item:hover {
