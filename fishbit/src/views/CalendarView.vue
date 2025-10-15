@@ -65,6 +65,17 @@ function generateEventsFromHabits(habits, progress = []) {
       if (currentDate < createdAt) continue
 
       let shouldShow = false
+      if (!habit.repeat) {
+      // Only show on the creation day
+      const createdDayKey = createdAt.toISOString().split('T')[0]
+      const currentDayKey = currentDate.toISOString().split('T')[0]
+      if (createdDayKey === currentDayKey) shouldShow = true
+    } else{
+
+    
+
+
+
       switch (habit.frequency) {
         case 'daily':
           shouldShow = true
@@ -82,7 +93,7 @@ function generateEventsFromHabits(habits, progress = []) {
             shouldShow = true
           break
         }
-      }
+      }}
 
       if (shouldShow) {
         const dateKey = currentDate.toISOString().split('T')[0]
