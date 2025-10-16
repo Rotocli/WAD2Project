@@ -36,7 +36,7 @@
                     <i class="bi bi-plus-circle"></i>
                     <span>Add Habit</span>
                   </router-link>
-                  <router-link to="/pets" class="action-btn">
+                  <router-link to="/fishtank" class="action-btn">
                     <i class="bi bi-eye"></i>
                     <span>View All Fish</span>
                   </router-link>
@@ -44,10 +44,10 @@
                     <i class="bi bi-cart"></i>
                     <span>Shop Items</span>
                   </router-link>
-                  <button @click="customizeAquarium" class="action-btn">
+                  <router-link to="/fishtank" class="action-btn">
                     <i class="bi bi-palette"></i>
                     <span>Customize Tank</span>
-                  </button>
+                  </router-link>
                 </div>
               </div>
             </div>
