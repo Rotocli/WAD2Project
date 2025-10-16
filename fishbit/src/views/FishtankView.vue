@@ -2,6 +2,14 @@
   <div class="fishtank-view">
     <div class="container-fluid p-4">
       <h2>My Fishes</h2>
+      <div>
+        <div v-if="!fishStore.fish || fishStore.fish.length === 0" class="no-fish-msg">
+          <div class="no-fish-card">
+            <span class="no-fish-emoji">🐟</span>
+            <span class="no-fish-text">You do not have any fishes yet</span>
+          </div>
+        </div>
+        <div v-else>
       <div class="fish-list">
         <div v-for="(fish, idx) in fishStore.fish" :key="fish.id" class="fish-card">
           <div class="habit-title">
@@ -36,6 +44,9 @@
             <button class="btn btn-sm btn-outline-primary mt-2" @click="editFish(idx)">Edit</button>
           </div>
         </div>
+      </div>
+
+      </div>
       </div>
       <!-- Edit Fish Modal -->
       <div v-if="editIdx !== null" class="modal-mask">
@@ -336,4 +347,30 @@ async function handleDeleteDecoration(idx) {
   color: #fff;
   opacity: 1;
 }
+
+.no-fish-msg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0 1.5rem 0;
+}
+.no-fish-card {
+  background: #eef7fb;
+  border: 1px solid #c3e1f7;
+  border-radius: 14px;
+  padding: 1.3rem 2rem;
+  box-shadow: 0 2px 10px rgba(50,130,182,0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.no-fish-emoji {
+  font-size: 2.2rem;
+}
+.no-fish-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #49708a;
+}
+
 </style>
