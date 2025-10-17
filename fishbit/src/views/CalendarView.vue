@@ -372,4 +372,24 @@ watch(
   border-radius: 6px;
   font-weight: 600;
 }
+
+.vuecal__cell {
+  padding: 12px !important;
+  min-height: 100px !important;
+}
+
+.vuecal__event:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.vuecal__event {
+  margin: 4px !important;
+  padding: 12px 8px !important;
+  border-radius: 8px !important;
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 </style>
