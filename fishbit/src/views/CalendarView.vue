@@ -164,8 +164,10 @@ function generateEventsFromHabits(habits, progress = []) {
   const events = []
   const today = new Date()
   const startOfWeek = new Date(today)
-  startOfWeek.setDate(today.getDate() - today.getDay())
+  startOfWeek.setDate(today.getDate() - 365)
 
+  const DAYS_TO_GENERATE = 730
+  
   habits.forEach(habit => {
     if (!habit.isActive) return
 
