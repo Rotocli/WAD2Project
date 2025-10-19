@@ -152,7 +152,13 @@ export const useHabitStore = defineStore('habit', () => {
         await fishStore.createFish({
           habitId: docRef.id,
           habitName: habitData.name,
-          species: randomSpecies
+          species: randomSpecies,
+          decorations:{
+            head:'tophat',
+            eye: 'stareyes',
+            body: 'spots',
+            trail: 'fire'
+          }
         })
         
         console.log('✅ Fish auto-created for new habit:', habitData.name)

@@ -217,6 +217,7 @@ export const useFishStore = defineStore('fish', () => {
         createdAt: new Date(),
         isAlive: true,
         lastFed: new Date(),
+        decorations:fishData.decorations,
         
         // Customization properties
         baseColor: fishData.baseColor || speciesData.baseColor,

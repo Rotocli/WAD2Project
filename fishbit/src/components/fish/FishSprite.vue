@@ -16,6 +16,15 @@
       class="fish-svg"
       :class="{ 'flipped': currentDirection === 'left' }"
     >
+      <FishDecoration
+        v-if="decorations.trail"
+        type="trail"
+        :decoration="decorations.trail"
+        :x="10"
+        :y="30"
+        :time="time"
+        :fishColor="fish.baseColor"
+      />
       <!-- Body -->
       <ellipse 
         cx="40" 
@@ -24,6 +33,14 @@
         ry="18" 
         :fill="fish.baseColor"
         class="fish-body"
+      />
+      <FishDecoration
+      v-if="decorations.body"
+      type="body"
+      :decoration="decorations.body"
+      :x="40"
+      :y="30"
+      :fishColor="fish.baseColor"
       />
       
       <!-- Stripes/Pattern (if applicable) -->
@@ -35,6 +52,15 @@
       <!-- Eye (positioned for right-facing fish) -->
       <circle cx="55" cy="26" r="5" fill="white"/>
       <circle cx="55" cy="26" r="3" fill="#000"/>
+
+      <FishDecoration
+        v-if="decorations.eye"
+        type="eye"
+        :decoration="decorations.eye"
+        :x="decorations.eye.position?.x || 55"
+        :y="decorations.eye.position?.y || 26"
+        :time="time"
+      />
       
       <!-- Tail (at LEFT side for right-facing fish) -->
       <ellipse 
@@ -70,6 +96,14 @@
         :fill="fish.stripeColor"
         opacity="0.7"
       />
+      <FishDecoration
+        v-if="decorations.head"
+        type="head"
+        :decoration="decorations.head"
+        :x="decorations.head.position?.x || 55"
+        :y="decorations.head.position?.y || 5"
+        :time="time"
+      />
       
       <!-- Mouth (at RIGHT side for right-facing fish) -->
       <path 
@@ -97,6 +131,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { shouldPauseOnHover, getEdgeBoundaries, getBobbingSettings, getYBounds } from '../../config/fishBehavior'
+import FishDecoration from './FishDecoration.vue'
 
 const props = defineProps({
   fish: {
@@ -160,6 +195,53 @@ const healthColorClass = computed(() => {
   if (props.fish.health > 40) return 'health-medium'
   return 'health-low'
 })
+
+const decorations = computed(() => {
+  const deco = {
+    head: getDecoConfig('head', props.fish.decorations?.head),
+    eye: getDecoConfig('eye', props.fish.decorations?.eye),
+    body: getDecoConfig('body', props.fish.decorations?.body),
+    trail: getDecoConfig('trail', props.fish.decorations?.trail)
+  }
+  
+  // ADD THIS DEBUG LINE:
+  console.log('Trail config:', deco.trail, 'Fish decorations:', props.fish.decorations?.trail)
+  
+  return deco
+})
+
+// Helper function to get decoration configuration
+function getDecoConfig(slot, decoId) {
+  if (!decoId || decoId === 'none' || decoId === '') return null
+  
+  const decoData = {
+    head: {
+      crown: { svg: 'crown', color: '#FFD700', position: { x: 55, y: 12 } },
+      topHat: { svg: 'tophat', color: '#1a1a1a', position: { x: 55, y: 8 } },
+      bow: { svg: 'bow', color: '#FF69B4', position: { x: 55, y: 14 } }
+    },
+    eye: {
+      sunglasses: { svg: 'sunglasses', color: '#2a2a2a', position: { x: 55, y: 26 } },
+      monocle: { svg: 'monocle', color: '#D4AF37', position: { x: 55, y: 26 } },
+      starEyes: { svg: 'stareyes', color: '#FFD700', position: { x: 55, y: 26 } }
+    },
+    body: {
+      stripes: { svg: 'stripes', type: 'pattern' },
+      spots: { svg: 'spots', type: 'pattern' },
+      glitter: { svg: 'glitter', type: 'pattern', animate: true }
+    },
+    trail: {
+      rainbow: { 
+        svg: 'rainbow', 
+        colors: ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'] 
+      },
+      bubbles: { svg: 'bubbles', color: '#87CEEB', count: 5 },
+      fire: { svg: 'fire', colors: ['#FF4500', '#FF8C00', '#FFD700'] }
+    }
+  }
+  
+  return decoData[slot]?.[decoId] || null
+}
 
 // Animation loop
 function animate() {
