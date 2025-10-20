@@ -110,27 +110,41 @@ async function enableNotifications() {
   }
 }
 
-// NEW: Disable notifications
+// Disable notifications
 async function disableNotifications() {
-  if (confirm('Are you sure you want to disable notifications?')) {
-    try {
-      if (userStore.currentUserId) {
-        const { doc, updateDoc } = await import('firebase/firestore')
-        const { db } = await import('../services/firebase')
-        
-        // Remove token from Firestore
-        await updateDoc(doc(db, 'users', userStore.currentUserId), {
-          fcmToken: null
-        })
-        
-        fcmToken.value = null
-        console.log('✅ Notifications disabled')
-        alert('Notifications have been disabled')
-      }
-    } catch (error) {
-      console.error('Error disabling notifications:', error)
-      alert('Error disabling notifications')
+  if (!confirm('Are you sure you want to disable notifications?')) return;
+
+  try {
+    if (userStore.currentUserId) {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('../services/firebase')
+
+      await updateDoc(doc(db, 'users', userStore.currentUserId), {
+        fcmToken: null
+      })
+      fcmToken.value = null
+      console.log('✅ Firestore token cleared')
     }
+
+    // Unregister Firebase service worker
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
+      if (registration) {
+        await registration.unregister()
+        console.log('🧹 Firebase service worker unregistered')
+      }
+    }
+
+    // Delete FCM token from client
+    const { getMessaging, deleteToken } = await import('firebase/messaging')
+    const messaging = getMessaging()
+    await deleteToken(messaging)
+    console.log('🧹 FCM token deleted from device')
+
+    alert('Notifications have been fully disabled.')
+  } catch (error) {
+    console.error('Error disabling notifications:', error)
+    alert('Error disabling notifications.')
   }
 }
 
