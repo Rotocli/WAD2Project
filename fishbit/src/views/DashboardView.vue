@@ -63,6 +63,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
 import { useHabitStore } from '../stores/habitStore'
 import { useFishStore } from '../stores/fishStore'
+import { notificationService } from '../services/notificationService'
 import WelcomeSection from '../components/DashboardView/WelcomeSection.vue'
 import StatCard from '../components/DashboardView/StatCard.vue'
 import HabitDisplay from '../components/DashboardView/HabitDisplay.vue'
@@ -125,6 +126,32 @@ function customizeAquarium() {
 onMounted(() => {
   // Set random motivational quote
   motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
+})
+
+onMounted(() => {
+  // Schedule daily reminders
+  if (notificationService.hasPermission()) {
+    notificationService.scheduleDailyReminders(
+      habitStore.activeHabits,
+      habitStore.progress
+    )
+  }
+})
+
+onMounted(() => {
+  // Schedule reminders when app loads
+  if (notificationService.hasPermission()) {
+    // Wait for habits to load first
+    watch(
+      () => [habitStore.activeHabits, habitStore.progress],
+      ([habits, progress]) => {
+        if (habits.length > 0) {
+          notificationService.scheduleDailyReminders(habits, progress)
+        }
+      },
+      { immediate: true }
+    )
+  }
 })
 </script>
 

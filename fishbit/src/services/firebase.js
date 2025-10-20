@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
+import { getMessaging } from 'firebase/messaging'
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
+export const messaging = getMessaging(app)
 
 // Set auth persistence to LOCAL (survives browser reloads and closes)
 setPersistence(auth, browserLocalPersistence)
