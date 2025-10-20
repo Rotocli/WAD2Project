@@ -154,10 +154,10 @@ export const useHabitStore = defineStore('habit', () => {
           habitName: habitData.name,
           species: randomSpecies,
           decorations:{
-            head:'tophat',
-            eye: 'stareyes',
-            body: 'spots',
-            trail: 'fire'
+            head:'',
+            eye: '',
+            body: '',
+            trail: ''
           }
         })
         

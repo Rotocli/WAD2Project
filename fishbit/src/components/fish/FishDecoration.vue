@@ -12,17 +12,15 @@
     </g>
 
     <g v-if="type === 'head' && decoration.svg === 'tophat'">
-      <!-- Brim -->
       <ellipse 
         :cx="x" 
-        :cy="y+8" 
+        :cy="y+12" 
         rx="10" 
         ry="2" 
         :fill="decoration.color"
         stroke="#000"
         stroke-width="0.5"
       />
-      <!-- Hat body -->
       <rect 
         :x="x-6" 
         :y="y-4" 
@@ -33,7 +31,6 @@
         stroke-width="0.5"
         rx="1"
       />
-      <!-- Band -->
       <rect 
         :x="x-6" 
         :y="y+4" 
@@ -44,7 +41,6 @@
     </g>
 
     <g v-if="type === 'head' && decoration.svg === 'bow'">
-      <!-- Left loop -->
       <ellipse 
         :cx="x-5" 
         :cy="y+2" 
@@ -54,7 +50,6 @@
         stroke="#FF1493"
         stroke-width="0.5"
       />
-      <!-- Right loop -->
       <ellipse 
         :cx="x+5" 
         :cy="y+2" 
@@ -64,7 +59,6 @@
         stroke="#FF1493"
         stroke-width="0.5"
       />
-      <!-- Center knot -->
       <circle 
         :cx="x" 
         :cy="y+2" 
@@ -73,7 +67,6 @@
         stroke="#FF1493"
         stroke-width="0.5"
       />
-      <!-- Ribbons -->
       <path 
         :d="`M ${x} ${y+4} L ${x-2} ${y+8} L ${x-1} ${y+8}`"
         :stroke="decoration.color"
@@ -92,7 +85,6 @@
 
     <!-- EYE DECORATIONS -->
     <g v-if="type === 'eye' && decoration.svg === 'sunglasses'">
-      <!-- Rectangular lens covering the eye -->
       <rect 
         :x="x-8" 
         :y="y-4" 
@@ -102,7 +94,6 @@
         opacity="0.95"
         rx="2"
       />
-      <!-- Frame -->
       <rect 
         :x="x-8" 
         :y="y-4" 
@@ -113,7 +104,6 @@
         stroke-width="1"
         rx="2"
       />
-      <!-- Shine effect -->
       <rect 
         :x="x+2" 
         :y="y-3" 
@@ -126,7 +116,6 @@
     </g>
 
     <g v-if="type === 'eye' && decoration.svg === 'monocle'">
-      <!-- Rim -->
       <circle 
         :cx="x" 
         :cy="y" 
@@ -135,7 +124,6 @@
         :stroke="decoration.color"
         stroke-width="1.5"
       />
-      <!-- Glass -->
       <circle 
         :cx="x" 
         :cy="y" 
@@ -143,21 +131,18 @@
         fill="white"
         opacity="0.3"
       />
-      <!-- Chain attachment -->
       <circle 
         :cx="x+6" 
         :cy="y-3" 
         r="1" 
         :fill="decoration.color"
       />
-      <!-- Chain -->
       <path 
         :d="`M ${x+6} ${y-3} Q ${x+10} ${y-5} ${x+12} ${y-3}`"
         fill="none"
         :stroke="decoration.color"
         stroke-width="0.5"
       />
-      <!-- Shine -->
       <circle 
         :cx="x-2" 
         :cy="y-2" 
@@ -168,7 +153,6 @@
     </g>
 
     <g v-if="type === 'eye' && decoration.svg === 'stareyes'">
-      <!-- Star shape over eye -->
       <path 
         :d="`M ${x} ${y-4} L ${x+1.5} ${y-1} L ${x+4} ${y-1} L ${x+2} ${y+1} L ${x+2.5} ${y+4} L ${x} ${y+2} L ${x-2.5} ${y+4} L ${x-2} ${y+1} L ${x-4} ${y-1} L ${x-1.5} ${y-1} Z`"
         :fill="decoration.color"
@@ -186,7 +170,6 @@
           repeatCount="indefinite"
         />
       </path>
-      <!-- Sparkles -->
       <circle :cx="x+6" :cy="y-3" r="0.8" fill="#FFD700" opacity="0.7">
         <animate attributeName="opacity" values="0.7;0;0.7" dur="1.5s" repeatCount="indefinite"/>
       </circle>
@@ -230,49 +213,77 @@
       </circle>
     </g>
 
+    <!-- TRAIL EFFECTS - Using converted viewBox coordinates -->
     <!-- TRAIL EFFECTS -->
-    <g v-if="type === 'trail' && decoration.svg === 'bubbles'">
-      <circle v-for="(bubble, i) in (decoration.count || 5)" :key="i"
-        :cx="trailX - (i * 8)"
-        :cy="trailY + Math.sin(time + i) * 3"
-        :r="2.5 - i * 0.3"
+<g v-if="type === 'trail' && decoration.svg === 'bubbles'">
+  <!-- Render trail segments from history -->
+  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
+    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
+      <circle v-for="i in 3" :key="i"
+        :cx="convertToSVGX(pos.x, decoration.currentX) - (i * 3)"
+        :cy="convertToSVGY(pos.y, decoration.currentY) + Math.sin(time + index + i) * 2"
+        :r="1.5 - i * 0.3"
         :fill="decoration.color"
-        opacity="0.7"
+        :opacity="(0.7 - i * 0.15) * (1 - index / decoration.trailHistory.length)"
         stroke="white"
-        stroke-width="0.8"
-      >
-        <animate 
-          attributeName="cy"
-          :values="`${trailY - 3};${trailY + 3};${trailY - 3}`"
-          :dur="`${1.5 + i * 0.2}s`"
-          repeatCount="indefinite"
-        />
-      </circle>
+        stroke-width="0.4"
+      />
     </g>
+  </g>
+  
+  <!-- Fallback if no history yet -->
+  <g v-else>
+    <circle v-for="i in 3" :key="i"
+      :cx="x - (i * 3)"
+      :cy="y + Math.sin(time + i) * 2"
+      :r="1.5 - i * 0.3"
+      :fill="decoration.color"
+      :opacity="0.7 - i * 0.15"
+      stroke="white"
+      stroke-width="0.4"
+    />
+  </g>
+</g>
 
-    <g v-if="type === 'trail' && decoration.svg === 'rainbow'">
+<g v-if="type === 'trail' && decoration.svg === 'rainbow'">
+  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
+    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
       <path v-for="(color, i) in decoration.colors" :key="i"
-        :d="`M ${trailX} ${trailY + (i-3)*2} L ${trailX - 15} ${trailY + (i-3)*2}`"
+        :d="`M ${convertToSVGX(pos.x, decoration.currentX)} ${convertToSVGY(pos.y, decoration.currentY) + (i-3)*1.2} L ${convertToSVGX(pos.x, decoration.currentX) - 8} ${convertToSVGY(pos.y, decoration.currentY) + (i-3)*1.2}`"
         :stroke="color"
-        stroke-width="2.5"
-        :opacity="0.8 - i * 0.08"
+        stroke-width="1.5"
+        :opacity="(0.8 - i * 0.08) * (1 - index / decoration.trailHistory.length)"
         stroke-linecap="round"
       />
     </g>
+  </g>
+  
+  <g v-else>
+    <path v-for="(color, i) in decoration.colors" :key="i"
+      :d="`M ${x} ${y + (i-3)*1.5} L ${x - 15} ${y + (i-3)*1.5}`"
+      :stroke="color"
+      stroke-width="2"
+      :opacity="0.8 - i * 0.08"
+      stroke-linecap="round"
+    />
+  </g>
+</g>
 
-    <g v-if="type === 'trail' && decoration.svg === 'fire'">
+<g v-if="type === 'trail' && decoration.svg === 'fire'">
+  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
+    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
       <g v-for="(color, i) in decoration.colors" :key="i">
         <ellipse 
-          :cx="trailX - (i * 4)"
-          :cy="trailY"
-          :rx="4 - i * 0.5"
-          :ry="6 - i * 0.8"
+          :cx="convertToSVGX(pos.x, decoration.currentX) - (i * 2)"
+          :cy="convertToSVGY(pos.y, decoration.currentY)"
+          :rx="2.5 - i * 0.3"
+          :ry="4 - i * 0.5"
           :fill="color"
-          :opacity="0.8 - i * 0.2"
+          :opacity="(0.8 - i * 0.2) * (1 - index / decoration.trailHistory.length)"
         >
           <animate
             attributeName="ry"
-            :values="`${6 - i * 0.8};${7 - i * 0.8};${6 - i * 0.8}`"
+            :values="`${4 - i * 0.5};${5 - i * 0.5};${4 - i * 0.5}`"
             dur="0.4s"
             repeatCount="indefinite"
           />
@@ -280,15 +291,39 @@
       </g>
     </g>
   </g>
+  
+  <g v-else>
+    <g v-for="(color, i) in decoration.colors" :key="i">
+      <ellipse 
+        :cx="x - (i * 3)"
+        :cy="y"
+        :rx="3 - i * 0.4"
+        :ry="5 - i * 0.6"
+        :fill="color"
+        :opacity="0.8 - i * 0.2"
+      >
+        <animate
+          attributeName="ry"
+          :values="`${5 - i * 0.6};${6 - i * 0.6};${5 - i * 0.6}`"
+          dur="0.4s"
+          repeatCount="indefinite"
+        />
+      </ellipse>
+    </g>
+  </g>
+</g>
+  </g>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 
+
+
 const props = defineProps({
   type: {
     type: String,
-    required: true // 'head', 'eye', 'body', 'trail'
+    required: true
   },
   decoration: {
     type: Object,
@@ -296,11 +331,11 @@ const props = defineProps({
   },
   x: {
     type: Number,
-    default: 0
+    default: 40
   },
   y: {
     type: Number,
-    default: 0
+    default: 30
   },
   time: {
     type: Number,
@@ -312,13 +347,7 @@ const props = defineProps({
   }
 })
 
-// For trail positioning
-const trailX = computed(() => props.x)
-const trailY = computed(() => props.y)
-
-// Pattern color that contrasts with fish body
 const patternColor = computed(() => {
-  // Simple color contrast logic
   const fishHex = props.fishColor
   const brightness = parseInt(fishHex.slice(1, 3), 16) + 
                      parseInt(fishHex.slice(3, 5), 16) + 
@@ -326,8 +355,11 @@ const patternColor = computed(() => {
   
   return brightness > 382 ? '#333333' : '#FFFFFF'
 })
+
+// Convert page percentage coordinates to SVG viewBox coordinates
+
 </script>
 
 <style scoped>
-/* SVG animations are handled inline */
+/* SVG animations handled inline */
 </style>

@@ -9,6 +9,8 @@
     :title="fish.customName"
   >
     <!-- SVG-based fish that can be customized -->
+
+   
     <svg 
       :width="spriteSize" 
       :height="spriteSize * 0.75" 
@@ -16,15 +18,8 @@
       class="fish-svg"
       :class="{ 'flipped': currentDirection === 'left' }"
     >
-      <FishDecoration
-        v-if="decorations.trail"
-        type="trail"
-        :decoration="decorations.trail"
-        :x="10"
-        :y="30"
-        :time="time"
-        :fishColor="fish.baseColor"
-      />
+      
+      
       <!-- Body -->
       <ellipse 
         cx="40" 
@@ -34,6 +29,14 @@
         :fill="fish.baseColor"
         class="fish-body"
       />
+      
+      
+      <!-- Stripes/Pattern (if applicable) -->
+      <g v-if="fish.pattern === 'stripes' || fish.pattern === 'default'">
+        <ellipse cx="25" cy="30" rx="8" ry="12" :fill="fish.stripeColor" opacity="0.8"/>
+        <ellipse cx="45" cy="30" rx="8" ry="12" :fill="fish.stripeColor" opacity="0.8"/>
+      </g>
+
       <FishDecoration
       v-if="decorations.body"
       type="body"
@@ -42,12 +45,6 @@
       :y="30"
       :fishColor="fish.baseColor"
       />
-      
-      <!-- Stripes/Pattern (if applicable) -->
-      <g v-if="fish.pattern === 'stripes' || fish.pattern === 'default'">
-        <ellipse cx="25" cy="30" rx="8" ry="12" :fill="fish.stripeColor" opacity="0.8"/>
-        <ellipse cx="45" cy="30" rx="8" ry="12" :fill="fish.stripeColor" opacity="0.8"/>
-      </g>
       
       <!-- Eye (positioned for right-facing fish) -->
       <circle cx="55" cy="26" r="5" fill="white"/>
@@ -76,7 +73,15 @@
         :fill="fish.baseColor"
         opacity="0.7"
       />
-      
+      <FishDecoration
+      v-if="decorations.trail"
+      type="trail"
+      :decoration="decorations.trail"
+      :time="time"
+      :fishColor="fish.baseColor"
+      :x="10"
+      :y="30"
+    />
       <!-- Top Fin -->
       <ellipse 
         cx="40" 
@@ -129,9 +134,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted,watchEffect } from 'vue'
 import { shouldPauseOnHover, getEdgeBoundaries, getBobbingSettings, getYBounds } from '../../config/fishBehavior'
 import FishDecoration from './FishDecoration.vue'
+
+
+
+
 
 const props = defineProps({
   fish: {
@@ -150,6 +159,8 @@ const emit = defineEmits(['fish-clicked'])
 const edgeBoundaries = getEdgeBoundaries()
 const bobbingSettings = getBobbingSettings()
 const yBounds = getYBounds()
+const trailX = ref(0)        // ← DEFINE FIRST
+const trailY = ref(0)   
 
 // State for dynamic swimming
 const currentX = ref(props.fish.position.x)
@@ -206,6 +217,9 @@ const decorations = computed(() => {
   
   // ADD THIS DEBUG LINE:
   console.log('Trail config:', deco.trail, 'Fish decorations:', props.fish.decorations?.trail)
+  if (deco.trail) {
+    deco.trail.history = trailHistory.value
+  }
   
   return deco
 })
@@ -242,7 +256,23 @@ function getDecoConfig(slot, decoId) {
   
   return decoData[slot]?.[decoId] || null
 }
+const trailHistory = ref([])
+const maxTrailLength = 15 // Increase this for longer trails (15-30 recommended)
 
+// Smooth trail following the fish with lag
+let frameCounter = 0
+watchEffect(() => {
+  frameCounter++
+  
+  // Only add to trail every 3 frames to avoid jitter
+  if (frameCounter % 3 === 0) {
+    trailHistory.value.push({ x: currentX.value, y: currentY.value })
+    
+    if (trailHistory.value.length > maxTrailLength) {
+      trailHistory.value.shift()
+    }
+  }
+})
 // Animation loop
 function animate() {
   time.value += 0.016 // ~60fps
@@ -304,6 +334,8 @@ onMounted(() => {
   currentX.value = props.fish.position.x
   currentY.value = props.fish.position.y
   currentDirection.value = props.fish.swimDirection || 'right'
+  trailX.value = props.fish.position.x      // ← ADD THIS
+  trailY.value = props.fish.position.y 
   
   // Start animation
   animate()
