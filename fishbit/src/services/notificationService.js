@@ -3,16 +3,16 @@ import { messaging } from './firebase'
 import { getToken, onMessage } from 'firebase/messaging'
 
 export const notificationService = {
+  _remindersScheduled: false,
+
   // Request permission and get FCM token
   async requestPermission() {
     try {
-      // Check if browser supports notifications
       if (!('Notification' in window)) {
         console.error('Browser does not support notifications')
         return null
       }
 
-      // Request notification permission
       const permission = await Notification.requestPermission()
       
       if (permission !== 'granted') {
@@ -20,11 +20,9 @@ export const notificationService = {
         return null
       }
 
-      // Register service worker
       const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
       console.log('✅ Service Worker registered:', registration)
 
-      // Get FCM token
       const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
         serviceWorkerRegistration: registration
@@ -32,8 +30,6 @@ export const notificationService = {
 
       if (token) {
         console.log('✅ FCM Token:', token)
-        // TODO: Save this token to Firestore for the user
-        // You'll need this to send notifications from backend
         return token
       } else {
         console.log('No registration token available')
@@ -45,12 +41,10 @@ export const notificationService = {
     }
   },
 
-  // Check if we have permission
   hasPermission() {
     return Notification.permission === 'granted'
   },
 
-  // Listen for foreground messages (when app is open)
   onMessageListener() {
     return new Promise((resolve) => {
       onMessage(messaging, (payload) => {
@@ -60,7 +54,6 @@ export const notificationService = {
     })
   },
 
-  // Send a local notification (still works for testing)
   sendNotification(title, options = {}) {
     if (!this.hasPermission()) {
       console.warn('No notification permission')
@@ -68,8 +61,6 @@ export const notificationService = {
     }
 
     const notification = new Notification(title, {
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
       ...options
     })
 
@@ -81,116 +72,137 @@ export const notificationService = {
     return notification
   },
 
-  // Schedule a habit reminder (local - for now)
-  scheduleHabitReminder(habit, time) {
-  const now = new Date()
-  const testTime = new Date(now.getTime() + 1 * 60000)
-
-  const reminderTimes = [
-    { hour: testTime.getHours(), minute: testTime.getMinutes() }
-  ]
-
-  reminderTimes.forEach(t => {
-    const reminderTime = new Date()
-    reminderTime.setHours(t.hour, t.minute, 0, 0)
-    const delay = reminderTime - now
-
-    if (delay > 0) {
-      setTimeout(() => {
-        this.sendNotification(`Time for: ${habit.name}`, {
-          body: habit.description || 'Complete your habit!',
-          tag: `habit-${habit.id}`,
-          requireInteraction: true
-        })
-      }, delay)
-    }
-  })
-},
-
-  
-scheduleDailyReminders(habits, progress) {
-  // TEST MODE: Schedule for 2 minutes from now
-  const now = new Date()
-  const testTime = new Date(now.getTime() + 2 * 60000) // 2 minutes from now
-  
-  const TEST_MODE = false
-  const reminderTimes = TEST_MODE
-  ? [{ hour: new Date(Date.now() + 2 * 60000).getHours(), minute: new Date(Date.now() + 2 * 60000).getMinutes() }]
-  : [{ hour: 16, minute: 0 }, { hour: 18, minute: 0 }]
-
-
-  console.log(`🔔 Setting up reminders for ${testTime.toLocaleTimeString()}`)
-
-  reminderTimes.forEach(time => {
-    const now = new Date()
-    const reminderTime = new Date()
-    reminderTime.setHours(time.hour, time.minute, 0, 0)
-
-    let delay = reminderTime - now
-    
-    if (delay <= 0) {
-      reminderTime.setDate(reminderTime.getDate() + 1)
-      delay = reminderTime - now
+  //put time for daily reminder
+  scheduleDailyReminders(habits, progress) {
+    // Prevent duplicate scheduling
+    if (this._remindersScheduled) {
+      console.log('⚠️ Reminders already scheduled, skipping...')
+      return
     }
 
-    const delaySeconds = Math.floor(delay / 1000)
-    console.log(`⏰ Next reminder in ${delaySeconds} seconds`)
-    
-    setTimeout(() => {
-      console.log('🔔 Sending scheduled reminder!')
-      this.checkAndSendReminder(habits, progress)
+    // Set your reminder times here
+    const reminderTimes = [
+      { hour: 1, minute: 51 },  
+      // { hour: 16, minute: 0 }, // 4:00 PM - PRODUCTION
+      // { hour: 18, minute: 0 }  // 6:00 PM - PRODUCTION
+    ]
+
+    console.log('🔔 Setting up daily reminders...')
+
+    reminderTimes.forEach(time => {
+      const now = new Date()
+      const reminderTime = new Date()
+      reminderTime.setHours(time.hour, time.minute, 0, 0)
+
+      let delay = reminderTime - now
       
-      // Reschedule for next day
-      setInterval(() => {
-        console.log('🔔 Sending scheduled reminder!')
+      // If time already passed today, schedule for tomorrow
+      if (delay <= 0) {
+        reminderTime.setDate(reminderTime.getDate() + 1)
+        delay = reminderTime - now
+      }
+
+      const delayMinutes = Math.floor(delay / 1000 / 60)
+      console.log(`⏰ Reminder scheduled for ${reminderTime.toLocaleString()} (in ${delayMinutes} minutes)`)
+      
+      setTimeout(() => {
+        console.log('🔔 Time to send scheduled reminder!')
         this.checkAndSendReminder(habits, progress)
-      }, 24 * 60 * 60 * 1000)
-    }, delay)
-  })
+        
+        // Reschedule for next day
+        setInterval(() => {
+          console.log('🔔 Daily reminder triggered!')
+          this.checkAndSendReminder(habits, progress)
+        }, 24 * 60 * 60 * 1000)
+      }, delay)
+    })
+
+    // Mark as scheduled
+    this._remindersScheduled = true
+    console.log('✅ Reminders scheduled successfully')
+  },
+
+  checkAndSendReminder(habits, progress) {
+  console.log('🔍 Checking habits for reminder...');
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0];
+  const todayDayOfWeek = today.getDay();
+
+  // These are only habits active AND scheduled for TODAY
+  const todaysHabits = habits.filter(h => {
+    if (!h.isActive) return false;
+    const createdAt = h.createdAt?.seconds
+      ? new Date(h.createdAt.seconds * 1000)
+      : new Date(h.createdAt);
+
+    if (today < createdAt) return false;
+
+    if (!h.repeat) {
+      const createdDayKey = createdAt.toISOString().split('T')[0];
+      return createdDayKey === todayString;
+    }
+
+    switch (h.frequency) {
+      case 'daily': return true;
+      case 'weekly': {
+        const creationWeekday = createdAt.getDay();
+        return todayDayOfWeek === creationWeekday;
+      }
+      case 'custom': {
+        const daysSinceStart = Math.floor(
+          (today - createdAt) / (1000 * 60 * 60 * 24)
+        );
+        return daysSinceStart >= 0 && daysSinceStart % h.customFrequency === 0;
+      }
+      default: return false;
+    }
+  });
+
+  const totalHabits = todaysHabits.length;
+
+  // Only counts progressed records for today, for habits in today's list, and only if completed
+  const completedToday = todaysHabits.filter(habit => {
+    return progress.some(p => {
+      let progressDate;
+      if (typeof p.date === 'string') {
+        progressDate = p.date.split('T')[0];
+      } else if (p.date?.seconds) {
+        progressDate = new Date(p.date.seconds * 1000).toISOString().split('T')[0];
+      } else {
+        progressDate = new Date(p.date).toISOString().split('T')[0];
+      }
+      return (
+        progressDate === todayString &&
+        p.completed === true &&
+        String(p.habitId) === String(habit.id)
+      );
+    });
+  }).length;
+
+  const remaining = totalHabits - completedToday;
+
+  // Notification only if there's something left to do
+  if (totalHabits > 0 && remaining > 0) {
+    this.sendNotification('🔔 Habit Reminder', {
+      body: `${completedToday}/${totalHabits} tasks done today! ${remaining} left to go! 💪`,
+      requireInteraction: true,
+      tag: 'habit-reminder-today'
+    });
+    console.log('✅ Reminder notification sent!');
+  } else if (totalHabits > 0 && remaining === 0) {
+    console.log('🎉 All habits completed - no reminder needed!');
+  } else {
+    console.log('ℹ️ No habits scheduled for today - skipping reminder');
+  }
 },
 
-sendTestReminder(habits, progress) {
+  // Manual test function
+  sendTestReminder(habits, progress) {
     console.log('🧪 Sending test reminder now...')
     this.checkAndSendReminder(habits, progress)
   },
 
-  checkAndSendReminder(habits, progress) {
-  const today = new Date().toISOString().split('T')[0]
-
-  // Filter only active habits
-  const activeHabits = habits.filter(h => h.isActive)
-  const totalHabits = activeHabits.length
-
-  // Skip if no active habits
-  if (totalHabits === 0) {
-    console.log('ℹ️ No active habits - skipping reminder')
-    return
-  }
-
-  // Count completed habits for today
-  const completedToday = progress.filter(p => {
-    const pDate = new Date(p.date).toISOString().split('T')[0]
-    return pDate === today && p.completed && activeHabits.some(h => String(h.id) === String(p.habitId))
-  }).length
-
-  const remaining = totalHabits - completedToday
-
-  console.log(`📊 Progress: ${completedToday}/${totalHabits} habits completed`)
-
-  // Send notification only if some habits are still incomplete
-  if (remaining > 0) {
-    this.sendNotification('🔔 Habit Reminder', {
-      body: `${completedToday}/${totalHabits} tasks done today! ${remaining} left to go! 💪`,
-      requireInteraction: true
-    })
-    console.log('✅ Reminder sent!')
-  } else {
-    console.log('✅ All habits completed - no reminder needed')
-  }
-},
-
-
-  // Save FCM token to user's Firestore document
+  // Save FCM token to Firestore
   async saveTokenToFirestore(userId, token) {
     try {
       const { db } = await import('./firebase')

@@ -113,45 +113,26 @@ const quotes = [
 // Event handlers
 function handleFishClick(fish) {
   console.log('Fish clicked:', fish)
-  // TODO: Open fish detail modal or navigate to pets page
-  // For now, just log
 }
 
-function customizeAquarium() {
-  // TODO: Open customization modal
-  console.log('Customize aquarium')
-  // This will be implemented when we build the shop/customization UI
-}
-
+// FIXED: Single onMounted with all initialization
 onMounted(() => {
+  console.log('🚀 Dashboard mounted')
+  
   // Set random motivational quote
   motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
-})
-
-onMounted(() => {
-  // Schedule daily reminders
-  if (notificationService.hasPermission()) {
-    notificationService.scheduleDailyReminders(
-      habitStore.activeHabits,
-      habitStore.progress
-    )
-  }
-})
-
-onMounted(() => {
-  // Schedule reminders when app loads
-  if (notificationService.hasPermission()) {
-    // Wait for habits to load first
-    watch(
-      () => [habitStore.activeHabits, habitStore.progress],
-      ([habits, progress]) => {
-        if (habits.length > 0) {
-          notificationService.scheduleDailyReminders(habits, progress)
-        }
-      },
-      { immediate: true }
-    )
-  }
+  
+  // Schedule reminders when habits are loaded
+  watch(
+    () => [userStore.currentUserId, habitStore.activeHabits, habitStore.progress],
+    ([userId, habits, progress]) => {
+      if (userId && habits.length > 0 && progress && notificationService.hasPermission()) {
+        console.log('✅ Scheduling daily reminders with', habits.length, 'habits')
+        notificationService.scheduleDailyReminders(habits, progress)
+      }
+    },
+    { immediate: true }
+  )
 })
 </script>
 
