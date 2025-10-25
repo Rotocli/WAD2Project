@@ -83,7 +83,7 @@ export const notificationService = {
     // Set your reminder times here
     const reminderTimes = [
       // { hour: 16, minute: 0 }, // 4:00 PM - PRODUCTION
-      { hour: 18, minute: 0 }  // 6:00 PM - PRODUCTION
+      { hour: 18, minute: 0  }  // 6:00 PM - PRODUCTION
     ]
 
     console.log('🔔 Setting up daily reminders...')
