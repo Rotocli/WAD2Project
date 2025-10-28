@@ -89,21 +89,34 @@
       <h2 class="my-4">My Fishtank</h2>
       <div class="tank-grid-container">
         <div class="tank-grid">
-          <div
-            v-for="(cell, idx) in aquariumStore.grid"
-            :key="idx"
-            class="tank-cell"
-            :class="{ 'tank-floor': idx >= 8 }"
-          >
-            <div v-if="cell.decoration" class="decoration" @click="editDecoration(idx)">
-              <span style="font-size:1.5rem;">{{ cell.decoration.icon }}</span>
-              <div>{{ cell.decoration.name }}</div>
-              <button class="delete-cross" @click.stop="handleDeleteDecoration(idx)" aria-label="Delete decoration">&times;</button>
-            </div>
-            <button v-else class="add-btn" @click="editDecoration(idx)">+</button>
-          </div>
-        </div>
+
+          <!-- First row: 4 cells, empty, blue background -->
+      <div v-for="idx in 4" :key="'row1-' + idx" class="tank-cell">
+        <!-- Empty blue cell -->
       </div>
+      <!-- Second row: 4 cells, empty, blue background -->
+      <div v-for="idx in 4" :key="'row2-' + idx" class="tank-cell">
+
+        <!-- Empty blue cell -->
+      </div>
+      <!-- Third row: 8 cells, decorations or add buttons -->
+      <div
+        v-for="(cell, idx) in aquariumStore.grid.slice(0, 8)"
+        :key="idx"
+        class="tank-cell tank-floor"
+      >
+        <div v-if="cell.decoration" class="decoration" @click="editDecoration(idx)">
+          <span style="font-size:1.5rem;">{{ cell.decoration.icon }}</span>
+
+          <div>{{ cell.decoration.name }}</div>
+          <button class="delete-cross" @click.stop="handleDeleteDecoration(idx)" aria-label="Delete decoration">&times;</button>
+        </div>
+        <button v-else class="add-btn" @click="editDecoration(idx)">+</button>
+      </div>
+    </div>
+  </div>
+
+        
       <!-- Edit Decoration Modal -->
       <div v-if="editDecoIdx !== null" class="modal-mask">
   <div class="modal-dialog">
@@ -178,7 +191,6 @@ function closeEdit() {
 // Decoration
 
 const editDecoIdx = ref(null);
-const editDecoData = reactive({ name: "", icon: "" });
 
 function editDecoration(idx) {
   editDecoIdx.value = idx;
@@ -252,19 +264,19 @@ async function handleDeleteDecoration(idx) {
 }
 .tank-grid {
   display: grid;
-  grid-template-columns: repeat(4, 80px);
-  grid-template-rows: repeat(3, 80px);
+  grid-template-columns: repeat(8, 55px);
+  grid-template-rows: repeat(3, 60px);
   background: #eaf1f9;
   border: 2px solid #aac;
   border-radius: 8px;
-  width: 335px;
-  height: 255px;
+  width: 440px;
+  height: 180px;
   gap: 0;
 }
 .tank-cell {
   position: relative;
-  width: 90px;         
-  height: 90px;
+  width: 55px;         
+  height: 60px;
   background: #eaf0f7;
   display: flex;
   align-items: center;
@@ -301,7 +313,7 @@ async function handleDeleteDecoration(idx) {
 .decoration div {
   font-size: 1rem;
   word-break: break-word;
-  max-width: 80px;     /* Prevent long names from overflowing */
+  max-width: 45px;     /* Prevent long names from overflowing */
   margin-top: 2px;
 }
 
