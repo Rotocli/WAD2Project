@@ -88,17 +88,22 @@
 
             <!-- Manual Triggers -->
             <div class="section">
-              <h4>🔧 Manual Triggers</h4>
+              <h4>Manual Triggers</h4>
               <div class="button-grid">
                 <button @click="triggerDailyChecks" class="action-btn warning">
                   Run Daily Checks
+                </button>
+                <button @click="testNotification" class="action-btn">
+                  Test Notification
+                </button>
+                <button @click="testHabitReminder" class="action-btn">
+                  Test Habit Reminder
                 </button>
                 <button @click="refreshData" class="action-btn">
                   Refresh Data
                 </button>
               </div>
             </div>
-
             <!-- Event Log -->
             <div class="section">
               <h4>📋 Event Log</h4>
@@ -132,6 +137,7 @@
 </template>
 
 <script setup>
+import { notificationService } from '@/services/notificationService'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useHabitStore } from '@/stores/habitStore'
@@ -190,6 +196,58 @@ async function triggerDailyChecks() {
   } catch (error) {
     addEvent('error', `Error: ${error.message}`)
   }
+}
+
+async function testNotification() {
+  addEvent('Testing notification system...', 'system')
+  
+  // Check permission
+  if (!notificationService.hasPermission()) {
+    addEvent('Requesting notification permission...', 'system')
+    const token = await notificationService.requestPermission()
+    
+    if (!token) {
+      addEvent('Notification permission denied', 'error')
+      return
+    }
+    
+    addEvent('Notification permission granted', 'system')
+  }
+
+  // Send simple test
+  notificationService.sendNotification('FishBit Test', {
+    body: 'Notification system is working!',
+    icon: '/favicon.ico',
+    requireInteraction: true
+  })
+  
+  addEvent('Test notification sent successfully', 'system')
+}
+
+async function testHabitReminder() {
+  addEvent('Testing habit reminder notification...', 'system')
+  
+  // Check permission first
+  if (!notificationService.hasPermission()) {
+    addEvent('Requesting notification permission...', 'system')
+    const token = await notificationService.requestPermission()
+    
+    if (!token) {
+      addEvent('Notification permission denied', 'error')
+      return
+    }
+  }
+
+  // Make sure progress is loaded
+  await habitStore.fetchProgress(userStore.currentUserId)
+  
+  // Send reminder with actual habit data
+  notificationService.sendTestReminder(
+    habitStore.habits,
+    habitStore.progress
+  )
+  
+  addEvent('Habit reminder notification sent', 'system')
 }
 
 async function refreshData() {
