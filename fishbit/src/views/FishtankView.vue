@@ -89,34 +89,28 @@
       <h2 class="my-4">My Fishtank</h2>
       <div class="tank-grid-container">
         <div class="tank-grid">
+          <!-- FIRST ROW: Empty blue cells -->
+          <div v-for="idx in 8" :key="'row1-' + idx" class="tank-cell"></div>
+          
+          <!-- SECOND ROW: Empty blue cells -->
+          <div v-for="idx in 8" :key="'row2-' + idx" class="tank-cell"></div>
 
-          <!-- First row: 4 cells, empty, blue background -->
-      <div v-for="idx in 4" :key="'row1-' + idx" class="tank-cell">
-        <!-- Empty blue cell -->
-      </div>
-      <!-- Second row: 4 cells, empty, blue background -->
-      <div v-for="idx in 4" :key="'row2-' + idx" class="tank-cell">
-
-        <!-- Empty blue cell -->
-      </div>
-      <!-- Third row: 8 cells, decorations or add buttons -->
-      <div
-        v-for="(cell, idx) in aquariumStore.grid.slice(0, 8)"
-        :key="idx"
-        class="tank-cell tank-floor"
-      >
-        <div v-if="cell.decoration" class="decoration" @click="editDecoration(idx)">
-          <span style="font-size:1.5rem;">{{ cell.decoration.icon }}</span>
-
-          <div>{{ cell.decoration.name }}</div>
-          <button class="delete-cross" @click.stop="handleDeleteDecoration(idx)" aria-label="Delete decoration">&times;</button>
+          <!-- THIRD ROW: Decorations or add buttons -->
+          <div
+            v-for="(cell, idx) in aquariumStore.grid.slice(0, 8)"
+            :key="'row3-' + idx"
+            class="tank-cell tank-floor"
+          >
+            <div v-if="cell.decoration" class="decoration" @click="editDecoration(idx)">
+              <span>{{ cell.decoration.icon }}</span>
+              <div class="deco-name">{{ cell.decoration.name }}</div>
+              <button class="delete-cross" @click.stop="handleDeleteDecoration(idx)" aria-label="Delete decoration">&times;</button>
+            </div>
+            <button v-else class="add-btn" @click="editDecoration(idx)">+</button>
+          </div>
         </div>
-        <button v-else class="add-btn" @click="editDecoration(idx)">+</button>
       </div>
-    </div>
-  </div>
-
-        
+    
       <!-- Edit Decoration Modal -->
       <div v-if="editDecoIdx !== null" class="modal-mask">
   <div class="modal-dialog">
@@ -258,26 +252,26 @@ async function handleDeleteDecoration(idx) {
 }
 
 .tank-grid-container {
-  margin-top: 1.5rem;
+  margin-top: 2.8rem;
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: center;
 }
 .tank-grid {
   display: grid;
-  grid-template-columns: repeat(8, 55px);
-  grid-template-rows: repeat(3, 60px);
+  grid-template-columns: repeat(8, 100px);
+  grid-template-rows: repeat(3, 80px); 
   background: #eaf1f9;
-  border: 2px solid #aac;
-  border-radius: 8px;
-  width: 440px;
-  height: 180px;
-  gap: 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px #ccd5e388;
+  width: 800px;
+  align-self: center;
 }
 .tank-cell {
   position: relative;
-  width: 55px;         
-  height: 60px;
-  background: #eaf0f7;
+  width: 100px;
+  height: 80px;
+  background: #d7e0ec;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,6 +279,8 @@ async function handleDeleteDecoration(idx) {
 }
 .tank-floor {
   background: #ede6da !important;
+  border: 1.3px solid #dbdbdb;
+  border-collapse: collapse;
 }
 .add-btn {
   background: none;
@@ -292,29 +288,35 @@ async function handleDeleteDecoration(idx) {
   font-size: 2rem;
   color: #888;
   cursor: pointer;
+  display: flex;
+  align-items: center;    
+  justify-content: center;
+  width: 100%;
+  height: 100%;
 }
 .decoration {
-  width: 100%;   /* Occupy full cell width */
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: center;      
+  justify-content: center;  
   text-align: center;
   position: relative;
   pointer-events: auto;
+  cursor: pointer;
 }
 
 .decoration span {
-  font-size: 1.5rem;
-  margin-bottom: 2px;
+  font-size: 2rem;
+  margin-bottom: 3px;
 }
 
-.decoration div {
-  font-size: 1rem;
-  word-break: break-word;
-  max-width: 45px;     /* Prevent long names from overflowing */
-  margin-top: 2px;
+.deco-name {
+  font-size: 0.7rem;
+  max-width: 45px;
+  overflow-wrap: break-word;
+  margin-top: 1px;
 }
 
 .modal-mask {
@@ -337,21 +339,25 @@ async function handleDeleteDecoration(idx) {
 
 .delete-cross {
   position: absolute;
-  top: 6px;
-  right: 8px;
-  background: rgba(255,255,255,0.85);
+  top: 5px;
+  right: 7px;
+  background: rgba(255,255,255,0.88);
   border: none;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  font-size: 1.3rem;
+  width: 24px;
+  height: 24px;
+  font-size: 1.25rem;
   color: #e11d48;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, opacity 0.2s;
   z-index: 3;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: center;         /* Center vertically */
+  justify-content: center;     /* Center horizontally */
+  padding: 0;
+  line-height: 1;              /* Prevent off-center effect */
+  font-family: inherit;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
 }
 
 .delete-cross:hover {
@@ -384,5 +390,7 @@ async function handleDeleteDecoration(idx) {
   font-weight: 500;
   color: #49708a;
 }
+
+
 
 </style>
