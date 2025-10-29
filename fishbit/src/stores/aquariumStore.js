@@ -250,21 +250,41 @@ export const useAquariumStore = defineStore('aquarium', () => {
     }
   }
 
-  // Fill grid from decorations list
+  // FIXED: Fill grid from decorations using gridIndex to preserve positions
   function loadGridFromDecorations() {
-    for (let i = 0; i < 12; i++) {
-      grid.value[i] = settings.value.decorations[i] ? { decoration: settings.value.decorations[i] } : {}
-    }
+    // Reset grid
+    grid.value = Array.from({ length: 12 }, () => ({}))
+    
+    // Place decorations at their saved grid positions
+    settings.value.decorations.forEach(decoration => {
+      if (decoration.gridIndex !== undefined && decoration.gridIndex >= 0 && decoration.gridIndex < 12) {
+        grid.value[decoration.gridIndex] = { decoration }
+      }
+    })
   }
 
-  // Sync grid cells to decorations list (strip cells without decorations)
+  // FIXED: Sync grid to decorations while preserving gridIndex
   function syncGridToDecorations() {
-    settings.value.decorations = grid.value.map(cell => cell.decoration).filter(Boolean)
+    settings.value.decorations = grid.value
+      .map((cell, index) => {
+        if (cell.decoration) {
+          return {
+            ...cell.decoration,
+            gridIndex: index // Store the grid position
+          }
+        }
+        return null
+      })
+      .filter(Boolean) // Remove null entries
   }
 
   async function updateGridCell(idx, decoration) {
     try {
-      grid.value[idx].decoration = decoration
+      // Add gridIndex to the decoration
+      grid.value[idx].decoration = {
+        ...decoration,
+        gridIndex: idx
+      }
       syncGridToDecorations()
       const userStore = useUserStore()
       const userId = userStore.currentUserId

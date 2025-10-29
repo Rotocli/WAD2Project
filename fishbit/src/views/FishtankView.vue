@@ -188,13 +188,23 @@ function editDecoration(idx) {
     selectedDecoType.value = Object.keys(aquariumStore.decorationTypes)[0];
   }
 }
+
 async function confirmDeco() {
   const type = selectedDecoType.value;
   const deco = aquariumStore.decorationTypes[type];
+  
+  // Calculate x position from grid cell index (8 columns)
+  const cellIndex = editDecoIdx.value;
+  const column = cellIndex % 8; // 0-7
+  const xPosition = (column * 12.5) + 6.25; // Center of each cell (100% / 8 = 12.5% per cell)
+  
   await aquariumStore.updateGridCell(editDecoIdx.value, {
     type,
     name: deco.name,
     icon: deco.icon || "",
+    x: xPosition, // Add x coordinate
+    y: 0, // Decorations sit on the floor
+    layer: deco.category === 'plant' ? 0 : 1 // Plants in back, structures in front
   });
   closeDeco();
 }
