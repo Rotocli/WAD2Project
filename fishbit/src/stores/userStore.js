@@ -22,6 +22,7 @@ export const useUserStore = defineStore('user', () => {
   const currentUserId = computed(() => user.value?.uid || null)
   const totalPoints = computed(() => userProfile.value?.totalPoints || 0)
   const currentStreak = computed(() => userProfile.value?.currentStreak || 0)
+  const isDeveloper = computed(() => userProfile.value?.isDeveloper === true) // ← NEW
 
   // Actions
   async function login(email, password) {
@@ -50,6 +51,7 @@ export const useUserStore = defineStore('user', () => {
         totalPoints: 0,
         currentStreak: 0,
         longestStreak: 0,
+        isDeveloper: false, // ← NEW: Default to false for new users
         preferences: {
           emailReminders: true,
           reminderTime: '09:00'
@@ -84,6 +86,11 @@ export const useUserStore = defineStore('user', () => {
       
       if (docSnap.exists()) {
         userProfile.value = docSnap.data()
+        
+        // ← NEW: Log developer status for debugging
+        if (userProfile.value?.isDeveloper) {
+          console.log('🔧 Developer account detected:', userProfile.value.email)
+        }
       }
     } catch (err) {
       console.error('Error fetching user profile:', err)
@@ -158,6 +165,7 @@ export const useUserStore = defineStore('user', () => {
     currentUserId,
     totalPoints,
     currentStreak,
+    isDeveloper, // ← NEW: Export isDeveloper
     
     // Actions
     login,

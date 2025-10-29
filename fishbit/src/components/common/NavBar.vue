@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" :class="{ 'dev-mode': userStore.isDeveloper }">
     <div class="container-fluid">
       <router-link class="navbar-brand d-flex align-items-center" to="/dashboard">
         <span class="fish-icon">🐠</span>
@@ -117,6 +117,7 @@ async function handleLogout() {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0.8rem 1rem;
+  transition: top 0.3s ease;
   height: 74px;
   min-height: 74px;
   max-height: 74px;
@@ -125,6 +126,11 @@ async function handleLogout() {
   box-sizing: border-box;
   z-index: 100;
 }
+
+/* Push navbar down when dev mode is active */
+.navbar.dev-mode {
+  top: 36px; /* Height of dev banner */
+ }
 
 /* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
 .navbar-collapse, .collapse.show {
@@ -143,6 +149,7 @@ async function handleLogout() {
     color: #fff !important;
     border-bottom: 1px solid rgba(255,255,255,0.13);
   }
+
 }
 
 .fish-icon {

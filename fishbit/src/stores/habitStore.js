@@ -14,8 +14,32 @@ import {
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { useUserStore } from './userStore'
+import { timeService } from '../services/timeService'
 
 export const useHabitStore = defineStore('habit', () => {
+  // ========================================
+  // TIME HELPERS - Use these throughout the store
+  // These ensure Time Machine works correctly
+  // ========================================
+  
+  /**
+   * Get current date (respects Time Machine)
+   * @returns {Date} - Current date (real or simulated)
+   */
+  const getCurrentDate = () => timeService.now()
+  
+  /**
+   * Get today's date string in YYYY-MM-DD format (respects Time Machine)
+   * @returns {string} - Today's date
+   */
+  const getTodayString = () => timeService.getTodayString()
+  
+  /**
+   * Get yesterday's date string in YYYY-MM-DD format (respects Time Machine)
+   * @returns {string} - Yesterday's date
+   */
+  const getYesterdayString = () => timeService.getYesterdayString()
+
   // State
   const habits = ref([])
   const loading = ref(false)
@@ -49,8 +73,9 @@ export const useHabitStore = defineStore('habit', () => {
   })
 
   const todaysHabits = computed(() => {
-    const today = new Date().getDay()
-    const todayDate=new Date()
+    const today = getCurrentDate().getDay() // Day of week (0-6)
+    const todayDate = getCurrentDate() // Full date object
+    
     return habits.value.filter(habit => {
       const createdAtDate = habit.createdAt.seconds 
         ? new Date(habit.createdAt.seconds * 1000)
@@ -59,29 +84,28 @@ export const useHabitStore = defineStore('habit', () => {
       // Don't show archived habits
       if (habit.isArchived) return false
         
-      if (habit.repeat===false){
+      if (habit.repeat === false) {
         const isSameDay =
           createdAtDate.getFullYear() === todayDate.getFullYear() &&
           createdAtDate.getMonth() === todayDate.getMonth() &&
-          createdAtDate.getDate() === todayDate.getDate();
+          createdAtDate.getDate() === todayDate.getDate()
         return isSameDay
       }
-      else{
-      if (habit.frequency === 'daily') return true
-      if (habit.frequency === 'weekly' && habit.daysOfWeek?.includes(today)) return true
-      if (habit.frequency==='custom'){
-        
+      else {
+        if (habit.frequency === 'daily') return true
+        if (habit.frequency === 'weekly' && habit.daysOfWeek?.includes(today)) return true
+        if (habit.frequency === 'custom') {
+          // Calculate number of days since creation
+          const diffTime = todayDate - createdAtDate
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
-        // Calculate number of days since creation
-        const diffTime = todayDate - createdAtDate
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-        // Check if today is a multiple of customFrequency
-        if (diffDays % habit.customFrequency === 0) return true
-      }
+          // Check if today is a multiple of customFrequency
+          if (diffDays % habit.customFrequency === 0) return true
+        }
       
-      return false
-    }})
+        return false
+      }
+    })
   })
 
   // Actions
@@ -123,7 +147,7 @@ export const useHabitStore = defineStore('habit', () => {
       const newHabit = {
         ...habitData,
         userId: userStore.currentUserId,
-        createdAt: new Date(),
+        createdAt: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
         isActive: true,
         isArchived: false,
         currentStreak: 0,
@@ -237,13 +261,13 @@ export const useHabitStore = defineStore('habit', () => {
     try {
       await updateDoc(doc(db, 'habits', habitId), {
         isArchived: true,
-        archivedAt: new Date()
+        archivedAt: getCurrentDate() // ✅ FIXED: Uses Time Machine time
       })
       
       const index = habits.value.findIndex(h => h.id === habitId)
       if (index !== -1) {
         habits.value[index].isArchived = true
-        habits.value[index].archivedAt = new Date()
+        habits.value[index].archivedAt = getCurrentDate() // ✅ FIXED
       }
       
       console.log('✅ Habit archived:', habitId)
@@ -285,7 +309,7 @@ export const useHabitStore = defineStore('habit', () => {
     const habit = habits.value.find(h => h.id === habitId)
     if (!habit) return
 
-    const today = new Date().toISOString().split('T')[0]
+    const today = getTodayString() // ✅ FIXED: Uses Time Machine time
     
     try {
       // Check if already completed today
@@ -294,8 +318,8 @@ export const useHabitStore = defineStore('habit', () => {
       )
       
       if (progressDoc.exists()) {
-        const progressRef = doc(db, 'progress', `${habitId}_${today}`);
-        await updateDoc(progressRef, { completed: true });
+        const progressRef = doc(db, 'progress', `${habitId}_${today}`)
+        await updateDoc(progressRef, { completed: true })
         console.log(habitId)
         throw new Error('Habit already completed today!')
       }
@@ -306,11 +330,11 @@ export const useHabitStore = defineStore('habit', () => {
         userId: userStore.currentUserId,
         date: today,
         completed: true,
-        timestamp: new Date(),
+        timestamp: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
         pointsEarned: 10
       })
 
-        addProgressEntry({
+      addProgressEntry({
         habitId,
         userId: userStore.currentUserId,
         date: today,
@@ -320,19 +344,20 @@ export const useHabitStore = defineStore('habit', () => {
       // Update habit stats
       const newStreak = calculateStreak(habit)
       await updateHabit(habitId, {
-        lastCompleted: new Date(),
+        lastCompleted: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
         currentStreak: newStreak,
         bestStreak: Math.max(newStreak, habit.bestStreak || 0),
         completedCount: (habit.completedCount || 0) + 1
       })
-          const progressTodaySnapshot = await getDocs(
-      query(
-        collection(db, 'progress'),
-        where('userId', '==', userStore.currentUserId),
-        where('completed', '==', true),
-        where('date', '==', today)
+      
+      const progressTodaySnapshot = await getDocs(
+        query(
+          collection(db, 'progress'),
+          where('userId', '==', userStore.currentUserId),
+          where('completed', '==', true),
+          where('date', '==', today)
+        )
       )
-    )
 
       let newUserStreak = 1
       if (progressTodaySnapshot.size > 1) {
@@ -340,9 +365,7 @@ export const useHabitStore = defineStore('habit', () => {
         newUserStreak = userStore.userProfile.currentStreak || 1
       } else {
         // Check if user completed any habit yesterday
-        const yesterday = new Date()
-        yesterday.setDate(yesterday.getDate() - 1)
-        const yesterdayStr = yesterday.toISOString().split('T')[0]
+        const yesterdayStr = getYesterdayString() // ✅ FIXED: Uses Time Machine time
 
         const progressYesterdaySnapshot = await getDocs(
           query(
@@ -385,7 +408,7 @@ export const useHabitStore = defineStore('habit', () => {
     
     const lastDate = new Date(habit.lastCompleted.seconds ? 
       habit.lastCompleted.seconds * 1000 : habit.lastCompleted)
-    const today = new Date()
+    const today = getCurrentDate() // ✅ FIXED: Uses Time Machine time
     const diffTime = Math.abs(today - lastDate)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
@@ -398,7 +421,7 @@ export const useHabitStore = defineStore('habit', () => {
     }
   }
 
-    async function fetchProgress(userId) {
+  async function fetchProgress(userId) {
     if (!userId) return
     try {
       const q = query(collection(db, 'progress'), where('userId', '==', userId))
@@ -421,7 +444,7 @@ export const useHabitStore = defineStore('habit', () => {
 
     loading.value = true
     error.value = null
-    const today = new Date().toISOString().split('T')[0]; 
+    const today = getTodayString() // ✅ FIXED: Uses Time Machine time
     console.log(userStore.currentUserId)
     console.log(today)
     
@@ -430,11 +453,12 @@ export const useHabitStore = defineStore('habit', () => {
         collection(db, 'progress'),
         where('userId', '==', userStore.currentUserId),
         where('completed','==',true)
-    );
+    )
 
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(q)
     if (querySnapshot.empty) {
-        console.log('No documents found for today:', today);}
+        console.log('No documents found for today:', today)
+    }
     console.log(querySnapshot.docs)
     
 
@@ -443,41 +467,42 @@ export const useHabitStore = defineStore('habit', () => {
         .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
         .filter(progress => {
             // Since your date is stored as string "2025-10-13"
-            return progress.date == today;
-        });
+            return progress.date == today
+        })
     console.log(todaysCompleted)
     
 
-    return todaysCompleted; // array of completed tasks
+    return todaysCompleted // array of completed tasks
   }
- async function undoHabit(habitId) {
-  const userStore = useUserStore();
-  if (!userStore.currentUserId) return;
+  
+  async function undoHabit(habitId) {
+    const userStore = useUserStore()
+    if (!userStore.currentUserId) return
 
-  loading.value = true;
-  error.value = null;
+    loading.value = true
+    error.value = null
 
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const progressRef = doc(db, 'progress', `${habitId}_${today}`);
+    try {
+      const today = getTodayString() // ✅ FIXED: Uses Time Machine time
+      const progressRef = doc(db, 'progress', `${habitId}_${today}`)
 
-    const progressDoc = await getDoc(progressRef);
-    if (!progressDoc.exists()) {
-      console.log('No progress record found for today');
-      return;
+      const progressDoc = await getDoc(progressRef)
+      if (!progressDoc.exists()) {
+        console.log('No progress record found for today')
+        return
+      }
+
+      // Update the 'completed' field to false
+      await updateDoc(progressRef, { completed: false })
+
+      console.log('Habit marked as undone for today!')
+    } catch (err) {
+      console.error('Error undoing habit:', err)
+      error.value = err.message
+    } finally {
+      loading.value = false
     }
-
-    // Update the 'completed' field to false
-    await updateDoc(progressRef, { completed: false });
-
-    console.log('Habit marked as undone for today!');
-  } catch (err) {
-    console.error('Error undoing habit:', err);
-    error.value = err.message;
-  } finally {
-    loading.value = false;
   }
-}
 
 
   return {
@@ -512,4 +537,3 @@ export const useHabitStore = defineStore('habit', () => {
     addProgressEntry
   }
 })
-
