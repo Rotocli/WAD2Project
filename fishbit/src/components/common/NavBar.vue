@@ -117,6 +117,32 @@ async function handleLogout() {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0.8rem 1rem;
+  height: 74px;
+  min-height: 74px;
+  max-height: 74px;
+  padding-top: 0;
+  padding-bottom: 0;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+/* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
+.navbar-collapse, .collapse.show {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+  padding-bottom: 1.2rem;
+}
+
+/* Mobile view fix: ensures menu background fills whole column */
+@media (max-width: 992px) {
+  .navbar-collapse {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  }
+  .navbar-nav .nav-link {
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.13);
+  }
 }
 
 .fish-icon {
@@ -170,6 +196,7 @@ async function handleLogout() {
 .dropdown-menu {
   border: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #fff;
 }
 
 .dropdown-item:hover {
