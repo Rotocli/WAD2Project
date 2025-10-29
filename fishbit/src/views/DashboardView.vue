@@ -118,22 +118,39 @@ function handleFishClick(fish) {
 // FIXED: Single onMounted with all initialization
 onMounted(() => {
   console.log('🚀 Dashboard mounted')
-  
+
   // Set random motivational quote
   motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
-  
-  // Schedule reminders when habits are loaded
-  watch(
+
+  // Schedule reminders when habits AND progress are loaded
+  const unwatchReminders = watch(
     () => [userStore.currentUserId, habitStore.activeHabits, habitStore.progress],
-    ([userId, habits, progress]) => {
-      if (userId && habits.length > 0 && progress && notificationService.hasPermission()) {
-        console.log('✅ Scheduling daily reminders with', habits.length, 'habits')
-        notificationService.scheduleDailyReminders(habits, progress)
+    async ([userId, habits, progress]) => {
+      if (userId && habits.length > 0) {
+        // Ensure progress is loaded before scheduling reminders
+        if (!progress || progress.length === 0) {
+          console.log('⏳ Waiting for progress to load...')
+          await habitStore.fetchProgress(userId)
+          console.log('✅ Progress loaded:', habitStore.progress.length, 'entries')
+        }
+
+        if (notificationService.hasPermission()) {
+          console.log(
+            '✅ Scheduling daily reminders with',
+            habits.length, 'habits and',
+            habitStore.progress.length, 'progress entries'
+          )
+          notificationService.scheduleDailyReminders(habits, habitStore.progress)
+
+          // Stop watching after first successful schedule
+          unwatchReminders()
+        }
       }
     },
     { immediate: true }
   )
 })
+
 </script>
 
 <style scoped>

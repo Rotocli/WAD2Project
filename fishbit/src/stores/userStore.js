@@ -132,26 +132,27 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // Initialize auth listener
-  function initAuthListener() {
-    console.log("🔐 userStore: Initializing auth listener...")
-    onAuthStateChanged(auth, async (firebaseUser) => {
-      console.log("🔐 userStore: Auth state changed:", firebaseUser ? firebaseUser.uid : "No user")
-      user.value = firebaseUser
-      if (firebaseUser) {
-        await fetchUserProfile(firebaseUser.uid)
-        console.log("✅ userStore: User profile loaded for", firebaseUser.uid)
-        const { useHabitStore } = await import('./habitStore.js')
-        const habitStore = useHabitStore()
+function initAuthListener() {
+  console.log("🔐 userStore: Initializing auth listener...")
+  onAuthStateChanged(auth, async (firebaseUser) => {
+    console.log("🔐 userStore: Auth state changed:", firebaseUser ? firebaseUser.uid : "No user")
 
-      
-        console.log("✅ userStore: Habits loaded")
-        await habitStore.fetchHabits()
-      } else {
-        userProfile.value = null
-      }
-      loading.value = false
-    })
-  }
+    user.value = firebaseUser
+    if (firebaseUser) {
+      await fetchUserProfile(firebaseUser.uid)
+      const { useHabitStore } = await import('./habitStore.js')
+      const habitStore = useHabitStore()
+      await habitStore.fetchHabits()
+      await habitStore.fetchProgress(firebaseUser.uid)
+      console.log("✅ userStore: All user data loaded")
+    } else {
+      userProfile.value = null
+    }
+    loading.value = false
+  })
+}
+
+
 
   return {
     // State
