@@ -116,27 +116,29 @@ async function handleLogout() {
 .navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  padding: 0.8rem 1rem;
+  padding: 0;
   transition: top 0.3s ease;
-  height: 74px;
-  min-height: 74px;
-  max-height: 74px;
-  padding-top: 0;
-  padding-bottom: 0;
-  box-sizing: border-box;
+  height: 70px;
   z-index: 100;
+}
+
+.container-fluid {
+  padding: 0 1.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
 }
 
 /* Push navbar down when dev mode is active */
 .navbar.dev-mode {
   top: 36px; /* Height of dev banner */
- }
+}
 
 /* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
 .navbar-collapse, .collapse.show {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.13);
-  padding-bottom: 1.2rem;
 }
 
 /* Mobile view fix: ensures menu background fills whole column */
@@ -144,24 +146,47 @@ async function handleLogout() {
   .navbar-collapse {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+    padding: 1rem 0;
   }
   .navbar-nav .nav-link {
     color: #fff !important;
     border-bottom: 1px solid rgba(255,255,255,0.13);
+    padding: 0.75rem 1rem;
   }
+}
 
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.navbar-nav .nav-item {
+  display: flex;
+  align-items: center;
 }
 
 .fish-icon {
   font-size: 1.8rem;
   margin-right: 0.5rem;
   animation: swim 3s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
 }
 
 .brand-text {
   font-size: 1.5rem;
   font-weight: bold;
   color: white;
+  line-height: 1;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  height: 100%;
 }
 
 @keyframes swim {
@@ -193,11 +218,26 @@ async function handleLogout() {
   border-radius: 20px;
   color: white;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  height: fit-content;
 }
 
 .points-display i,
 .streak-display i {
   margin-right: 0.3rem;
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+}
+
+.dropdown .btn {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  height: fit-content;
 }
 
 .dropdown-menu {

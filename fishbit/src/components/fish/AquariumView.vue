@@ -14,6 +14,7 @@
         v-for="fish in backLayerFish"
         :key="fish.id"
         :fish="fish"
+        @fish-clicked="onFishClick"
       />
       <DecorationSprite
         v-for="decoration in backDecorations"
@@ -27,6 +28,7 @@
         v-for="fish in midLayerFish"
         :key="fish.id"
         :fish="fish"
+        @fish-clicked="onFishClick"
       />
     </div>
 
@@ -36,6 +38,7 @@
         v-for="fish in frontLayerFish"
         :key="fish.id"
         :fish="fish"
+        @fish-clicked="onFishClick"
       />
       <DecorationSprite
         v-for="decoration in frontDecorations"
@@ -87,8 +90,15 @@ const fishStore = useFishStore()
 const aquariumStore = useAquariumStore()
 const userStore = useUserStore()
 
+const emit = defineEmits(['fish-clicked'])
+
 const loading = ref(true)
 const bubbles = ref([])
+
+// Emit fish click event to parent
+function onFishClick(fish) {
+  emit('fish-clicked', fish)
+}
 
 // Computed properties
 const fishCount = computed(() => fishStore.activeFish.length)
