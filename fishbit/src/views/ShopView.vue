@@ -59,6 +59,27 @@
         </button>
       </div>
 
+      <!-- Category Fish Deco buttons -->
+       <div v-if="activeCategory==='fish'" class="category-filters">
+        <button 
+          v-for="(deco,cat) in fishDecoStore.fishDecorations"
+          
+          :key="deco"
+          class="filter-btn"
+          :class="{ active: activeDecoCategory.includes(cat)}"
+          @click="addDecoCategory(cat)"
+          
+          
+        >
+          {{cat}}
+        </button>
+        
+        
+        
+
+
+       </div>
+
       <!-- Carousel -->
       <div class="carousel-section">
         <div class="carousel-container">
@@ -109,6 +130,7 @@
       </div>
 
       <!-- Inventory Section -->
+
       <div class="inventory-section">
         <h2>Inventory</h2>
         <div class="inventory-grid">
@@ -153,9 +175,13 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAquariumStore } from '../stores/aquariumStore';
 import { useUserStore } from '../stores/userStore';
+import { useFishDecoStore} from '../stores/fishDecoStore';
 
+const fishDecoStore=useFishDecoStore();
 const aquariumStore = useAquariumStore();
 const userStore = useUserStore();
+
+
 
 // Search
 const searchQuery = ref('');
@@ -163,6 +189,7 @@ const showSearchResults = ref(false);
 
 // Category
 const activeCategory = ref('aquarium');
+
 
 // Carousel
 const currentIndex = ref(0);
@@ -173,6 +200,19 @@ const editMode = ref(false);
 const selectedSlots = ref([]);
 
 // Shop Items
+const activeDecoCategory=ref([])
+
+function addDecoCategory(cat){
+  if (activeDecoCategory.value.includes(cat)){
+    activeDecoCategory.value=activeDecoCategory.value.filter(item=>item !==cat);
+    
+  }
+  else{
+    activeDecoCategory.value.push(cat)
+
+  }
+}
+
 const shopItems = computed(() => {
   if (activeCategory.value === 'aquarium') {
     return Object.entries(aquariumStore.decorationTypes).map(([key, value]) => ({
@@ -181,14 +221,55 @@ const shopItems = computed(() => {
       ...value
     }));
   } else {
+    if (activeDecoCategory.value.length==0){
+      const fishDecorations = 
+      Object.entries(fishDecoStore.fishDecorations).flatMap(([category, decos]) =>
+      Object.entries(decos)
+        .filter(([_, value]) => value.name !== 'None') 
+        .map(([key, value]) => ({
+          id: key,
+          category,  // e.g. 'head', 'eye'
+          name: value.name,
+          icon: value.icon,
+          cost: value.cost
+        }))
+
+      );
+
+      return fishDecorations
+      
+
+
+    
+    
     // Fish decorations - blank templates for now
-    return [
-      { id: 'fish-deco-1', name: 'Fish Decoration 1', icon: '🐠', cost: 100, type: 'fish' },
-      { id: 'fish-deco-2', name: 'Fish Decoration 2', icon: '🐟', cost: 150, type: 'fish' },
-      { id: 'fish-deco-3', name: 'Fish Decoration 3', icon: '🐡', cost: 200, type: 'fish' },
-    ];
+    
   }
-});
+  else{
+    
+      const fishDecorations = 
+      Object.entries(fishDecoStore.fishDecorations).filter(([key,vaue1])=>activeDecoCategory.value.includes(key)).flatMap(([category, decos]) =>
+      Object.entries(decos)
+        .filter(([_, value]) => value.name !== 'None') 
+        .map(([key, value]) => ({
+          id: key,
+          category,  // e.g. 'head', 'eye'
+          name: value.name,
+          icon: value.icon,
+          cost: value.cost
+        }))
+
+      );
+
+      return fishDecorations
+
+      
+      
+    
+  }
+}});
+
+
 
 // Search functionality
 const filteredSearchResults = computed(() => {

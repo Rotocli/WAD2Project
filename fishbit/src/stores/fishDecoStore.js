@@ -158,6 +158,8 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
     }
   }
 
+  
+
   // User's equipped decorations
   const equippedDecorations = ref({
     head: 'none',
@@ -178,6 +180,8 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
   const getDecoration = (slot, decoId) => {
     return fishDecorations[slot][decoId] || null
   }
+
+
 
   // Get equipped decoration for a slot
   const getEquippedDecoration = (slot) => {

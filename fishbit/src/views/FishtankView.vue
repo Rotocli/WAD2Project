@@ -127,6 +127,38 @@
               </select>
             </div>
             <div class="form-group">
+              <label>Head:</label>
+              <select v-model="editFishData.decorations.head" class="form-control">
+                <option v-for="(deco,key) in fishDecoStore.fishDecorations.head" :key="key" :id="key" :value="key" :name="key">
+                  {{ deco.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Eye:</label>
+              <select v-model="editFishData.decorations.eye" class="form-control">
+                <option v-for="(deco,key) in fishDecoStore.fishDecorations.eye" :key="key" :id="key" :value="key" :name="key">
+                  {{ deco.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Body:</label>
+              <select v-model="editFishData.decorations.body" class="form-control">
+                <option v-for="(deco,key) in fishDecoStore.fishDecorations.body" :key="key" :id="key" :value="key" :name="key">
+                  {{ deco.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Trail:</label>
+              <select v-model="editFishData.decorations.trail" class="form-control">
+                <option v-for="(deco,key) in fishDecoStore.fishDecorations.trail" :key="key" :id="key" :value="key" :name="key">
+                  {{ deco.name }}
+                </option>
+              </select>
+            </div>
+             <div class="form-group">
               <label>Colour:</label>
               <input type="color" v-model="editFishData.baseColor" class="form-control color-input" />
             </div>
@@ -212,14 +244,17 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { useFishStore } from "../stores/fishStore";
-import { useHabitStore } from "../stores/HabitStore";
+import { useHabitStore } from "../stores/habitStore";
 import { useAquariumStore } from "../stores/aquariumStore";
 import { useUserStore } from "../stores/userStore";
+import { useFishDecoStore } from "../stores/fishDecoStore";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
+
 const fishStore = useFishStore();
 const habitStore = useHabitStore();
 const aquariumStore = useAquariumStore();
+const fishDecoStore=useFishDecoStore();
 const selectedDecoType = ref("");
 
 // Drag and drop state
@@ -255,6 +290,13 @@ const editFishData = reactive({
   habitId: "",
   species: "",
   baseColor: "",
+  decorations:{
+    head:'',
+    eye: '',
+    body: '',
+    trail: ''
+  }
+
 });
 
 function editFish(idx) {
