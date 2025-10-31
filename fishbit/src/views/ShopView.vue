@@ -63,14 +63,14 @@
       <div class="carousel-section">
         <div class="carousel-container">
           <!-- Left Item (Smaller, Opaque) -->
-          <div class="carousel-item carousel-item-left" @click="previousItem">
+          <div class="custom-carousel-item carousel-item-left" @click="previousItem">
             <div class="item-preview">
               <span class="item-icon small">{{ getPreviousItem().icon }}</span>
             </div>
           </div>
 
           <!-- Center Item (Main Display) -->
-          <div class="carousel-item carousel-item-center">
+          <div class="custom-carousel-item carousel-item-center">
             <div class="item-card">
               <div class="item-display">
                 <span class="item-icon large">{{ getCurrentItem().icon }}</span>
@@ -86,7 +86,7 @@
           </div>
 
           <!-- Right Item (Smaller, Opaque) -->
-          <div class="carousel-item carousel-item-right" @click="nextItem">
+          <div class="custom-carousel-item carousel-item-right" @click="nextItem">
             <div class="item-preview">
               <span class="item-icon large">{{ getNextItem().icon }}</span>
             </div>
@@ -478,8 +478,12 @@ function saveInventory() {
   min-height: 400px;
 }
 
-.carousel-item {
+.custom-carousel-item {
   transition: all 0.4s ease;
+  display: flex; /* ADD THIS */
+  align-items: center; /* ADD THIS */
+  justify-content: center;
+
 }
 
 .carousel-item-left,
@@ -487,6 +491,8 @@ function saveInventory() {
   opacity: 0.4;
   transform: scale(0.7);
   cursor: pointer;
+  
+
 }
 
 .carousel-item-left:hover,
@@ -509,6 +515,7 @@ function saveInventory() {
 .carousel-item-center {
   transform: scale(1);
   z-index: 2;
+  
 }
 
 .item-card {
