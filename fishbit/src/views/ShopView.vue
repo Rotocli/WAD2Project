@@ -41,12 +41,18 @@
         </div>
       </div>
 
+      <!-- User Points Display -->
+      <div class="coins-display">
+        <span class="coin-icon">💰</span>
+        <span class="coin-amount">{{ userStore.totalPoints || 0 }}</span>
+      </div>
+
       <!-- Category Filter Buttons -->
       <div class="category-filters">
         <button 
           class="filter-btn"
           :class="{ active: activeCategory === 'aquarium' }"
-          @click="activeCategory = 'aquarium'"
+          @click="activeCategory = 'aquarium'; activeDecoCategory = []"
         >
           Aquarium
         </button>
@@ -59,38 +65,30 @@
         </button>
       </div>
 
-      <!-- Category Fish Deco buttons -->
-       <div v-if="activeCategory==='fish'" class="category-filters">
+      <!-- Sub-category Fish Deco buttons -->
+      <div v-if="activeCategory === 'fish'" class="category-filters">
         <button 
-          v-for="(deco,cat) in fishDecoStore.fishDecorations"
-          
-          :key="deco"
-          class="filter-btn"
-          :class="{ active: activeDecoCategory.includes(cat)}"
-          @click="addDecoCategory(cat)"
-          
-          
+          v-for="(decos, cat) in fishDecoStore.fishDecorations"
+          :key="cat"
+          class="filter-btn sub-filter"
+          :class="{ active: activeDecoCategory.includes(cat) }"
+          @click="toggleDecoCategory(cat)"
         >
-          {{cat}}
+          {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
         </button>
-        
-        
-        
-
-
-       </div>
+      </div>
 
       <!-- Carousel -->
       <div class="carousel-section">
         <div class="carousel-container">
-          <!-- Left Item (Smaller, Opaque) -->
+          <!-- Left Item -->
           <div class="custom-carousel-item carousel-item-left" @click="previousItem">
             <div class="item-preview">
               <span class="item-icon small">{{ getPreviousItem().icon }}</span>
             </div>
           </div>
 
-          <!-- Center Item (Main Display) -->
+          <!-- Center Item -->
           <div class="custom-carousel-item carousel-item-center">
             <div class="item-card">
               <div class="item-display">
@@ -102,11 +100,14 @@
                   <span class="coin-icon">💰</span>
                   <span class="price-amount">{{ getCurrentItem().cost }}</span>
                 </div>
+                <div v-if="inventoryStore.hasItem(getCurrentItem().id)" class="owned-badge">
+                  ✓ Owned ({{ inventoryStore.getQuantity(getCurrentItem().id) }})
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Item (Smaller, Opaque) -->
+          <!-- Right Item -->
           <div class="custom-carousel-item carousel-item-right" @click="nextItem">
             <div class="item-preview">
               <span class="item-icon large">{{ getNextItem().icon }}</span>
@@ -125,27 +126,27 @@
         <!-- Buy Button -->
         <button class="buy-button" @click="buyItem" :disabled="!canBuy">
           <i class="bi bi-plus-circle"></i>
-          Buy
+          {{ inventoryStore.hasItem(getCurrentItem().id) ? 'Buy Another' : 'Buy' }}
         </button>
       </div>
 
       <!-- Inventory Section -->
-
       <div class="inventory-section">
         <h2>Inventory</h2>
         <div class="inventory-grid">
           <div 
-            v-for="(slot, index) in inventorySlots" 
+            v-for="(item, index) in inventorySlots" 
             :key="index"
             class="inventory-slot"
             :class="{ 
-              'has-item': slot.item,
+              'has-item': item,
               'selected': editMode && selectedSlots.includes(index)
             }"
             @click="handleSlotClick(index)"
           >
-            <div v-if="slot.item" class="inventory-item">
-              <span class="inventory-icon">{{ slot.item.icon }}</span>
+            <div v-if="item" class="inventory-item">
+              <span class="inventory-icon">{{ item.icon }}</span>
+              <div class="quantity-badge">{{ item.quantity }}</div>
               <button 
                 v-if="editMode" 
                 class="delete-slot-btn" 
@@ -175,13 +176,13 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAquariumStore } from '../stores/aquariumStore';
 import { useUserStore } from '../stores/userStore';
-import { useFishDecoStore} from '../stores/fishDecoStore';
+import { useFishDecoStore } from '../stores/fishDecoStore';
+import { useInventoryStore } from '../stores/inventoryStore';
 
-const fishDecoStore=useFishDecoStore();
+const fishDecoStore = useFishDecoStore();
 const aquariumStore = useAquariumStore();
 const userStore = useUserStore();
-
-
+const inventoryStore = useInventoryStore();
 
 // Search
 const searchQuery = ref('');
@@ -189,87 +190,94 @@ const showSearchResults = ref(false);
 
 // Category
 const activeCategory = ref('aquarium');
-
+const activeDecoCategory = ref([]);
+const inventoryTab = ref('all');
 
 // Carousel
 const currentIndex = ref(0);
 
-// Inventory
-const inventorySlots = ref(Array.from({ length: 15 }, () => ({ item: null })));
+// Inventory - using original slot-based system
+const inventorySlots = ref([]);
 const editMode = ref(false);
 const selectedSlots = ref([]);
 
-// Shop Items
-const activeDecoCategory=ref([])
+// Load inventory on mount
+onMounted(async () => {
+  await inventoryStore.fetchInventory();
+  loadInventoryIntoSlots();
+  
+  // Close search on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-section')) {
+      showSearchResults.value = false;
+    }
+  });
+});
 
-function addDecoCategory(cat){
-  if (activeDecoCategory.value.includes(cat)){
-    activeDecoCategory.value=activeDecoCategory.value.filter(item=>item !==cat);
-    
-  }
-  else{
-    activeDecoCategory.value.push(cat)
-
-  }
+// Load inventory items into slots (15 slots total)
+function loadInventoryIntoSlots() {
+  inventorySlots.value = Array.from({ length: 15 }, () => null);
+  inventoryStore.inventoryItems.forEach((item, index) => {
+    if (index < 15) {
+      inventorySlots.value[index] = item;
+    }
+  });
 }
 
+// Toggle deco category filter
+function toggleDecoCategory(cat) {
+  const index = activeDecoCategory.value.indexOf(cat);
+  if (index > -1) {
+    activeDecoCategory.value.splice(index, 1);
+  } else {
+    activeDecoCategory.value.push(cat);
+  }
+  // Reset carousel to first item when filter changes
+  currentIndex.value = 0;
+}
+
+// Shop Items
 const shopItems = computed(() => {
   if (activeCategory.value === 'aquarium') {
     return Object.entries(aquariumStore.decorationTypes).map(([key, value]) => ({
       id: key,
-      type: 'decoration',
+      type: 'aquarium',
       ...value
     }));
   } else {
-    if (activeDecoCategory.value.length==0){
-      const fishDecorations = 
-      Object.entries(fishDecoStore.fishDecorations).flatMap(([category, decos]) =>
+    const allFishDecos = Object.entries(fishDecoStore.fishDecorations).flatMap(([category, decos]) =>
       Object.entries(decos)
-        .filter(([_, value]) => value.name !== 'None') 
+        .filter(([_, value]) => value.name !== 'None')
         .map(([key, value]) => ({
           id: key,
-          category,  // e.g. 'head', 'eye'
+          type: 'fish',
+          category,
           name: value.name,
           icon: value.icon,
           cost: value.cost
         }))
+    );
 
+    if (activeDecoCategory.value.length === 0) {
+      return allFishDecos;
+    } else {
+      return allFishDecos.filter(item => 
+        activeDecoCategory.value.includes(item.category)
       );
-
-      return fishDecorations
-      
-
-
-    
-    
-    // Fish decorations - blank templates for now
-    
+    }
   }
-  else{
-    
-      const fishDecorations = 
-      Object.entries(fishDecoStore.fishDecorations).filter(([key,vaue1])=>activeDecoCategory.value.includes(key)).flatMap(([category, decos]) =>
-      Object.entries(decos)
-        .filter(([_, value]) => value.name !== 'None') 
-        .map(([key, value]) => ({
-          id: key,
-          category,  // e.g. 'head', 'eye'
-          name: value.name,
-          icon: value.icon,
-          cost: value.cost
-        }))
+});
 
-      );
-
-      return fishDecorations
-
-      
-      
-    
+// Inventory Display
+const displayedInventory = computed(() => {
+  if (inventoryTab.value === 'all') {
+    return inventoryStore.inventoryItems;
+  } else if (inventoryTab.value === 'aquarium') {
+    return inventoryStore.aquariumDecorations;
+  } else {
+    return inventoryStore.fishDecorations;
   }
-}});
-
-
+});
 
 // Search functionality
 const filteredSearchResults = computed(() => {
@@ -280,12 +288,21 @@ const filteredSearchResults = computed(() => {
     ...Object.entries(aquariumStore.decorationTypes).map(([key, value]) => ({
       id: key,
       category: 'aquarium',
-      type: 'decoration',
+      type: 'aquarium',
       ...value
     })),
-    { id: 'fish-deco-1', name: 'Fish Decoration 1', icon: '🐠', cost: 100, category: 'fish', type: 'fish' },
-    { id: 'fish-deco-2', name: 'Fish Decoration 2', icon: '🐟', cost: 150, category: 'fish', type: 'fish' },
-    { id: 'fish-deco-3', name: 'Fish Decoration 3', icon: '🐡', cost: 200, category: 'fish', type: 'fish' },
+    ...Object.entries(fishDecoStore.fishDecorations).flatMap(([category, decos]) =>
+      Object.entries(decos)
+        .filter(([_, value]) => value.name !== 'None')
+        .map(([key, value]) => ({
+          id: key,
+          category: 'fish',
+          type: 'fish',
+          name: value.name,
+          icon: value.icon,
+          cost: value.cost
+        }))
+    )
   ];
 
   return allItems.filter(item => 
@@ -294,11 +311,11 @@ const filteredSearchResults = computed(() => {
 });
 
 function getSearchResultsByCategory(category) {
-  return filteredSearchResults.value.filter(item => item.category === category);
+  return filteredSearchResults.value.filter(item => item.type === category);
 }
 
 function selectSearchItem(item) {
-  activeCategory.value = item.category;
+  activeCategory.value = item.type;
   const categoryItems = shopItems.value;
   const index = categoryItems.findIndex(i => i.id === item.id);
   if (index !== -1) {
@@ -308,18 +325,9 @@ function selectSearchItem(item) {
   searchQuery.value = '';
 }
 
-// Close search results when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.search-section')) {
-      showSearchResults.value = false;
-    }
-  });
-});
-
 // Carousel Navigation
 function getCurrentItem() {
-  return shopItems.value[currentIndex.value] || { name: 'No items', icon: '❓', cost: 0 };
+  return shopItems.value[currentIndex.value] || { name: 'No items', icon: '❓', cost: 0, id: '' };
 }
 
 function getPreviousItem() {
@@ -352,32 +360,25 @@ const canBuy = computed(() => {
   return userStore.totalPoints >= item.cost;
 });
 
-function buyItem() {
+async function buyItem() {
   if (!canBuy.value) {
-    alert('Not enough points!');
+    alert('Not enough coins!');
     return;
   }
 
   const item = getCurrentItem();
   
-  // Find first empty slot
-  const emptySlotIndex = inventorySlots.value.findIndex(slot => !slot.item);
-  
-  if (emptySlotIndex === -1) {
-    alert('Inventory is full!');
-    return;
+  try {
+    const result = await inventoryStore.purchaseItem(item);
+    alert(result.message);
+    // Reload inventory into slots after purchase
+    loadInventoryIntoSlots();
+  } catch (err) {
+    alert(err.message);
   }
-
-  // Add to inventory
-  inventorySlots.value[emptySlotIndex].item = { ...item };
-  
-  // Deduct points (you'll need to implement this in userStore)
-  // userStore.deductPoints(item.cost);
-  
-  alert(`${item.name} added to inventory!`);
 }
 
-// Inventory management
+// Inventory management - original style
 function handleSlotClick(index) {
   if (!editMode.value) return;
 
@@ -389,8 +390,16 @@ function handleSlotClick(index) {
   }
 }
 
-function removeFromSlot(index) {
-  inventorySlots.value[index].item = null;
+async function removeFromSlot(index) {
+  const item = inventorySlots.value[index];
+  if (!item) return;
+
+  try {
+    await inventoryStore.removeItem(item.itemId);
+    inventorySlots.value[index] = null;
+  } catch (err) {
+    alert('Error removing item: ' + err.message);
+  }
 }
 
 function enterEditMode() {
@@ -401,7 +410,6 @@ function enterEditMode() {
 function saveInventory() {
   editMode.value = false;
   selectedSlots.value = [];
-  // Save to database if needed
   alert('Inventory saved!');
 }
 </script>
@@ -410,6 +418,27 @@ function saveInventory() {
 .shop-view {
   min-height: calc(100vh - 70px);
   background: #f8f9fa;
+}
+
+/* Coins Display */
+.coins-display {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+.coin-amount {
+  color: #667eea;
 }
 
 /* Search Section */
@@ -517,7 +546,8 @@ function saveInventory() {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .filter-btn {
@@ -530,6 +560,11 @@ function saveInventory() {
   color: #6b7280;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.filter-btn.sub-filter {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.95rem;
 }
 
 .filter-btn:hover {
@@ -561,10 +596,9 @@ function saveInventory() {
 
 .custom-carousel-item {
   transition: all 0.4s ease;
-  display: flex; /* ADD THIS */
-  align-items: center; /* ADD THIS */
+  display: flex;
+  align-items: center;
   justify-content: center;
-
 }
 
 .carousel-item-left,
@@ -572,8 +606,6 @@ function saveInventory() {
   opacity: 0.4;
   transform: scale(0.7);
   cursor: pointer;
-  
-
 }
 
 .carousel-item-left:hover,
@@ -596,7 +628,6 @@ function saveInventory() {
 .carousel-item-center {
   transform: scale(1);
   z-index: 2;
-  
 }
 
 .item-card {
@@ -653,6 +684,15 @@ function saveInventory() {
 
 .price-amount {
   font-size: 2rem;
+}
+
+.owned-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 /* Carousel Navigation */
@@ -719,10 +759,6 @@ function saveInventory() {
   cursor: not-allowed;
 }
 
-.buy-button i {
-  font-size: 1.5rem;
-}
-
 /* Inventory Section */
 .inventory-section {
   background: white;
@@ -785,6 +821,23 @@ function saveInventory() {
 
 .inventory-icon {
   font-size: 2.5rem;
+}
+
+.quantity-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 2px solid white;
 }
 
 .delete-slot-btn {
@@ -878,20 +931,23 @@ function saveInventory() {
   .item-icon.large {
     font-size: 4rem;
   }
-
-  .inventory-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }
 
 @media (max-width: 768px) {
+  .coins-display {
+    top: 70px;
+    right: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
   .search-bar {
     font-size: 1rem;
     padding: 0.875rem 0.875rem 0.875rem 2.75rem;
   }
 
   .filter-btn {
-    padding: 0.625rem 2rem;
+    padding: 0.625rem 1.5rem;
     font-size: 1rem;
   }
 
@@ -900,10 +956,32 @@ function saveInventory() {
     display: none;
   }
 
-  .carousel-nav {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+  .inventory-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .coins-display {
+    top: 70px;
+    right: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  .search-bar {
+    font-size: 1rem;
+    padding: 0.875rem 0.875rem 0.875rem 2.75rem;
+  }
+
+  .filter-btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .carousel-item-left,
+  .carousel-item-right {
+    display: none;
   }
 
   .item-card {
