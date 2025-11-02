@@ -51,9 +51,9 @@ const achievements = computed(() => [
     name: 'All-Star Routine',
     description: 'Complete every habit tracked each day for one week',
     emoji: '⭐',
-    attained: habitStore.didAllHabitsForAWeek, // Example; tweak using your store logic
+    attained: habitStore.didAllHabitsForAWeek,
   },
-  // ... add more
+
 ])
 </script>
 
