@@ -72,7 +72,8 @@
               data-bs-toggle="dropdown"
             >
               <i class="bi bi-person-circle"></i>
-              {{ username }}
+              
+              &nbsp{{ username }}
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
@@ -114,7 +115,7 @@ async function handleLogout() {
 
 <style scoped>
 .navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0;
   transition: top 0.3s ease;
@@ -138,19 +139,18 @@ async function handleLogout() {
 
 /* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
 .navbar-collapse, .collapse.show {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
 }
 
 /* Mobile view fix: ensures menu background fills whole column */
 @media (max-width: 992px) {
   .navbar-collapse {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     box-shadow: 0 2px 16px rgba(0,0,0,0.15);
-    padding: 1rem 0;
+    padding: 1rem;
   }
   .navbar-nav .nav-link {
     color: #fff !important;
-    border-bottom: 1px solid rgba(255,255,255,0.13);
     padding: 0.75rem 1rem;
   }
 }
@@ -179,6 +179,7 @@ async function handleLogout() {
   font-weight: bold;
   color: white;
   line-height: 1;
+  font-style: oblique;
 }
 
 .navbar-brand {
@@ -203,6 +204,8 @@ async function handleLogout() {
 
 .nav-link:hover {
   color: white !important;
+  background-color: #4a66e0;
+  border-radius: 15px;
   transform: translateY(-2px);
 }
 
@@ -213,7 +216,7 @@ async function handleLogout() {
 
 .points-display,
 .streak-display {
-  background: rgba(255,255,255,0.2);
+  background: #4a66e0;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   color: white;
@@ -243,11 +246,15 @@ async function handleLogout() {
 .dropdown-menu {
   border: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: #fff;
+  background: #667eea;
+}
+
+.dropdown-item {
+  color: white;
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4a66e0;
   color: white;
 }
 </style>

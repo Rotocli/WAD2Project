@@ -23,7 +23,7 @@
                 <div class="fish-details">
                   <div><b>Name:</b> {{ fish.customName }}</div>
                   <div>
-                    <b>Colour:</b>
+                    <b>Colour: </b>
                     <span
                       :style="{
                         display:'inline-block',
@@ -109,14 +109,6 @@
             <div class="form-group">
               <label>Name:</label>
               <input v-model="editFishData.customName" class="form-control" type="text" />
-            </div>
-            <div class="form-group">
-              <label>Habit:</label>
-              <select v-model="editFishData.habitId" class="form-control">
-                <option v-for="h in habitStore.habits" :value="h.id" :key="h.id">
-                  {{ h.name }}
-                </option>
-              </select>
             </div>
             <div class="form-group">
               <label>Species:</label>
@@ -240,7 +232,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { useFishStore } from "../stores/fishStore";
@@ -248,13 +239,15 @@ import { useHabitStore } from "../stores/habitStore";
 import { useAquariumStore } from "../stores/aquariumStore";
 import { useUserStore } from "../stores/userStore";
 import { useFishDecoStore } from "../stores/fishDecoStore";
+import { useInventoryStore } from "../stores/inventoryStore";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 
 const fishStore = useFishStore();
 const habitStore = useHabitStore();
 const aquariumStore = useAquariumStore();
-const fishDecoStore=useFishDecoStore();
+const fishDecoStore = useFishDecoStore();
+const inventoryStore = useInventoryStore();
 const selectedDecoType = ref("");
 
 // Drag and drop state
@@ -274,40 +267,132 @@ const substratePreviewStyle = computed(() => ({
     ${aquariumStore.currentSubstrate.color} 100%)`
 }));
 
-// Fishes
+// Ensure inventory is loaded and provide a fast ownership lookup
 onMounted(() => {
   fishStore.fetchFish();
   habitStore.fetchHabits && habitStore.fetchHabits();
   aquariumStore.fetchSettings();
+  inventoryStore.fetchInventory && inventoryStore.fetchInventory();
+
   if (!aquariumStore.grid || aquariumStore.grid.length !== 12) {
-    aquariumStore.grid = Array.from({length: 12}, (_,i)=> aquariumStore.grid?.[i] || {});
+    aquariumStore.grid = Array.from({ length: 12 }, (_, i) => aquariumStore.grid?.[i] || {});
   }
 });
 
+// Build a Set of owned item identifiers (cover common id shapes)
+const ownedItemIds = computed(() => {
+  const items = inventoryStore.inventoryItems || [];
+  const ids = new Set();
+  for (const it of items) {
+    if (!it) continue;
+    if (it.id) ids.add(String(it.id));
+    if (it._id) ids.add(String(it._id));
+    if (it.itemId) ids.add(String(it.itemId));
+    if (it.key) ids.add(String(it.key));
+    if (it.decoId) ids.add(String(it.decoId));
+    // If inventory items store a nested item object
+    if (it.item && (it.item.id || it.item._id || it.item.key)) {
+      if (it.item.id) ids.add(String(it.item.id));
+      if (it.item._id) ids.add(String(it.item._id));
+      if (it.item.key) ids.add(String(it.item.key));
+    }
+  }
+  return ids;
+});
+
+// simple helper to check ownership
+function userOwns(id) {
+  if (!id) return false;
+  return ownedItemIds.value.has(String(id));
+}
+
 const editIdx = ref(null);
 const editFishData = reactive({
+  id: "",
   customName: "",
   habitId: "",
   species: "",
   baseColor: "",
-  decorations:{
-    head:'',
-    eye: '',
-    body: '',
-    trail: ''
+  decorations: {
+    head: "",
+    eye: "",
+    body: "",
+    trail: ""
   }
-
 });
+
+// Helper: return list of decoration options for a given slot filtered by inventory ownership.
+// Always include the currently-selected decoration for that fish (so user isn't forced to lose it).
+function getOwnedDecos(slot) {
+  const decosObj = fishDecoStore.fishDecorations?.[slot] || {};
+  const current = editFishData.decorations?.[slot];
+  const opts = [];
+  for (const [key, deco] of Object.entries(decosObj)) {
+    // include None option if present in data
+    if (key === 'None' || key === 'none' || key === '') {
+      opts.push({ key, deco });
+      continue;
+    }
+    // include if user owns it or it's currently equipped
+    if (userOwns(key) || (current && String(current) === String(key))) {
+      opts.push({ key, deco });
+    }
+  }
+  return opts;
+}
 
 function editFish(idx) {
   editIdx.value = idx;
-  Object.assign(editFishData, fishStore.fish[idx]);
+  const f = fishStore.fish[idx] || {};
+  // copy known fields and deep copy decorations so editing doesn't mutate store directly
+  editFishData.id = f.id || f._id || "";
+  editFishData.customName = f.customName || f.name || "";
+  editFishData.habitId = f.habitId || "";
+  editFishData.species = f.species || "";
+  editFishData.baseColor = f.baseColor || "";
+  editFishData.decorations = { ...(f.decorations || {}) };
 }
+
+// Client-side ownership check before sending update
 async function confirmEdit() {
-  const fishObj = fishStore.fish[editIdx.value];
-  await fishStore.updateFish(fishObj.id, { ...editFishData });
-  closeEdit();
+  const fishObj = fishStore.fish[editIdx.value] || {};
+  const slots = ['head', 'eye', 'body', 'trail'];
+  const missing = [];
+
+  for (const s of slots) {
+    const requested = editFishData.decorations?.[s];
+    if (!requested || requested === 'None' || requested === '') continue;
+    const currentlyEquipped = fishObj?.decorations?.[s];
+    // allow if already equipped OR user owns the requested item
+    if (String(requested) === String(currentlyEquipped)) continue;
+    if (!userOwns(requested)) {
+      missing.push({ slot: s, id: requested });
+    }
+  }
+
+  if (missing.length > 0) {
+    alert('You do not own one or more selected decorations. Please choose items from your inventory.');
+    return;
+  }
+
+  // Only send allowed fields
+  const payload = {
+    customName: editFishData.customName,
+    habitId: editFishData.habitId,
+    species: editFishData.species,
+    baseColor: editFishData.baseColor,
+    decorations: { ...editFishData.decorations }
+  };
+
+  try {
+    await fishStore.updateFish(editFishData.id || fishObj.id || fishObj._id, payload);
+    closeEdit();
+  } catch (err) {
+    console.error('Failed to update fish', err);
+    alert('Unable to update fish. Try again.');
+  }
 }
+
 function closeEdit() {
   editIdx.value = null;
 }
@@ -380,7 +465,7 @@ const editDecoIdx = ref(null);
 
 function editDecoration(idx) {
   editDecoIdx.value = idx;
-  if(aquariumStore.grid[idx].decoration){
+  if (aquariumStore.grid[idx].decoration) {
     selectedDecoType.value = aquariumStore.grid[idx].decoration.type;
   } else {
     selectedDecoType.value = Object.keys(aquariumStore.decorationTypes)[0];
@@ -412,7 +497,7 @@ function closeDeco() {
 }
 
 async function handleDeleteDecoration(idx) {
-  await aquariumStore.removeDecoration(idx)
+  await aquariumStore.removeDecoration(idx);
 }
 </script>
 

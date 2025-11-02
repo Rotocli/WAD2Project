@@ -3,8 +3,7 @@ import { ref, computed } from 'vue'
 import { 
   collection, 
   doc, 
-  setDoc, 
-  getDoc, 
+  setDoc,  
   getDocs,
   updateDoc, 
   deleteDoc,
