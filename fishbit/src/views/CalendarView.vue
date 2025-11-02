@@ -4,11 +4,16 @@
       <h2>Habit Calendar</h2>
       <p>Track your habits below:</p>
 
-      <!-- ADD THIS: Navigation controls -->
       <div class="calendar-nav">
-        <button @click="previousWeek" class="nav-btn">← Previous Week</button>
+        <button @click="previousWeek" class="nav-btn">
+          <span class="mobile-text">←</span>
+          <span class="desktop-text">← Previous Week</span>
+        </button>
         <button @click="goToToday" class="today-btn">Today</button>
-        <button @click="nextWeek" class="nav-btn">Next Week →</button>
+        <button @click="nextWeek" class="nav-btn">
+          <span class="mobile-text">→</span>
+          <span class="desktop-text">Next Week →</span>
+        </button>
       </div>
 
       <VueCal
@@ -18,13 +23,13 @@
         :events="calendarEvents"
         :disable-views="['day', 'year', 'years']"
         :selected-date="selectedDate"
-        style="height: 500px;"
+        class="responsive-calendar"
         @cell-click="handleCellClick"
         @event-click="handleEventClick"
         hide-title-bar
       />
 
-      <!-- ADD THIS: Modal for habit details -->
+      <!-- Modal for habit details -->
       <div v-if="showModal" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
           <button class="modal-close" @click="closeModal">×</button>
@@ -241,7 +246,7 @@ watch(
 </script>
 
 <style>
-/* Your existing styles stay exactly the same */
+/* Your existing VueCal styles */
 .vuecal__event.habit-completed,
 .vuecal__event--habit-completed {
   background-color: #a8f0a3 !important;
@@ -255,129 +260,17 @@ watch(
 }
 
 .vuecal__event {
-  padding: 4px 6px !important;
+  padding: 12px 8px !important;
   text-align: center !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-}
-
-/* ADD THESE: New styles for navigation and modal */
-.calendar-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.nav-btn, .today-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.nav-btn {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-.nav-btn:hover {
-  background-color: #d1d5db;
-}
-
-.today-btn {
-  background-color: #7c3aed;
-  color: white;
-}
-
-.today-btn:hover {
-  background-color: #6d28d9;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: #6b7280;
-  line-height: 1;
-}
-
-.modal-close:hover {
-  color: #374151;
-}
-
-.modal-content h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  color: #111827;
-}
-
-.modal-date {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
-}
-
-.modal-section {
-  margin: 1rem 0;
-}
-
-.modal-section strong {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #374151;
-}
-
-.status-completed {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #a8f0a3;
-  color: #000;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.status-pending {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background-color: #f8c0c0;
-  color: #000;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.vuecal__cell {
-  padding: 12px !important;
-  min-height: 100px !important;
+  margin: 4px !important;
+  border-radius: 8px !important;
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .vuecal__event:hover {
@@ -385,13 +278,345 @@ watch(
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
-.vuecal__event {
-  margin: 4px !important;
-  padding: 12px 8px !important;
-  border-radius: 8px !important;
-  min-height: 50px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.vuecal__cell {
+  padding: 12px !important;
+  min-height: 100px !important;
+}
+
+/* Responsive Calendar */
+.responsive-calendar {
+  height: 500px;
+  width: 100%;
+}
+
+/* Navigation buttons */
+.calendar-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.nav-btn, .today-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.nav-btn {
+  background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+  color: #374151;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn:hover {
+  background: linear-gradient(to bottom, #e5e7eb, #d1d5db);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.today-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
+}
+
+.today-btn:hover {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(124, 58, 237, 0.4);
+}
+
+/* Show/hide text based on screen size */
+.mobile-text {
+  display: none;
+}
+
+.desktop-text {
+  display: inline;
+}
+
+/* Modal improvements */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+  padding: 1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 24px;
+  max-width: 550px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: slideUp 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: #f3f4f6;
+  border: none;
+  font-size: 1.75rem;
+  cursor: pointer;
+  color: #6b7280;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: #e5e7eb;
+  color: #374151;
+  transform: rotate(90deg);
+}
+
+.modal-content h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 2rem;
+  color: #111827;
+  font-weight: 800;
+  padding-right: 2rem;
+}
+
+.modal-date {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.modal-section {
+  margin: 1.5rem 0;
+}
+
+.modal-section strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #374151;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.modal-section p {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  padding: 1.25rem;
+  border-radius: 16px;
+  color: #4c1d95;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.status-completed {
+  display: inline-block;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #86efac 0%, #10b981 100%);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+  font-size: 1.1rem;
+}
+
+.status-pending {
+  display: inline-block;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+  font-size: 1.1rem;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.5rem;
+}
+
+.container h2 {
+  margin-bottom: 0.5rem;
+}
+
+.container > p {
+  margin-bottom: 2rem;
+}
+
+/* 768px  */
+@media (max-width: 768px) {
+  .calendar-view {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .container h2 {
+    font-size: 1.75rem;
+  }
+
+  .container > p {
+    font-size: 0.95rem;
+  }
+
+  .mobile-text {
+    display: inline;
+  }
+
+  .desktop-text {
+    display: none;
+  }
+
+  .nav-btn, .today-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .responsive-calendar {
+    height: 400px !important;
+  }
+
+  .vuecal__event {
+    padding: 8px 4px !important;
+    min-height: 40px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .vuecal__cell {
+    min-height: 80px !important;
+    padding: 8px !important;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .modal-content h3 {
+    font-size: 1.5rem;
+  }
+
+  .modal-section p {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .status-completed,
+  .status-pending {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* 480px */
+@media (max-width: 480px) {
+  .calendar-view {
+    padding: 0.5rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  .container h2 {
+    font-size: 1.5rem;
+  }
+
+  .calendar-nav {
+    gap: 0.5rem;
+  }
+
+  .nav-btn, .today-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .responsive-calendar {
+    height: 350px !important;
+  }
+
+  .vuecal__event {
+    padding: 6px 4px !important;
+    min-height: 35px !important;
+    font-size: 0.75rem !important;
+    margin: 2px !important;
+  }
+
+  .vuecal__cell {
+    min-height: 70px !important;
+    padding: 4px !important;
+  }
+
+  .modal-content {
+    padding: 1.25rem;
+  }
+
+  .modal-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .responsive-calendar {
+    height: 300px !important;
+  }
+
+  .vuecal__event {
+    font-size: 0.7rem !important;
+    padding: 4px 2px !important;
+  }
 }
 </style>

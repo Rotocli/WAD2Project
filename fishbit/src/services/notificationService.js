@@ -5,7 +5,6 @@ import { getToken, onMessage } from 'firebase/messaging'
 export const notificationService = {
   _remindersScheduled: false,
 
-  // Request permission and get FCM token
   async requestPermission() {
     try {
       if (!('Notification' in window)) {
@@ -20,8 +19,28 @@ export const notificationService = {
         return null
       }
 
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      console.log('✅ Service Worker registered:', registration)
+      // ← FIX: Wait for service worker to be READY, not just registered
+      let registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
+      
+      if (!registration) {
+        console.log('⏳ Registering service worker...')
+        registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      }
+      
+      // ← FIX: Wait for it to become active
+      if (registration.installing || registration.waiting) {
+        console.log('⏳ Waiting for service worker to activate...')
+        await new Promise((resolve) => {
+          const worker = registration.installing || registration.waiting
+          worker.addEventListener('statechange', (e) => {
+            if (e.target.state === 'activated') {
+              resolve()
+            }
+          })
+        })
+      }
+      
+      console.log('✅ Service Worker ready:', registration)
 
       const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
