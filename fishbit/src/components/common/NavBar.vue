@@ -1,10 +1,12 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" :class="{ 'dev-mode': userStore.isDeveloper }">
     <div class="container-fluid">
-      <router-link class="navbar-brand d-flex align-items-center" to="/dashboard">
+      
+        
+      <span class="navbar-brand d-flex align-items-center" to="/dashboard">
         <span class="fish-icon">🐠</span>
         <span class="brand-text">FishBit</span>
-      </router-link>
+      </span>
       
       <button 
         class="navbar-toggler" 
@@ -176,6 +178,7 @@ async function handleLogout() {
 
 .brand-text {
   font-size: 1.5rem;
+  margin-right: 0.8rem;
   font-weight: bold;
   color: white;
   line-height: 1;
