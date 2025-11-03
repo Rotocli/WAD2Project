@@ -39,6 +39,9 @@
             </div>
           </div>
         </div>
+
+
+
         <div class="col-lg-6">
           <div class="hero-illustration">
             <div class="fish-tank-preview">

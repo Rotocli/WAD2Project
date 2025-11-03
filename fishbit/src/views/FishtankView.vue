@@ -121,7 +121,7 @@
             <div class="form-group">
               <label>Head:</label>
               <select v-model="editFishData.decorations.head" class="form-control">
-                <option v-for="(deco,key) in fishDecoStore.fishDecorations.head" :key="key" :id="key" :value="key" :name="key">
+                <option v-for="(deco,key) in getOwnedFishDecos('head')" :key="key" :value="key">
                   {{ deco.name }}
                 </option>
               </select>
@@ -129,7 +129,7 @@
             <div class="form-group">
               <label>Eye:</label>
               <select v-model="editFishData.decorations.eye" class="form-control">
-                <option v-for="(deco,key) in fishDecoStore.fishDecorations.eye" :key="key" :id="key" :value="key" :name="key">
+                <option v-for="(deco,key) in getOwnedFishDecos('eye')" :key="key" :value="key">
                   {{ deco.name }}
                 </option>
               </select>
@@ -137,7 +137,7 @@
             <div class="form-group">
               <label>Body:</label>
               <select v-model="editFishData.decorations.body" class="form-control">
-                <option v-for="(deco,key) in fishDecoStore.fishDecorations.body" :key="key" :id="key" :value="key" :name="key">
+                <option v-for="(deco,key) in getOwnedFishDecos('body')" :key="key" :value="key">
                   {{ deco.name }}
                 </option>
               </select>
@@ -145,7 +145,7 @@
             <div class="form-group">
               <label>Trail:</label>
               <select v-model="editFishData.decorations.trail" class="form-control">
-                <option v-for="(deco,key) in fishDecoStore.fishDecorations.trail" :key="key" :id="key" :value="key" :name="key">
+                <option v-for="(deco,key) in getOwnedFishDecos('trail')" :key="key" :value="key">
                   {{ deco.name }}
                 </option>
               </select>
@@ -216,7 +216,7 @@
             <div>
               <label>Decoration:</label>
               <select v-model="selectedDecoType">
-                <option v-for="(deco, key) in aquariumStore.decorationTypes" :key="key" :value="key">
+                <option v-for="(deco, key) in getOwnedAquariumDecos()" :key="key" :value="key">
                   {{ deco.name }}
                 </option>
               </select>
@@ -323,22 +323,40 @@ const editFishData = reactive({
 
 // Helper: return list of decoration options for a given slot filtered by inventory ownership.
 // Always include the currently-selected decoration for that fish (so user isn't forced to lose it).
-function getOwnedDecos(slot) {
+function getOwnedFishDecos(slot) {
   const decosObj = fishDecoStore.fishDecorations?.[slot] || {};
   const current = editFishData.decorations?.[slot];
-  const opts = [];
+  const result = {};
+  
   for (const [key, deco] of Object.entries(decosObj)) {
     // include None option if present in data
-    if (key === 'None' || key === 'none' || key === '') {
-      opts.push({ key, deco });
+    if (key === 'None' || key === 'none' || key === '' || deco.name === 'None') {
+      result[key] = deco;
       continue;
     }
     // include if user owns it or it's currently equipped
     if (userOwns(key) || (current && String(current) === String(key))) {
-      opts.push({ key, deco });
+      result[key] = deco;
     }
   }
-  return opts;
+  return result;
+}
+
+// Helper: return list of aquarium decorations filtered by inventory ownership
+// Always include the currently-selected decoration at this grid position
+function getOwnedAquariumDecos() {
+  const decosObj = aquariumStore.decorationTypes || {};
+  const currentCell = aquariumStore.grid[editDecoIdx.value];
+  const currentType = currentCell?.decoration?.type;
+  const result = {};
+  
+  for (const [key, deco] of Object.entries(decosObj)) {
+    // Include if user owns it or it's currently placed in this cell
+    if (userOwns(key) || (currentType && String(currentType) === String(key))) {
+      result[key] = deco;
+    }
+  }
+  return result;
 }
 
 function editFish(idx) {
@@ -361,7 +379,7 @@ async function confirmEdit() {
 
   for (const s of slots) {
     const requested = editFishData.decorations?.[s];
-    if (!requested || requested === 'None' || requested === '') continue;
+    if (!requested || requested === 'None' || requested === 'none' || requested === '') continue;
     const currentlyEquipped = fishObj?.decorations?.[s];
     // allow if already equipped OR user owns the requested item
     if (String(requested) === String(currentlyEquipped)) continue;
@@ -371,7 +389,7 @@ async function confirmEdit() {
   }
 
   if (missing.length > 0) {
-    alert('You do not own one or more selected decorations. Please choose items from your inventory.');
+    alert('You do not own one or more selected fish decorations. Please purchase them from the shop first.');
     return;
   }
 
@@ -468,13 +486,35 @@ function editDecoration(idx) {
   if (aquariumStore.grid[idx].decoration) {
     selectedDecoType.value = aquariumStore.grid[idx].decoration.type;
   } else {
-    selectedDecoType.value = Object.keys(aquariumStore.decorationTypes)[0];
+    const ownedDecos = getOwnedAquariumDecos();
+    const firstOwned = Object.keys(ownedDecos)[0];
+    selectedDecoType.value = firstOwned || "";
   }
 }
 
 async function confirmDeco() {
   const type = selectedDecoType.value;
+  
+  if (!type) {
+    alert('Please select a decoration.');
+    return;
+  }
+  
+  // Check if user owns this decoration (unless it's already placed in this cell)
+  const currentCell = aquariumStore.grid[editDecoIdx.value];
+  const currentType = currentCell?.decoration?.type;
+  
+  if (String(type) !== String(currentType) && !userOwns(type)) {
+    alert('You do not own this aquarium decoration. Please purchase it from the shop first.');
+    return;
+  }
+  
   const deco = aquariumStore.decorationTypes[type];
+  
+  if (!deco) {
+    alert('Invalid decoration selected.');
+    return;
+  }
   
   // Calculate x position from grid cell index (8 columns)
   const cellIndex = editDecoIdx.value;
@@ -552,42 +592,41 @@ async function handleDeleteDecoration(idx) {
 }
 
 .fish-svg-static {
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+  display: block;
 }
 
-/* Responsive fish card: stack 1 per row on small screens */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .fish-list {
-    grid-template-columns: repeat(2, minmax(210px, 1fr));
-    gap: 1.2rem;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 }
+
 @media (max-width: 650px) {
   .fish-list {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+  }
+  .fish-card {
+    max-width: 400px;
+    margin: 0 auto;
   }
 }
 
-/* Aquarium Decoration Editor */
+/* Aquarium Preview */
 .aquarium-decoration-editor {
-  margin-top: 2.8rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  margin-top: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .aquarium-preview {
   position: relative;
   width: 100%;
-  max-width: 900px;
-  min-width: 320px;
-  height: 400px;
-  border-radius: 15px 15px 0 0;
+  height: 450px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3);
-  transition: all 0.5s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Water Surface Effect */
@@ -600,57 +639,47 @@ async function handleDeleteDecoration(idx) {
   background: linear-gradient(180deg, 
     rgba(255, 255, 255, 0.3) 0%, 
     rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmer 3s ease-in-out infinite;
-  z-index: 2;
+    transparent 100%);
   pointer-events: none;
+  z-index: 10;
 }
 
-@keyframes shimmer {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.8; }
-}
-
-/* Decoration Grid Overlay - Bottom Row */
+/* Decoration Grid Overlay */
 .decoration-grid-overlay {
   position: absolute;
   bottom: 40px;
   left: 0;
   right: 0;
+  height: 120px;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: 0;
-  height: 120px;
-  z-index: 3;
+  gap: 4px;
   padding: 0 10px;
+  z-index: 3;
 }
 
 .grid-cell {
   position: relative;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed transparent;
   border-radius: 8px;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  margin: 2px;
 }
 
 .grid-cell:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.grid-cell.drag-over {
-  background: rgba(102, 126, 234, 0.3);
-  border-color: #667eea;
-  border-style: solid;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .grid-cell.has-decoration {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.grid-cell.drag-over {
   border-color: rgba(255, 255, 255, 0.3);
   background: rgba(255, 255, 255, 0.1);
 }
@@ -922,5 +951,16 @@ async function handleDeleteDecoration(idx) {
 .btn-sm {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
+}
+
+.btn-outline-primary {
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+}
+
+.btn-outline-primary:hover {
+  background: #3b82f6;
+  color: white;
 }
 </style>
