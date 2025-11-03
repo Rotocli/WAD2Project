@@ -14,6 +14,27 @@
     
     <!-- Time Machine - Only visible for developer accounts -->
     <TimeMachine />
+
+    <!-- loading screen --> 
+    <div v-if="userStore.loading" class="loading-screen"> 
+      <div class="loading-content"> 
+        <!-- Animated Fish --> 
+         <div class="loading-fish"> 
+          <span class="fish">🐠</span> 
+          <span class="fish">🐟</span> 
+          <span class="fish">🐡</span> 
+          </div> 
+          <h2 class="loading-title">Habit Aquarium</h2> 
+          <p class="loading-text">Setting up your tank...</p>
+          
+          <!-- Progress dots --> 
+          <div class="loading-dots"> 
+            <span></span> 
+            <span></span> 
+            <span></span> 
+            </div> 
+          </div>
+        </div> 
   </div>
 </template>
 
@@ -150,25 +171,18 @@ function setupTimeJumpCallback() {
 }
 
 onMounted(() => {
-  // Initialize auth listener
+  // initialize auth listener
   userStore.initAuthListener()
-  
-  // Set up time jump callback for Time Machine integration
   setupTimeJumpCallback()
   
-  // Watch for authentication and perform checks when user logs in
   watch(
     () => userStore.currentUserId,
     async (userId) => {
       if (userId) {
         devLog('User authenticated, performing initial checks...')
-        
-        // Wait a bit for stores to initialize
+       
         setTimeout(async () => {
-          // Check for multiple missed days first
           await checkMultipleMissedDays()
-          
-          // Then perform daily checks
           await performDailyChecks()
         }, 1000)
       }
@@ -213,4 +227,49 @@ onMounted(() => {
 .fade-leave-to {
   opacity: 0;
 }
-</style>
+
+.loading-screen { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  z-index: 10000; 
+  animation: fadeIn 0.3s ease; 
+  } 
+  
+.loading-content { 
+  text-align: center; 
+  color: white; 
+  } 
+
+/* Animated Fish */ 
+.loading-fish { 
+  display: flex; 
+  justify-content: center; 
+  gap: 2rem; 
+  margin-bottom: 2rem; 
+  font-size: 3rem; 
+  } 
+
+.fish { 
+  animation: swim 2s ease-in-out infinite; 
+  display: inline-block; 
+} 
+  
+.fish:nth-child(1) {
+  animation-delay: 0s; 
+  } 
+  
+.fish:nth-child(2) { 
+  animation-delay: 0.3s; 
+  } 
+  
+.fish:nth-child(3) { 
+  animation-delay: 0.6s; 
+  } 
+  </style>

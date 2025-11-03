@@ -254,10 +254,9 @@ const progressPercentage = computed(() =>
 .stat-number {
   display: block;
   font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  color: #4a66e0;
+
 }
 
 .stat-label {
@@ -360,27 +359,6 @@ const progressPercentage = computed(() =>
   gap: 0.5rem;
   margin-left: auto;
   margin-right: 1rem;
-}
-
-.share-btn {
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.9rem;
-}
-
-.share-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.share-btn:active {
-  transform: translateY(0);
 }
 
 .copy-notification {

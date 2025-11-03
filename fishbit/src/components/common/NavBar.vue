@@ -45,11 +45,6 @@
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/friends">
-              <i class="bi bi-people"></i> Friends
-            </router-link>
-          </li>
-          <li class="nav-item">
             <router-link class="nav-link" to="/goals">
               <i class="bi bi-trophy"></i> Goals
             </router-link>
