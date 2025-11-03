@@ -256,7 +256,6 @@ const progressPercentage = computed(() =>
   font-size: 2rem;
   font-weight: 700;
   color: #4a66e0;
-
 }
 
 .stat-label {

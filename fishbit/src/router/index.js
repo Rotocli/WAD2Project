@@ -9,7 +9,6 @@ const HabitsView = () => import('../views/HabitsView.vue')
 const CalendarView = () => import('../views/CalendarView.vue')
 const FishtankView = () => import('../views/FishtankView.vue')
 const ShopView = () => import('../views/ShopView.vue')
-const FriendsView = () => import('../views/FriendsView.vue')
 const ProfileView = () => import('../views/ProfileView.vue')
 const GoalsView = () => import('../views/GoalsView.vue')
 const LoginView = () => import('../views/LoginView.vue')
@@ -62,12 +61,6 @@ const routes = [
     path: '/shop',
     name: 'shop',
     component: ShopView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/friends',
-    name: 'friends',
-    component: FriendsView,
     meta: { requiresAuth: true }
   },
   {
