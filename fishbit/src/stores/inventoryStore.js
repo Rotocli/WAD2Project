@@ -28,6 +28,17 @@ export const useInventoryStore = defineStore('inventory', () => {
     inventoryItems.value.filter(item => item.itemType === 'fish')
   )
 
+  // NEW: Fish food items
+  const fishFoodItems = computed(() => 
+    inventoryItems.value.filter(item => item.itemType === 'fishfood')
+  )
+
+  // NEW: Get total fish food count
+  const totalFishFood = computed(() => {
+    const fishFoodItem = inventoryItems.value.find(item => item.itemId === 'revival_food')
+    return fishFoodItem ? fishFoodItem.quantity : 0
+  })
+
   const groupedFishDecorations = computed(() => {
     const grouped = {
       head: [],
@@ -77,6 +88,7 @@ export const useInventoryStore = defineStore('inventory', () => {
       }
       
       console.log('✅ Inventory loaded:', inventoryItems.value.length, 'items')
+      console.log('🍖 Fish food count:', totalFishFood.value)
     } catch (err) {
       error.value = err.message
       console.error('Error fetching inventory:', err)
@@ -100,46 +112,49 @@ export const useInventoryStore = defineStore('inventory', () => {
         throw new Error('Not enough points!')
       }
 
-      // Deduct points from user (negative amount to deduct)
-      await userStore.updatePoints(-itemData.cost)
-
-      // Create inventory item
-      const inventoryItem = {
-        itemId: itemData.id,
-        itemType: itemData.type || 'aquarium', // 'aquarium' or 'fish'
-        category: itemData.category || null, // For fish decos: 'head', 'eye', etc.
-        name: itemData.name,
-        icon: itemData.icon,
-        cost: itemData.cost,
-        quantity: 1,
-        purchasedAt: new Date()
-      }
-
-      // Check if item already exists in inventory
-      const existingItem = inventoryItems.value.find(
-        item => item.itemId === itemData.id
-      )
-
       const docRef = doc(db, 'inventory', userStore.currentUserId)
-
+      
+      // Check if item already exists in inventory
+      const existingItem = inventoryItems.value.find(item => item.itemId === itemData.itemId)
+      
       if (existingItem) {
-        // Increase quantity
-        existingItem.quantity += 1
+        // Increment quantity
+        const updatedItems = inventoryItems.value.map(item => {
+          if (item.itemId === itemData.itemId) {
+            return { ...item, quantity: item.quantity + 1 }
+          }
+          return item
+        })
         
-        // Update in Firebase
-        await updateDoc(docRef, {
-          items: inventoryItems.value
-        })
+        await updateDoc(docRef, { items: updatedItems })
+        inventoryItems.value = updatedItems
+        
+        console.log(`🛒 Purchased ${itemData.name} - New quantity: ${existingItem.quantity + 1}`)
       } else {
-        // Add new item to inventory
+        // Add new item with quantity 1
+        const newItem = {
+          itemId: itemData.itemId,
+          name: itemData.name,
+          icon: itemData.icon,
+          itemType: itemData.itemType,
+          category: itemData.category,
+          quantity: 1,
+          purchasedAt: new Date()
+        }
+        
         await updateDoc(docRef, {
-          items: arrayUnion(inventoryItem)
+          items: arrayUnion(newItem)
         })
-        inventoryItems.value.push(inventoryItem)
+        
+        inventoryItems.value.push(newItem)
+        console.log(`🛒 Purchased ${itemData.name} - New item added`)
       }
 
-      console.log('✅ Item purchased:', itemData.name)
-      return { success: true, message: `${itemData.name} added to inventory!` }
+      // Deduct points
+      await userStore.updatePoints(-itemData.cost)
+      
+      console.log(`✅ Purchase complete! Fish food count: ${totalFishFood.value}`)
+      return true
     } catch (err) {
       error.value = err.message
       console.error('Error purchasing item:', err)
@@ -149,115 +164,107 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
   }
 
-  async function useItem(itemId) {
+  // NEW: Use fish food to revive a fish
+  async function useFishFood(fishId) {
     const userStore = useUserStore()
-    if (!userStore.currentUserId) return
-
-    const item = inventoryItems.value.find(i => i.itemId === itemId)
-    if (!item) {
-      throw new Error('Item not found in inventory')
+    if (!userStore.currentUserId) {
+      throw new Error('User not authenticated')
     }
 
+    console.log('🍖 [FISH FOOD] Attempting to use fish food on fish:', fishId)
+
+    // Check if user has fish food
+    if (totalFishFood.value <= 0) {
+      console.warn('⚠️ [FISH FOOD] No fish food available!')
+      throw new Error('No fish food available!')
+    }
+
+    loading.value = true
+    error.value = null
+
     try {
-      // Decrease quantity
-      item.quantity -= 1
-
-      // Remove from inventory if quantity is 0
-      if (item.quantity <= 0) {
-        const docRef = doc(db, 'inventory', userStore.currentUserId)
-        await updateDoc(docRef, {
-          items: arrayRemove(item)
-        })
-        inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
-      } else {
-        // Update quantity in Firebase
-        const docRef = doc(db, 'inventory', userStore.currentUserId)
-        await updateDoc(docRef, {
-          items: inventoryItems.value
-        })
-      }
-
-      console.log('✅ Item used:', item.name)
-      return { success: true }
+      const docRef = doc(db, 'inventory', userStore.currentUserId)
+      
+      // Decrease fish food quantity
+      const updatedItems = inventoryItems.value.map(item => {
+        if (item.itemId === 'revival_food') {
+          const newQuantity = Math.max(0, item.quantity - 1)
+          console.log(`🍖 [FISH FOOD] Decreasing quantity from ${item.quantity} to ${newQuantity}`)
+          return { ...item, quantity: newQuantity }
+        }
+        return item
+      }).filter(item => item.quantity > 0) // Remove items with 0 quantity
+      
+      await updateDoc(docRef, { items: updatedItems })
+      inventoryItems.value = updatedItems
+      
+      console.log(`✅ [FISH FOOD] Used fish food! Remaining: ${totalFishFood.value}`)
+      return true
     } catch (err) {
       error.value = err.message
+      console.error('❌ [FISH FOOD] Error using fish food:', err)
       throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function applyAquariumDecoration(itemId, decorationData) {
+    const aquariumStore = useAquariumStore()
+    const userStore = useUserStore()
+    
+    if (!userStore.currentUserId) {
+      throw new Error('User not authenticated')
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      // Add decoration to aquarium
+      await aquariumStore.addDecoration(decorationData)
+      
+      console.log('✅ Applied aquarium decoration:', itemId)
+      return true
+    } catch (err) {
+      error.value = err.message
+      console.error('Error applying decoration:', err)
+      throw err
+    } finally {
+      loading.value = false
     }
   }
 
   async function removeItem(itemId) {
     const userStore = useUserStore()
-    if (!userStore.currentUserId) return
+    if (!userStore.currentUserId) {
+      throw new Error('User not authenticated')
+    }
 
-    const item = inventoryItems.value.find(i => i.itemId === itemId)
-    if (!item) return
+    loading.value = true
+    error.value = null
 
     try {
       const docRef = doc(db, 'inventory', userStore.currentUserId)
+      const itemToRemove = inventoryItems.value.find(item => item.itemId === itemId)
+      
+      if (!itemToRemove) {
+        throw new Error('Item not found in inventory')
+      }
+
       await updateDoc(docRef, {
-        items: arrayRemove(item)
+        items: arrayRemove(itemToRemove)
       })
       
-      inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
-      console.log('✅ Item removed from inventory')
+      inventoryItems.value = inventoryItems.value.filter(item => item.itemId !== itemId)
+      
+      console.log('✅ Removed item from inventory:', itemId)
     } catch (err) {
       error.value = err.message
+      console.error('Error removing item:', err)
       throw err
-    }
-  }
-
-  async function placeAquariumDecoration(itemId, gridIndex) {
-    const aquariumStore = useAquariumStore()
-    const item = inventoryItems.value.find(i => i.itemId === itemId)
-    
-    if (!item || item.itemType !== 'aquarium') {
-      throw new Error('Invalid aquarium decoration')
-    }
-
-    try {
-      // Get decoration details from aquariumStore
-      const decoration = aquariumStore.decorationTypes[itemId]
-      if (!decoration) {
-        throw new Error('Decoration not found')
-      }
-
-      // Place in aquarium
-      await aquariumStore.updateGridCell(gridIndex, {
-        ...decoration,
-        id: itemId
-      })
-
-      // Use the item (decrease quantity)
-      await useItem(itemId)
-
-      return { success: true, message: 'Decoration placed!' }
-    } catch (err) {
-      console.error('Error placing decoration:', err)
-      throw err
-    }
-  }
-
-  async function equipFishDecoration(itemId, fishId) {
-    const fishDecoStore = useFishDecoStore()
-    const item = inventoryItems.value.find(i => i.itemId === itemId)
-    
-    if (!item || item.itemType !== 'fish') {
-      throw new Error('Invalid fish decoration')
-    }
-
-    try {
-      // Equip the decoration
-      const result = await fishDecoStore.equipDecoration(item.category, itemId)
-      
-      if (result.success) {
-        // Use the item (decrease quantity)
-        await useItem(itemId)
-      }
-
-      return result
-    } catch (err) {
-      console.error('Error equipping decoration:', err)
-      throw err
+    } finally {
+      loading.value = false
     }
   }
 
@@ -270,18 +277,17 @@ export const useInventoryStore = defineStore('inventory', () => {
     // Computed
     aquariumDecorations,
     fishDecorations,
+    fishFoodItems,
+    totalFishFood,
     groupedFishDecorations,
     
-    // Helpers
+    // Methods
     hasItem,
     getQuantity,
-    
-    // Actions
     fetchInventory,
     purchaseItem,
-    useItem,
-    removeItem,
-    placeAquariumDecoration,
-    equipFishDecoration
+    useFishFood,
+    applyAquariumDecoration,
+    removeItem
   }
 })

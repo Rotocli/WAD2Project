@@ -1,5 +1,5 @@
 // src/services/dailyCheckService.js
-// Handles daily checks for streak breaks, habit resets, and time-based logic
+// Handles daily checks for streak breaks, habit resets, fish health, and time-based logic
 
 import { timeService } from './timeService'
 import { devLog, devWarn } from '@/utils/devUtils'
@@ -25,9 +25,10 @@ class DailyCheckService {
    * @param {string} userId - Current user ID
    * @param {Object} habitStore - Habit store instance
    * @param {Object} userStore - User store instance
+   * @param {Object} fishStore - Fish store instance (NEW)
    * @returns {Object} - Results of checks
    */
-  async performDailyChecks(userId, habitStore, userStore) {
+  async performDailyChecks(userId, habitStore, userStore, fishStore = null) {
     if (this.isChecking) {
       devWarn('Daily check already in progress, skipping...')
       return this.lastCheckResult
@@ -42,6 +43,8 @@ class DailyCheckService {
         userStreakBroken: false,
         habitStreaksBroken: [],
         habitsChecked: 0,
+        fishHealthChecked: 0,
+        fishDied: [],
         errors: []
       }
 
@@ -53,6 +56,17 @@ class DailyCheckService {
       const habitStreakCheck = await this.checkHabitStreaks(userId, habitStore)
       results.habitStreaksBroken = habitStreakCheck.brokenHabits
       results.habitsChecked = habitStreakCheck.totalChecked
+
+      // ========================================
+      // 🐟 NEW: CHECK FISH HEALTH
+      // ========================================
+      if (fishStore) {
+        devLog('🐟 Checking fish health...')
+        const fishHealthCheck = await this.checkFishHealth(userId, fishStore, habitStore)
+        results.fishHealthChecked = fishHealthCheck.totalChecked
+        results.fishDied = fishHealthCheck.fishDied
+        devLog(`✅ Fish health check complete: ${fishHealthCheck.totalChecked} fish checked, ${fishHealthCheck.fishDied.length} died`)
+      }
 
       this.lastCheckResult = results
       devLog('✅ Daily checks complete:', results)
@@ -250,20 +264,112 @@ class DailyCheckService {
   }
 
   /**
+   * NEW: Check health of all user's fish and mark dead ones
+   * IMPORTANT: Excludes fish from archived habits (they should not lose health)
+   * @param {string} userId - User ID
+   * @param {Object} fishStore - Fish store instance
+   * @param {Object} habitStore - Habit store instance (optional, for checking archived status)
+   * @returns {Object} - Results of fish health checks
+   */
+  async checkFishHealth(userId, fishStore, habitStore = null) {
+    console.log('🏥 [DAILY CHECK] Starting fish health check for user:', userId)
+    
+    try {
+      // Get all alive fish for this user
+      let aliveFish = fishStore.fish.filter(f => f.userId === userId && f.isAlive)
+      
+      // If habitStore provided, exclude fish from archived habits
+      if (habitStore) {
+        aliveFish = aliveFish.filter(fish => {
+          const habit = habitStore.habits.find(h => h.id === fish.habitId)
+          
+          // Skip if habit is archived
+          if (habit && habit.isArchived) {
+            console.log(`⏸️ [DAILY CHECK] Skipping fish "${fish.customName}" - habit is archived`)
+            return false
+          }
+          
+          return true
+        })
+      }
+      
+      console.log(`🐠 [DAILY CHECK] Found ${aliveFish.length} alive fish with active habits to check`)
+
+      const fishDied = []
+
+      for (const fish of aliveFish) {
+        const health = fishStore.calculateFishHealth(fish.lastFed, fish.createdAt)
+        console.log(`🩺 [DAILY CHECK] Fish "${fish.customName}" health: ${health.toFixed(2)}%`)
+
+        // If health is 0 or below, mark fish as dead
+        if (health <= 0) {
+          console.warn(`💀 [DAILY CHECK] Fish "${fish.customName}" has died from neglect!`)
+          
+          try {
+            await updateDoc(doc(db, 'fish', fish.id), {
+              isAlive: false,
+              deathDate: timeService.now(),
+              deathReason: 'starvation'
+            })
+
+            // Update local state
+            const fishIndex = fishStore.fish.findIndex(f => f.id === fish.id)
+            if (fishIndex !== -1) {
+              fishStore.fish[fishIndex].isAlive = false
+              fishStore.fish[fishIndex].deathDate = timeService.now()
+              fishStore.fish[fishIndex].deathReason = 'starvation'
+            }
+
+            fishDied.push({
+              fishId: fish.id,
+              fishName: fish.customName,
+              habitId: fish.habitId,
+              lastFed: fish.lastFed,
+              health: health
+            })
+          } catch (err) {
+            console.error(`❌ [DAILY CHECK] Error marking fish ${fish.id} as dead:`, err)
+          }
+        } else if (health <= 20) {
+          console.warn(`⚠️ [DAILY CHECK] Fish "${fish.customName}" is in critical condition! (${health.toFixed(2)}% health)`)
+        } else {
+          console.log(`✅ [DAILY CHECK] Fish "${fish.customName}" is healthy (${health.toFixed(2)}% health)`)
+        }
+      }
+
+      return {
+        totalChecked: aliveFish.length,
+        fishDied,
+        timestamp: timeService.now().toISOString()
+      }
+
+    } catch (error) {
+      console.error('❌ [DAILY CHECK] Error checking fish health:', error)
+      return {
+        totalChecked: 0,
+        fishDied: [],
+        error: error.message
+      }
+    }
+  }
+
+  /**
    * Check for multiple missed days and handle accordingly
    * Useful when user hasn't opened app in days
    * @param {string} userId - User ID
    * @param {Object} habitStore - Habit store instance
    * @param {Object} userStore - User store instance
+   * @param {Object} fishStore - Fish store instance (NEW)
    * @param {number} daysToCheck - Number of past days to check
    */
-  async checkMultipleDays(userId, habitStore, userStore, daysToCheck = 7) {
+  async checkMultipleDays(userId, habitStore, userStore, fishStore = null, daysToCheck = 7) {
     devLog(`📅 Checking last ${daysToCheck} days for missed habits...`)
     
     const results = {
       daysChecked: daysToCheck,
       missedDays: [],
-      streaksBroken: false
+      streaksBroken: false,
+      fishDied: []
     }
 
     // Check each day going backwards
@@ -302,6 +408,12 @@ class DailyCheckService {
       }
     }
 
+    // Check fish health after multiple days
+    if (fishStore) {
+      const fishHealthCheck = await this.checkFishHealth(userId, fishStore, habitStore)
+      results.fishDied = fishHealthCheck.fishDied
+    }
+
     return results
   }
 
@@ -309,9 +421,10 @@ class DailyCheckService {
    * Get summary of user's current status
    * @param {string} userId - User ID
    * @param {Object} habitStore - Habit store instance
+   * @param {Object} fishStore - Fish store instance (NEW)
    * @returns {Object} - Status summary
    */
-  async getUserStatus(userId, habitStore) {
+  async getUserStatus(userId, habitStore, fishStore = null) {
     const today = timeService.getTodayString()
     
     // Get today's habits
@@ -327,7 +440,7 @@ class DailyCheckService {
     
     const completedSnapshot = await getDocs(completedQuery)
     
-    return {
+    const status = {
       date: today,
       totalHabits: todaysHabits.length,
       completedHabits: completedSnapshot.size,
@@ -336,6 +449,23 @@ class DailyCheckService {
         ? Math.round((completedSnapshot.size / todaysHabits.length) * 100) 
         : 0
     }
+
+    // Add fish statistics if fishStore provided
+    if (fishStore) {
+      const userFish = fishStore.fish.filter(f => f.userId === userId)
+      const aliveFish = userFish.filter(f => f.isAlive)
+      const criticalFish = aliveFish.filter(f => {
+        const health = fishStore.calculateFishHealth(f.lastFed, f.createdAt)
+        return health <= 20 && health > 0
+      })
+
+      status.totalFish = userFish.length
+      status.aliveFish = aliveFish.length
+      status.deadFish = userFish.length - aliveFish.length
+      status.criticalFish = criticalFish.length
+    }
+
+    return status
   }
 }
 

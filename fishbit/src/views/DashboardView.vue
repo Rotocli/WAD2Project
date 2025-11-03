@@ -6,6 +6,13 @@
         <WelcomeSection :motivationalQuote="motivationalQuote" :username="username"/>
       </div>
 
+      <!-- Fish Food Counter Section -->
+      <div class="p-4 pb-0">
+        <div class="fish-food-wrapper">
+          <FishFoodCounter />
+        </div>
+      </div>
+
       <!-- AQUARIUM - Full Width -->
       <div class="aquarium-section">
         <AquariumView @fish-clicked="handleFishClick" />
@@ -63,15 +70,18 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
 import { useHabitStore } from '../stores/habitStore'
 import { useFishStore } from '../stores/fishStore'
+import { useInventoryStore } from '../stores/inventoryStore'
 import { notificationService } from '../services/notificationService'
 import WelcomeSection from '../components/DashboardView/WelcomeSection.vue'
 import StatCard from '../components/DashboardView/StatCard.vue'
 import HabitDisplay from '../components/DashboardView/HabitDisplay.vue'
 import AquariumView from '../components/fish/AquariumView.vue'
+import FishFoodCounter from '../components/common/FishFoodCounter.vue'
 
 const userStore = useUserStore()
 const habitStore = useHabitStore()
 const fishStore = useFishStore()
+const inventoryStore = useInventoryStore()
 
 // Fetch user habits
 watch(
@@ -86,6 +96,15 @@ watch(
   () => userStore.currentUserId,
   (uid) => {
     if (uid) fishStore.fetchFish(uid)
+  },
+  { immediate: true }
+)
+
+// Fetch inventory for fish food counter
+watch(
+  () => userStore.currentUserId,
+  (uid) => {
+    if (uid) inventoryStore.fetchInventory()
   },
   { immediate: true }
 )
@@ -160,6 +179,13 @@ onMounted(() => {
 .dashboard-view {
   min-height: calc(100vh - 70px);
   background: #f8f9fa;
+}
+
+/* Fish Food Wrapper */
+.fish-food-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 /* Aquarium Section */
@@ -247,4 +273,3 @@ onMounted(() => {
   }
 }
 </style>
-z

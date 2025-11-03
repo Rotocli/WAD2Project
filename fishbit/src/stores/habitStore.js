@@ -396,6 +396,40 @@ export const useHabitStore = defineStore('habit', () => {
         await userStore.updatePoints(200) // Month streak bonus
       }
 
+      // ========================================
+      // 🐟 FEED THE FISH WHEN HABIT IS COMPLETED
+      // ========================================
+      console.log(`🍽️ [HABIT COMPLETE] Habit completed! Now feeding associated fish...`)
+      
+      try {
+        const { useFishStore } = await import('./fishStore')
+        const fishStore = useFishStore()
+        
+        // Get all fish associated with this habit
+        const habitFish = fishStore.getFishByHabitId(habitId)
+        
+        if (habitFish.length === 0) {
+          console.warn(`⚠️ [FEED] No fish found for habit ${habitId}`)
+        } else {
+          console.log(`🐠 [FEED] Found ${habitFish.length} fish to feed for habit: "${habit.name}"`)
+          
+          // Feed each fish associated with this habit
+          for (const fish of habitFish) {
+            if (fish.isAlive) {
+              await fishStore.feedFish(fish.id)
+              console.log(`✅ [FEED] Fed fish "${fish.customName}" (ID: ${fish.id})`)
+            } else {
+              console.log(`💀 [FEED] Skipping dead fish "${fish.customName}" (ID: ${fish.id})`)
+            }
+          }
+          
+          console.log(`🎉 [FEED] All fish fed successfully for habit: "${habit.name}"`)
+        }
+      } catch (fishErr) {
+        console.error('❌ [FEED] Error feeding fish:', fishErr)
+        // Don't fail habit completion if fish feeding fails
+      }
+
       return true
     } catch (err) {
       error.value = err.message

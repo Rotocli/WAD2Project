@@ -2,7 +2,7 @@
   <div class="aquarium-container" :style="aquariumStyle">
     <!-- Aquarium Label -->
     <div class="aquarium-label">
-      🐟 Your Habit Aquarium - {{ fishCount }} Fish
+      🐟 Your Habit Aquarium - {{ totalFishCount }} Fish ({{ deadFishCount }} 💀)
     </div>
 
     <!-- Water Surface Effect -->
@@ -47,6 +47,17 @@
       />
     </div>
 
+    <!-- NEW: Dead Fish Layer (floating at the top) -->
+    <div class="layer layer-dead">
+      <FishSprite
+        v-for="fish in deadFish"
+        :key="fish.id"
+        :fish="fish"
+        @fish-clicked="onFishClick"
+        @fish-revived="handleFishRevival"
+      />
+    </div>
+
     <!-- Surface Layer (Bubbles) -->
     <div class="layer layer-surface">
       <div 
@@ -67,13 +78,23 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="!loading && fishCount === 0" class="empty-state">
+    <div v-if="!loading && totalFishCount === 0" class="empty-state">
       <span class="empty-icon">🐠</span>
       <h3>Your aquarium is empty!</h3>
       <p>Create your first habit to get your first fish</p>
       <router-link to="/habits" class="btn btn-primary">
         Create Habit
       </router-link>
+    </div>
+
+    <!-- NEW: Revival Success Modal -->
+    <div v-if="showRevivalModal" class="revival-modal">
+      <div class="revival-modal-content">
+        <div class="revival-icon">🍖✨</div>
+        <h3>Fish Revival Scheduled!</h3>
+        <p><strong>{{ revivingFishName }}</strong> is being revived!</p>
+        <p class="revival-message">Come back soon to see your fish alive!</p>
+      </div>
     </div>
   </div>
 </template>
@@ -83,25 +104,62 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useFishStore } from '../../stores/fishStore'
 import { useAquariumStore } from '../../stores/aquariumStore'
 import { useUserStore } from '../../stores/userStore'
+import { useInventoryStore } from '../../stores/inventoryStore'
 import FishSprite from './FishSprite.vue'
 import DecorationSprite from './DecorationSprite.vue'
 
 const fishStore = useFishStore()
 const aquariumStore = useAquariumStore()
 const userStore = useUserStore()
+const inventoryStore = useInventoryStore()
 
 const emit = defineEmits(['fish-clicked'])
 
 const loading = ref(true)
 const bubbles = ref([])
+const showRevivalModal = ref(false)
+const revivingFishName = ref('')
 
 // Emit fish click event to parent
 function onFishClick(fish) {
   emit('fish-clicked', fish)
 }
 
+// NEW: Handle fish revival with fish food
+async function handleFishRevival(fish) {
+  console.log('🍖 [REVIVAL] Attempting to revive fish:', fish.customName)
+  
+  try {
+    // Use fish food from inventory
+    await inventoryStore.useFishFood(fish.id)
+    
+    // Mark fish for revival (will happen after page refresh/reload)
+    await fishStore.updateFish(fish.id, {
+      revivalPending: true,
+      revivalScheduledAt: new Date()
+    })
+    
+    // Show success modal
+    revivingFishName.value = fish.customName
+    showRevivalModal.value = true
+    
+    console.log(`✅ [REVIVAL] Fish "${fish.customName}" scheduled for revival!`)
+    
+    // Auto-hide modal after 3 seconds
+    setTimeout(() => {
+      showRevivalModal.value = false
+    }, 3000)
+    
+  } catch (error) {
+    console.error('❌ [REVIVAL] Error reviving fish:', error)
+    alert(error.message || 'Failed to revive fish')
+  }
+}
+
 // Computed properties
-const fishCount = computed(() => fishStore.activeFish.length)
+const totalFishCount = computed(() => fishStore.fish.length)
+const aliveFishCount = computed(() => fishStore.activeFish.length)
+const deadFishCount = computed(() => fishStore.fish.filter(f => !f.isAlive).length)
 
 const aquariumStyle = computed(() => ({
   background: aquariumStore.currentLighting.gradient,
@@ -115,11 +173,7 @@ const substrateStyle = computed(() => ({
     ${aquariumStore.currentSubstrate.color} 100%)`
 }))
 
-// Separate fish by layer for depth effect
-// const backLayerFish = computed(() => 
-//   fishStore.activeFish.filter(f => f.position.layer === 0)
-// )
-
+// Separate ALIVE fish by layer for depth effect
 const backLayerFish = computed(() => {
   const filtered = fishStore.activeFish.filter(f => f.position.layer === 0)
   console.log('🎯 backLayerFish computed:', filtered.map(f => f.customName))
@@ -133,6 +187,28 @@ const midLayerFish = computed(() =>
 const frontLayerFish = computed(() => 
   fishStore.activeFish.filter(f => f.position.layer === 2)
 )
+
+// NEW: Dead fish (all dead fish float at the top)
+const deadFish = computed(() => {
+  const dead = fishStore.fish.filter(f => !f.isAlive)
+  console.log('💀 deadFish computed:', dead.length, 'dead fish')
+  
+  // Position dead fish at the top of the aquarium, floating
+  return dead.map((fish, index) => {
+    return {
+      ...fish,
+      // Override position to float at top
+      position: {
+        ...fish.position,
+        x: 15 + (index * 20) % 70, // Spread them across the top
+        y: 5, // Near the top of the aquarium
+        layer: 3 // Above all other fish
+      },
+      // Mark as dead for styling
+      isDead: true
+    }
+  })
+})
 
 // Separate decorations by layer
 const backDecorations = computed(() =>
@@ -181,12 +257,12 @@ async function loadAquariumData() {
       aquariumStore.fetchSettings(userId)
     ])
     
-    console.log('✅ AquariumView: Data loaded. Fish count:', fishStore.fish.length, 'Active fish:', fishStore.activeFish.length)
+    console.log('✅ AquariumView: Data loaded. Total fish:', fishStore.fish.length, 'Alive:', fishStore.activeFish.length, 'Dead:', fishStore.fish.filter(f => !f.isAlive).length)
     console.log('🎨 Layer distribution:', {
       back: fishStore.activeFish.filter(f => f.position.layer === 0).map(f => f.customName),
       mid: fishStore.activeFish.filter(f => f.position.layer === 1).map(f => f.customName),
       front: fishStore.activeFish.filter(f => f.position.layer === 2).map(f => f.customName),
-      other: fishStore.activeFish.filter(f => ![0,1,2].includes(f.position.layer)).map(f => ({name: f.customName, layer: f.position.layer}))
+      dead: fishStore.fish.filter(f => !f.isAlive).map(f => f.customName)
     })
     createBubbles()
   } catch (error) {
@@ -277,8 +353,14 @@ onMounted(async () => {
   z-index: 3;
 }
 
-.layer-surface { 
+/* NEW: Dead fish layer - above everything */
+.layer-dead {
   z-index: 4;
+  pointer-events: none;
+}
+
+.layer-surface { 
+  z-index: 5;
 }
 
 /* Bubbles */
@@ -423,6 +505,87 @@ onMounted(async () => {
 .empty-state .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* NEW: Revival Modal */
+.revival-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.revival-modal-content {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  padding: 32px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.revival-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: revivalPulse 1s ease-in-out infinite;
+}
+
+@keyframes revivalPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.revival-modal-content h3 {
+  color: #78350f;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.revival-modal-content p {
+  color: #92400e;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.revival-message {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-top: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive */
