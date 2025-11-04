@@ -30,6 +30,7 @@
           <div class="info">
             <div class="title">{{ achievement.name }}</div>
             <div class="desc">{{ achievement.description }}</div>
+            <div class="points-badge">+{{ achievement.points }} points</div>
           </div>
         </div>
       </div>
@@ -80,6 +81,7 @@ async function checkAchievements() {
   if (!userStore.currentUserId) return
 
   const newUnlocks = []
+  let totalPointsEarned = 0
 
   achievements.value.forEach(async (achievement) => {
     // If already unlocked, skip
@@ -88,9 +90,11 @@ async function checkAchievements() {
     // If newly attained, unlock it
     if (achievement.attained) {
       newUnlocks.push(achievement.id)
+      totalPointsEarned += achievement.points
       userAchievements.value[achievement.id] = {
         unlockedAt: new Date(),
-        name: achievement.name
+        name: achievement.name,
+        pointsAwarded: achievement.points
       }
     }
   })
@@ -103,7 +107,11 @@ async function checkAchievements() {
         userAchievements.value,
         { merge: true }
       )
+
+      await userStore.addPoints(totalPointsEarned)
+    
       console.log('🏆 New achievements unlocked:', newUnlocks)
+      console.log(`💰 Points earned: ${totalPointsEarned}`)
     } catch (error) {
       console.error('Error saving achievements:', error)
     }
@@ -125,6 +133,7 @@ const achievements = computed(() => [
     name: 'Getting Started',
     description: 'Create your first habit',
     emoji: '🌱',
+    points: 10,
     attained: habitStore.habits.length >= 1,
     unlockedAt: userAchievements.value['first-habit']?.unlockedAt
   },
@@ -133,6 +142,7 @@ const achievements = computed(() => [
     name: 'Habit Builder',
     description: 'Create 5 habits',
     emoji: '🏗️',
+    points: 25,
     attained: habitStore.habits.length >= 5,
     unlockedAt: userAchievements.value['habit-5']?.unlockedAt
   },
@@ -141,6 +151,7 @@ const achievements = computed(() => [
     name: 'First Step',
     description: 'Complete your first habit',
     emoji: '✨',
+    points: 15,
     attained: habitStore.habits.some(h => h.completedCount >= 1),
     unlockedAt: userAchievements.value['first-complete']?.unlockedAt
   },
@@ -149,6 +160,7 @@ const achievements = computed(() => [
     name: 'On a Roll',
     description: 'Maintain a 3-day streak',
     emoji: '🔥',
+    points: 20,
     attained: userStore.currentStreak >= 3,
     unlockedAt: userAchievements.value['streak-3']?.unlockedAt
   },
@@ -157,6 +169,7 @@ const achievements = computed(() => [
     name: 'Week Warrior',
     description: 'Maintain a 7-day streak',
     emoji: '⚡',
+    points: 35,
     attained: userStore.currentStreak >= 7,
     unlockedAt: userAchievements.value['streak-7']?.unlockedAt
   },
@@ -165,6 +178,7 @@ const achievements = computed(() => [
     name: 'Monthly Master',
     description: 'Maintain a 30-day streak',
     emoji: '👑',
+    points: 100,
     attained: userStore.currentStreak >= 30,
     unlockedAt: userAchievements.value['streak-30']?.unlockedAt
   },
@@ -173,6 +187,7 @@ const achievements = computed(() => [
     name: 'Half Century',
     description: 'Complete any single habit 50 times',
     emoji: '💎',
+    points: 100,
     attained: habitStore.habits.some(h => h.completedCount >= 50),
     unlockedAt: userAchievements.value['habit-50']?.unlockedAt
   },
@@ -181,6 +196,7 @@ const achievements = computed(() => [
     name: 'Centurion',
     description: 'Complete any single habit 100 times',
     emoji: '🏆',
+    points: 300,
     attained: habitStore.habits.some(h => h.completedCount >= 100),
     unlockedAt: userAchievements.value['habit-100']?.unlockedAt
   },
@@ -189,6 +205,7 @@ const achievements = computed(() => [
     name: 'Point Collector',
     description: 'Earn 100 total points',
     emoji: '💯',
+    points: 20,
     attained: userStore.totalPoints >= 100,
     unlockedAt: userAchievements.value['points-100']?.unlockedAt
   },
@@ -197,6 +214,7 @@ const achievements = computed(() => [
     name: 'Point Hoarder',
     description: 'Earn 500 total points',
     emoji: '💰',
+    points: 100,
     attained: userStore.totalPoints >= 500,
     unlockedAt: userAchievements.value['points-500']?.unlockedAt
   },
@@ -205,6 +223,7 @@ const achievements = computed(() => [
     name: 'Early Bird',
     description: 'Complete all habits before 9 AM',
     emoji: '🌅',
+    points: 50,
     attained: false, // TODO: Implement time tracking
     unlockedAt: userAchievements.value['early-bird']?.unlockedAt
   },
@@ -213,6 +232,7 @@ const achievements = computed(() => [
     name: 'Perfect Week',
     description: 'Complete all daily habits for 7 days straight',
     emoji: '⭐',
+    points: 200,
     attained: false, // TODO: Implement tracking
     unlockedAt: userAchievements.value['perfect-week']?.unlockedAt
   },
@@ -393,5 +413,21 @@ const progressPercentage = computed(() =>
     flex-wrap: wrap;
   }
 
+}
+
+.points-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.achievement-row.attained .points-badge {
+  background: #d1fae5;
+  color: #065f46;
 }
 </style>
