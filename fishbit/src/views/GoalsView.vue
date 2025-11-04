@@ -73,6 +73,10 @@ async function loadAchievements() {
     }
   } catch (error) {
     console.error('Error loading achievements:', error)
+    if (error.code === 'permission-denied') {
+      console.log('No achievements yet - will be created on first unlock')
+      userAchievements.value = {}
+    }
   }
 }
 
