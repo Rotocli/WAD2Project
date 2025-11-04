@@ -3,7 +3,8 @@
     <div class="container-fluid p-0">
       <!-- Welcome Section -->
       <div class="p-4">
-        <WelcomeSection :motivationalQuote="motivationalQuote" :username="username"/>
+        <WelcomeSection :motivationalQuote="motivationalQuote" :username="username" :activeHabitsCount="activeHabitsCount" 
+          :fishCount="fishCount"/>
       </div>
 
       <!-- AQUARIUM - Full Width -->
@@ -13,12 +14,7 @@
 
       <!-- Stats Cards -->
       <div class="p-4">
-        <StatCard 
-          :currentStreak="currentStreak" 
-          :totalPoints="totalPoints" 
-          :activeHabitsCount="activeHabitsCount" 
-          :fishCount="fishCount"
-        />
+        
         
         <div class="row g-4 mt-2">
           <!-- Today's Habits -->

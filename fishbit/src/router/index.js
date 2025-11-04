@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { watch } from 'vue'
 import { useUserStore } from '../stores/userStore'
 
+
 // Lazy load views for better performance
 const HomeView = () => import('../views/HomeView.vue')
 const DashboardView = () => import('../views/DashboardView.vue')
@@ -13,6 +14,7 @@ const ProfileView = () => import('../views/ProfileView.vue')
 const GoalsView = () => import('../views/GoalsView.vue')
 const LoginView = () => import('../views/LoginView.vue')
 const RegisterView = () => import('../views/RegisterView.vue')
+const JournalView=()=> import('../views/JournalView.vue')
 
 const routes = [
   {
@@ -50,6 +52,13 @@ const routes = [
     name: 'habits',
     component: HabitsView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/journal',
+    name: 'journal',
+    component: JournalView,
+    meta: { requiresAuth: true }
+
   },
   {
     path: '/fishtank',

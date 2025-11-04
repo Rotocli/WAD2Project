@@ -25,6 +25,12 @@
             </router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/journal">
+              <i class="bi bi-file-text"></i> Journal
+            </router-link>
+          </li>
+
+          <li class="nav-item">
             <router-link class="nav-link" to="/habits">
               <i class="bi bi-check2-square"></i> Habits
             </router-link>
