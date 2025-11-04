@@ -15,17 +15,77 @@
 
       <!-- Fish Section -->
       <div v-if="fish" class="fish-section mt-4">
-        <h6 class="mb-2">🐠 Your Fish</h6>
-        <p><strong>Species:</strong> {{ speciesInfo.name }} {{ speciesInfo.emoji }}</p>
         
-
         <div
           class="fish-preview mt-3"
           :style="{
-            background: `linear-gradient(135deg, ${fish.baseColor}, ${fish.stripeColor})`
+            background: `white`
           }"
         >
-          <span class="fish-emoji">{{ speciesInfo.emoji }}</span>
+          <!-- Add this section in fishModal.vue template where you want the fish to appear -->
+          <div class="fish-display" v-if="fish">
+
+            <div class="fish-content">
+              <div class="fish-img">
+                <svg 
+                  width="80" 
+                  height="60" 
+                  viewBox="0 0 80 60"
+                  class="fish-svg-static"
+                >
+                  <ellipse 
+                    cx="40" 
+                    cy="30" 
+                    rx="30" 
+                    ry="18" 
+                    :fill="fish.baseColor"
+                  />
+                  <g v-if="fish.pattern === 'stripes' || fish.pattern === 'default'">
+                    <ellipse cx="25" cy="30" rx="8" ry="12" :fill="fish.stripeColor || fish.baseColor" opacity="0.8"/>
+                    <ellipse cx="45" cy="30" rx="8" ry="12" :fill="fish.stripeColor || fish.baseColor" opacity="0.8"/>
+                  </g>
+                  <circle cx="55" cy="26" r="5" fill="white"/>
+                  <circle cx="55" cy="26" r="3" fill="#000"/>
+                  <ellipse 
+                    cx="12" 
+                    cy="30" 
+                    rx="15" 
+                    ry="12" 
+                    :fill="fish.baseColor"
+                    opacity="0.9"
+                  />
+                  <path 
+                    d="M 8 20 L 0 30 L 8 40 Q 5 30 8 20" 
+                    :fill="fish.baseColor"
+                    opacity="0.7"
+                  />
+                  <ellipse 
+                    cx="40" 
+                    cy="12" 
+                    rx="15" 
+                    ry="6" 
+                    :fill="fish.stripeColor || fish.baseColor"
+                    opacity="0.7"
+                  />
+                  <ellipse 
+                    cx="40" 
+                    cy="48" 
+                    rx="15" 
+                    ry="6" 
+                    :fill="fish.stripeColor || fish.baseColor"
+                    opacity="0.7"
+                  />
+                  <path 
+                    d="M 75 30 L 78 28 L 75 26" 
+                    stroke="#000" 
+                    stroke-width="1" 
+                    fill="none"
+                    opacity="0.5"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -193,8 +253,8 @@ h6 {
 
 /* Fish Preview Circle */
 .fish-preview {
-  width: 140px !important;
-  height: 140px !important;
+  width: 200px !important;
+  height: 150px !important;
   border-radius: 50%;
   margin: 1.5rem auto 0 !important;
   display: flex;
