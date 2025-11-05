@@ -574,11 +574,11 @@ function saveInventory() {
 
 .filter-btn:hover {
   border-color: #667eea;
-  color: #667eea;
+  background-color: rgba(217, 197, 252, 0.4);
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
@@ -747,7 +747,7 @@ function saveInventory() {
   padding: 1rem 3rem;
   font-size: 1.3rem;
   font-weight: bold;
-  background: #78c3bd;
+  background: #58b8b0;
   color: white;
   border: none;
   border-radius: 50px;
@@ -813,25 +813,34 @@ function saveInventory() {
 }
 
 .inventory-slot.selected {
-  background: #eef2ff;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  background: #9eabf9;
+  border-color: #5568d3;
 }
 
 .inventory-item {
   width: 100%;
   height: 100%;
-  /* display: flex; */
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
+  text-align: center;
+  font-size: 1rem;
+  bottom: 0;
 }
 
 .inventory-icon {
-  font-size: 2.5rem;
-  min-width: 100%;
+  font-size: 2.8rem; 
+  width: 100%;
+  height: 200%;
+  max-width: 300px;
+  max-height: 300px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  top: -35px;
+  object-fit: contain;
 }
-
 
 .quantity-badge {
   position: absolute;
@@ -907,7 +916,7 @@ function saveInventory() {
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #58b8b0;
   color: white;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
@@ -927,7 +936,7 @@ function saveInventory() {
   bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  background: #f59e0b;
+  background: #ea963c;
   color: white;
   padding: 2px 6px;
   border-radius: 8px;

@@ -1,8 +1,6 @@
 <template>
   <div class="goals-view">
     <div class="container-fluid p-4">
-      <h2>🏆 Achievements</h2>
-      <p>Track your progress and unlock badges!</p>
 
       <div class="stats-summary">
         <div class="stat-card">
