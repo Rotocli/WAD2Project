@@ -1,7 +1,8 @@
 <template>
   <div class="profile-view">
     <div class="container-fluid p-4">
-      <h2 class="mb-4">Profile Settings</h2>
+      <h2 class="mb-4 profiletitle">Profile Settings</h2>
+      <p class="profiletitle">Adjust your settings</p>
       
       <div class="settings-section">
         <h3>🔔 Notifications</h3>
@@ -9,8 +10,8 @@
         <div class="setting-item">
           <div class="setting-info">
             <p>Push notifications for habit reminders</p>
-            <small v-if="fcmToken" class="text-success d-block">✅ Notifications enabled</small>
-            <small v-else class="text-muted d-block">❌ Notifications disabled</small>
+            <small v-if="fcmToken" class="d-block">Notifications enabled</small>
+            <small v-else class="text-muted d-block">Notifications disabled</small>
           </div>
           
           <div class="btn-group">
@@ -72,7 +73,7 @@ onMounted(async () => {
       const userDoc = await getDoc(doc(db, 'users', userStore.currentUserId))
       if (userDoc.exists() && userDoc.data().fcmToken) {
         fcmToken.value = userDoc.data().fcmToken
-        console.log('✅ Loaded saved FCM token')
+        console.log('Loaded saved FCM token')
       }
     } catch (error) {
       console.error('Error loading token:', error)
@@ -103,9 +104,9 @@ async function enableNotifications() {
       body: 'You will now receive habit reminders'
     })
     
-    alert('✅ Notifications enabled successfully!')
+    alert('Notifications enabled successfully!')
   } else {
-    alert('❌ Failed to enable notifications. Please check your browser settings.')
+    alert('Failed to enable notifications. Please check your browser settings.')
   }
 }
 
@@ -122,7 +123,7 @@ async function disableNotifications() {
         fcmToken: null
       })
       fcmToken.value = null
-      console.log('✅ Firestore token cleared')
+      console.log('Firestore token cleared')
     }
 
     // disabling notifs -> unregister firebase service worker
@@ -130,7 +131,7 @@ async function disableNotifications() {
       const registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
       if (registration) {
         await registration.unregister()
-        console.log('🧹 Firebase service worker unregistered')
+        console.log('Firebase service worker unregistered')
       }
     }
 
@@ -138,7 +139,7 @@ async function disableNotifications() {
     const { getMessaging, deleteToken } = await import('firebase/messaging')
     const messaging = getMessaging()
     await deleteToken(messaging)
-    console.log('🧹 FCM token deleted from device')
+    console.log('FCM token deleted from device')
 
     alert('Notifications have been fully disabled.')
   } catch (error) {
@@ -166,11 +167,16 @@ function sendHabitReminder() {
 
 .profile-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  background: linear-gradient(#43399d 20%,#cbadff);
+}
+
+.profiletitle {
+  color: white;
+  margin: 2rem;
 }
 
 .settings-section {
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

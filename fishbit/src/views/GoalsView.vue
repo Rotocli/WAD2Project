@@ -245,7 +245,7 @@ const progressPercentage = computed(() =>
 <style scoped>
 .goals-view {
   min-height: calc(100vh - 70px);
-  background: linear-gradient(#fbe7cd,#ddf5bc);
+  background: linear-gradient(#f7b69a,#deffaf);
 }
 
 .stats-summary {
@@ -259,7 +259,7 @@ const progressPercentage = computed(() =>
   padding: 1.5rem;
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
-  box-shadow: #f3895c33 10px 10px 2px 2px;
+  box-shadow: #da7b53b2 8px 8px 2px 2px;
   text-align: center;
   }
 

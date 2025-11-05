@@ -781,7 +781,7 @@ function saveInventory() {
   text-align: center;
   margin-bottom: 2rem;
   font-weight: 600;
-  color: #743712;
+  color: white;
 }
 
 .inventory-grid {
@@ -901,14 +901,13 @@ function saveInventory() {
 }
 
 .save-btn {
-  background: #834721;
+  background: #9e5e36 ;
   color: white;
-  box-shadow: 0 4px 12px rgba(82, 32, 12, 0.3);
 }
 
 .save-btn:hover {
+  background:#834721;;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(73, 40, 15, 0.4);
 }
 
 .inventory-item.in-use {

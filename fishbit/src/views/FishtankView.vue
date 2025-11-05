@@ -608,7 +608,7 @@ async function handleDeleteDecoration(idx) {
 <style scoped>
 .fishtank-view {
   min-height: calc(100vh - 70px);
-  background: linear-gradient(rgb(255, 230, 199), #fcb5be);
+  background: linear-gradient(rgb(255, 237, 165), #f58c9a);
 }
 
 .fish-list {
@@ -620,7 +620,7 @@ async function handleDeleteDecoration(idx) {
 }
 
 .fish-card {
-  background: rgb(255, 245, 238, 0.5);
+  background: rgba(255, 255, 255, 0.55);
   border-radius: 12px;
   padding: 1rem 1.5rem;
   min-width: 0; 
@@ -894,18 +894,18 @@ async function handleDeleteDecoration(idx) {
   top: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  backdrop-filter: blur(5px);
 }
 
 .modal-dialog {
-  background: #fee4c5;
   border-radius: 15px;
   padding: 2rem;
+  background: #ffffff;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   min-width: 400px;
   max-width: 500px;
@@ -985,8 +985,8 @@ async function handleDeleteDecoration(idx) {
 }
 
 .btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    background: white;
+    color: #92dd85;
 }
 
 .btn-secondary {
@@ -1008,7 +1008,6 @@ async function handleDeleteDecoration(idx) {
 .btn-outline-primary {
   background: white;
   color: rgb(231, 93, 62);
-  border: 2px solid rgb(231, 93, 62);
 }
 
 .btn-outline-primary:hover {

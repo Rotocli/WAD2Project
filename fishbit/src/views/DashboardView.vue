@@ -169,8 +169,8 @@ onMounted(() => {
   justify-content: center;
   flex-direction: column;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #99d3ff, white);
-  border: 2px solid #99d3ff;
+  background: radial-gradient(circle at 30% 30%, white, #99d3ff);
+  border: 2px solid #81b9f0;
   color: #57a4f1;
   text-decoration: none;
   cursor: pointer;
@@ -179,6 +179,7 @@ onMounted(() => {
   aspect-ratio: 1 / 1;
   max-width: 200px; 
   margin: 0 auto;
+  text-align: center;
   transition: 
     transform 0.25s ease,
     box-shadow 0.25s ease,
@@ -229,10 +230,9 @@ onMounted(() => {
 }
 
 .dashboard-card {
-  background: hsla(0, 0%, 100%, 0.5); ;
+  background: hsla(0, 0%, 100%, 0.55); ;
   border-radius: 15px;
-  color: white;
-  border: 3px solid white;
+  color: #57a4f1;
   overflow: hidden;
 }
 

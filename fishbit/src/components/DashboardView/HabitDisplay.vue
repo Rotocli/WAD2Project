@@ -204,10 +204,9 @@ onMounted(() => {
 
 <style scoped>
 .dashboard-card {
-  background: hsla(0, 0%, 100%, 0.35); ;
+  background: hsla(0, 0%, 100%, 0.55); ;
   border-radius: 15px;
-  color: white;
-  border: 2px solid white;
+  color: #57a4f1;
   overflow: hidden;
 }
 
@@ -238,7 +237,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(90deg,#65b1ff, #e7f5ff);
+  background: #ffffff;;
   border-radius: 10px;
   transition: all 0.3s ease;
   position:relative;
@@ -246,7 +245,7 @@ onMounted(() => {
 }
 
 .habit-item:hover {
-  background: linear-gradient(90deg,#65b1ff, #e7f5ff);;
+  background:  #ffffff;
   transform: translateX(5px);
 }
 
@@ -276,8 +275,14 @@ onMounted(() => {
 }
 
 .view-all {
-  color: white;
+  color: #57a4f1;
   font-weight: 600;
-  border: 1.5px solid rgb(255, 255, 255);
+  border: 1.5px solid #57a4f1;
+}
+
+.view-all:hover {
+  background: #57a4f1;
+  color: white;
+  text-decoration: none;
 }
 </style>
