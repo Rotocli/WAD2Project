@@ -324,39 +324,46 @@ const editFishData = reactive({
 // Helper: return list of decoration options for a given slot filtered by inventory ownership.
 // Always include the currently-selected decoration for that fish (so user isn't forced to lose it).
 function getOwnedFishDecos(slot) {
-  const decosObj = fishDecoStore.fishDecorations?.[slot] || {};
-  const current = editFishData.decorations?.[slot];
-  const result = {};
+  const decosObj = fishDecoStore.fishDecorations?.[slot] || {}
+  const current = editFishData.decorations?.[slot]
+  const result = {}
   
   for (const [key, deco] of Object.entries(decosObj)) {
-    // include None option if present in data
-    if (key === 'None' || key === 'none' || key === '' || deco.name === 'None') {
-      result[key] = deco;
-      continue;
+    if (key === 'none' || deco.name === 'None') {
+      result[key] = deco
+      continue
     }
-    // include if user owns it or it's currently equipped
-    if (userOwns(key) || (current && String(current) === String(key))) {
-      result[key] = deco;
+    
+    // Check if user has this item (not in use OR currently equipped)
+    const hasItem = inventoryStore.inventoryItems.some(
+      i => i.originalItemId === key && i.category === slot && (!i.inUse || String(current) === String(key))
+    )
+    
+    if (hasItem) {
+      result[key] = deco
     }
   }
-  return result;
+  return result
 }
-
 // Helper: return list of aquarium decorations filtered by inventory ownership
 // Always include the currently-selected decoration at this grid position
 function getOwnedAquariumDecos() {
-  const decosObj = aquariumStore.decorationTypes || {};
-  const currentCell = aquariumStore.grid[editDecoIdx.value];
-  const currentType = currentCell?.decoration?.type;
-  const result = {};
+  const decosObj = aquariumStore.decorationTypes || {}
+  const currentCell = aquariumStore.grid[editDecoIdx.value]
+  const currentType = currentCell?.decoration?.type
+  const result = {}
   
   for (const [key, deco] of Object.entries(decosObj)) {
-    // Include if user owns it or it's currently placed in this cell
-    if (userOwns(key) || (currentType && String(currentType) === String(key))) {
-      result[key] = deco;
+    // Check if user has this item (not in use OR currently placed)
+    const hasItem = inventoryStore.inventoryItems.some(
+      i => i.originalItemId === key && i.itemType === 'aquarium' && (!i.inUse || String(currentType) === String(key))
+    )
+    
+    if (hasItem) {
+      result[key] = deco
     }
   }
-  return result;
+  return result
 }
 
 function editFish(idx) {
@@ -373,41 +380,94 @@ function editFish(idx) {
 
 // Client-side ownership check before sending update
 async function confirmEdit() {
-  const fishObj = fishStore.fish[editIdx.value] || {};
-  const slots = ['head', 'eye', 'body', 'trail'];
-  const missing = [];
+  const fishObj = fishStore.fish[editIdx.value] || {}
+  const slots = ['head', 'eye', 'body', 'trail']
 
+  // Free up old decorations
   for (const s of slots) {
-    const requested = editFishData.decorations?.[s];
-    if (!requested || requested === 'None' || requested === 'none' || requested === '') continue;
-    const currentlyEquipped = fishObj?.decorations?.[s];
-    // allow if already equipped OR user owns the requested item
-    if (String(requested) === String(currentlyEquipped)) continue;
-    if (!userOwns(requested)) {
-      missing.push({ slot: s, id: requested });
+    const oldDeco = fishObj?.decorations?.[s]
+    const newDeco = editFishData.decorations?.[s]
+    
+    if (oldDeco && oldDeco !== newDeco) {
+      await freeDecoFromUse(oldDeco, s)
     }
   }
 
-  if (missing.length > 0) {
-    alert('You do not own one or more selected fish decorations. Please purchase them from the shop first.');
-    return;
-  }
-
-  // Only send allowed fields
   const payload = {
     customName: editFishData.customName,
-    habitId: editFishData.habitId,
     species: editFishData.species,
     baseColor: editFishData.baseColor,
     decorations: { ...editFishData.decorations }
-  };
+  }
 
   try {
-    await fishStore.updateFish(editFishData.id || fishObj.id || fishObj._id, payload);
-    closeEdit();
+    await fishStore.updateFish(editFishData.id || fishObj.id, payload)
+    
+    // Mark new decorations as in use
+    for (const s of slots) {
+      const newDeco = editFishData.decorations?.[s]
+      if (newDeco && newDeco !== 'none') {
+        await markDecoAsUsed(newDeco, s)
+      }
+    }
+    
+    closeEdit()
   } catch (err) {
-    console.error('Failed to update fish', err);
-    alert('Unable to update fish. Try again.');
+    console.error('Failed to update fish', err)
+    alert('Unable to update fish. Try again.')
+  }
+}
+
+// UPDATE confirmDeco for aquarium decorations:
+
+async function markAquariumDecoAsUsed(decoId) {
+  if (!decoId) return
+  
+  const item = inventoryStore.inventoryItems.find(
+    i => i.originalItemId === decoId && !i.inUse && i.itemType === 'aquarium'
+  )
+  
+  if (item) {
+    await inventoryStore.markItemInUse(item.itemId, true)
+  }
+}
+
+async function freeAquariumDecoFromUse(decoId) {
+  if (!decoId) return
+  
+  const item = inventoryStore.inventoryItems.find(
+    i => i.originalItemId === decoId && i.inUse && i.itemType === 'aquarium'
+  )
+  
+  if (item) {
+    await inventoryStore.markItemInUse(item.itemId, false)
+  }
+}
+
+async function markDecoAsUsed(decoId, slot) {
+  if (!decoId || decoId === 'none' || decoId === '') return
+  
+  // Find inventory item by originalItemId that matches and is not in use
+  const item = inventoryStore.inventoryItems.find(
+    i => i.originalItemId === decoId && !i.inUse && i.category === slot
+  )
+  
+  if (item) {
+    await inventoryStore.markItemInUse(item.itemId, true)
+  }
+}
+
+// ADD this function to free up decoration when removed:
+async function freeDecoFromUse(decoId, slot) {
+  if (!decoId || decoId === 'none' || decoId === '') return
+  
+  // Find the in-use item
+  const item = inventoryStore.inventoryItems.find(
+    i => i.originalItemId === decoId && i.inUse && i.category === slot
+  )
+  
+  if (item) {
+    await inventoryStore.markItemInUse(item.itemId, false)
   }
 }
 
@@ -493,43 +553,41 @@ function editDecoration(idx) {
 }
 
 async function confirmDeco() {
-  const type = selectedDecoType.value;
-  
+  const type = selectedDecoType.value
   if (!type) {
-    alert('Please select a decoration.');
-    return;
+    alert('Please select a decoration.')
+    return
   }
   
-  // Check if user owns this decoration (unless it's already placed in this cell)
-  const currentCell = aquariumStore.grid[editDecoIdx.value];
-  const currentType = currentCell?.decoration?.type;
-  
-  if (String(type) !== String(currentType) && !userOwns(type)) {
-    alert('You do not own this aquarium decoration. Please purchase it from the shop first.');
-    return;
-  }
-  
-  const deco = aquariumStore.decorationTypes[type];
-  
+  const deco = aquariumStore.decorationTypes[type]
   if (!deco) {
-    alert('Invalid decoration selected.');
-    return;
+    alert('Invalid decoration selected.')
+    return
   }
   
-  // Calculate x position from grid cell index (8 columns)
-  const cellIndex = editDecoIdx.value;
-  const column = cellIndex % 8; // 0-7
-  const xPosition = (column * 12.5) + 6.25; // Center of each cell (100% / 8 = 12.5% per cell)
+  // Free up old decoration if replacing
+  const currentCell = aquariumStore.grid[editDecoIdx.value]
+  if (currentCell?.decoration?.type) {
+    await freeAquariumDecoFromUse(currentCell.decoration.type)
+  }
+  
+  const cellIndex = editDecoIdx.value
+  const column = cellIndex % 8
+  const xPosition = (column * 12.5) + 6.25
   
   await aquariumStore.updateGridCell(editDecoIdx.value, {
     type,
     name: deco.name,
     icon: deco.icon || "",
-    x: xPosition, // Add x coordinate
-    y: 0, // Decorations sit on the floor
-    layer: deco.category === 'plant' ? 0 : 1 // Plants in back, structures in front
-  });
-  closeDeco();
+    x: xPosition,
+    y: 0,
+    layer: deco.category === 'plant' ? 0 : 1
+  })
+  
+  // Mark new decoration as in use
+  await markAquariumDecoAsUsed(type)
+  
+  closeDeco()
 }
 
 function closeDeco() {
@@ -537,7 +595,11 @@ function closeDeco() {
 }
 
 async function handleDeleteDecoration(idx) {
-  await aquariumStore.removeDecoration(idx);
+  const cell = aquariumStore.grid[idx]
+  if (cell?.decoration?.type) {
+    await freeAquariumDecoFromUse(cell.decoration.type)
+  }
+  await aquariumStore.removeDecoration(idx)
 }
 </script>
 

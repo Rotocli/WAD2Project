@@ -31,6 +31,7 @@
                   class="search-result-item"
                   @click="selectSearchItem(item)"
                 >
+                  
                   <span class="search-item-icon">{{ item.icon }}</span>
                   <span class="search-item-name">{{ item.name }}</span>
                   <span class="search-item-price">💰 {{ item.cost }}</span>
@@ -92,7 +93,7 @@
           <div class="custom-carousel-item carousel-item-center">
             <div class="item-card">
               <div class="item-display">
-                <span class="item-icon large">{{ getCurrentItem().icon }}</span>
+                <span class="item-icon large"><img class="item-icon large" src="../assets/fire.svg" alt=""></span>
               </div>
               <div class="item-info">
                 <h3 class="item-name">{{ getCurrentItem().name }}</h3>
@@ -144,16 +145,17 @@
             }"
             @click="handleSlotClick(index)"
           >
-            <div v-if="item" class="inventory-item">
+            <div v-if="item" class="inventory-item" :class="{ 'in-use': item.inUse }">
               <span class="inventory-icon">{{ item.icon }}</span>
-              <div class="quantity-badge">{{ item.quantity }}</div>
+              <!-- Remove quantity badge completely -->
               <button 
-                v-if="editMode" 
+                v-if="editMode && !item.inUse" 
                 class="delete-slot-btn" 
                 @click.stop="removeFromSlot(index)"
               >
                 &times;
               </button>
+              <div v-if="item.inUse" class="in-use-badge">In Use</div>
             </div>
           </div>
         </div>
@@ -434,7 +436,7 @@ function saveInventory() {
   gap: 0.5rem;
   font-size: 1.2rem;
   font-weight: bold;
-  z-index: 1000;
+  z-index: 99;
 }
 
 .coin-amount {
@@ -653,6 +655,7 @@ function saveInventory() {
 
 .item-icon.large {
   font-size: 5rem;
+  min-width: 100%;
 }
 
 .item-info {
@@ -905,6 +908,25 @@ function saveInventory() {
 .save-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.inventory-item.in-use {
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
+.in-use-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #f59e0b;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 /* Responsive */

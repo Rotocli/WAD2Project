@@ -12,15 +12,15 @@
 
    
     <svg 
-      :width="spriteSize" 
-      :height="spriteSize * 0.75" 
-      viewBox="0 0 80 60"
+      :width="spriteSize *1.4" 
+      :height="spriteSize * 1.3"
+      viewBox=" -30 -20 110 80"
       class="fish-svg"
       :class="{ 'flipped': currentDirection === 'left' }"
     >
       
       
-      <!-- Body -->
+      <!--Body-->
       <ellipse 
         cx="40" 
         cy="30" 
@@ -60,6 +60,22 @@
       />
       
       <!-- Tail (at LEFT side for right-facing fish) -->
+
+      <clipPath id="threeQuarter">
+        <path d="
+          M 40,30 
+          L 40-15,30 
+          A 15 12 0 1 1 40,30-12 
+          Z
+        " />
+      </clipPath>
+      <clipPath id="cutEllipse">
+        
+        <rect 
+          x="0" y="0" 
+          width="80" height="60"
+        />
+      </clipPath>
       <ellipse 
         cx="12" 
         cy="30" 
@@ -67,6 +83,7 @@
         ry="12" 
         :fill="fish.baseColor"
         opacity="0.9"
+        style="clip-path: url(#cutEllipse);"
       />
       <path 
         d="M 8 20 L 0 30 L 8 40 Q 5 30 8 20" 
@@ -81,6 +98,7 @@
       :fishColor="fish.baseColor"
       :x="10"
       :y="30"
+      :trailHistory="trailHistory"
     />
       <!-- Top Fin -->
       <ellipse 
@@ -356,6 +374,7 @@ onUnmounted(() => {
   pointer-events: auto;
   will-change: left, top;
   transition: filter 0.2s ease; /* Smooth filter transition only */
+  
 }
 
 /* Paused state - visual feedback */

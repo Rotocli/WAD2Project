@@ -1,0 +1,8 @@
+<svg width="40" height="20" viewBox="0 0 40 20" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fire “ellipses” stacked for gradient effect, centered -->
+  <ellipse cx="25" cy="10" rx="3" ry="5" fill="#FF4500" opacity="0.8"/>
+  <ellipse cx="22" cy="10" rx="2.6" ry="4.4" fill="#FF6347" opacity="0.7"/>
+  <ellipse cx="19" cy="10" rx="2.2" ry="3.8" fill="#FFA500" opacity="0.6"/>
+  <ellipse cx="16" cy="10" rx="1.8" ry="3.2" fill="#FFD700" opacity="0.5"/>
+</svg>
+

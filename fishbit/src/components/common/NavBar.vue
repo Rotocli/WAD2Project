@@ -1,8 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" :class="{ 'dev-mode': userStore.isDeveloper }">
     <div class="container-fluid">
-      
-        
       <span class="navbar-brand d-flex align-items-center" to="/dashboard">
         <span class="fish-icon">
           <img src="@/assets/image.png" alt="FishBit Logo" width="40" height="40"/>
@@ -13,76 +11,81 @@
       <button 
         class="navbar-toggler" 
         type="button" 
-        data-bs-toggle="collapse" 
-        data-bs-target="#navbarNav"
+        @click="toggleNavbar"
+        aria-label="Toggle navigation"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
       
-      <div class="collapse navbar-collapse" id="navbarNav">
+      <div 
+        ref="navbarCollapse"
+        class="collapse navbar-collapse" 
+        :class="{ show: isNavbarOpen }"
+      >
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <router-link class="nav-link" to="/dashboard">
+            <router-link class="nav-link" to="/dashboard" @click="closeNavbar">
               <i class="bi bi-house"></i> Home
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/journal">
+            <router-link class="nav-link" to="/journal" @click="closeNavbar">
               <i class="bi bi-file-text"></i> Journal
             </router-link>
           </li>
-
           <li class="nav-item">
-            <router-link class="nav-link" to="/habits">
+            <router-link class="nav-link" to="/habits" @click="closeNavbar">
               <i class="bi bi-check2-square"></i> Habits
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/calendar">
+            <router-link class="nav-link" to="/calendar" @click="closeNavbar">
               <i class="bi bi-calendar"></i> Calendar
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/fishtank">
+            <router-link class="nav-link" to="/fishtank" @click="closeNavbar">
               <i class="bi bi-heart"></i> Fishtank
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/shop">
+            <router-link class="nav-link" to="/shop" @click="closeNavbar">
               <i class="bi bi-shop"></i> Shop
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/goals">
+            <router-link class="nav-link" to="/goals" @click="closeNavbar">
               <i class="bi bi-trophy"></i> Goals
             </router-link>
           </li>
         </ul>
         
-        <div class="d-flex align-items-center">
-          <div class="points-display me-3">
-            <i class="bi bi-coin"></i>
-            <span>{{ totalPoints }}</span>
-          </div>
-          
-          <div class="streak-display me-3">
-            <i class="bi bi-fire"></i>
-            <span>{{ currentStreak }}</span>
+        <div class="navbar-right-section">
+          <div class="stats-row">
+            <div class="points-display">
+              <i class="bi bi-coin"></i>
+              <span>{{ totalPoints }}</span>
+            </div>
+            
+            <div class="streak-display">
+              <i class="bi bi-fire"></i>
+              <span>{{ currentStreak }}</span>
+            </div>
           </div>
           
           <div class="dropdown">
             <button 
-              class="btn btn-link nav-link dropdown-toggle" 
-              type="button" 
-              data-bs-toggle="dropdown"
+              class="btn btn-link nav-link dropdown-toggle user-dropdown-btn" 
+              type="button"
+              @click="toggleDropdown"
+              aria-expanded="false"
             >
               <i class="bi bi-person-circle"></i>
-              
-              &nbsp{{ username }}
+              <span class="ms-1">{{ username }}</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end" :class="{ show: isDropdownOpen }">
               <li>
-                <router-link class="dropdown-item" to="/profile">
+                <router-link class="dropdown-item" to="/profile" @click="handleProfileClick">
                   <i class="bi bi-gear"></i> Profile
                 </router-link>
               </li>
@@ -101,21 +104,78 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../../stores/userStore'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
+
+const isNavbarOpen = ref(false)
+const isDropdownOpen = ref(false)
+const navbarCollapse = ref(null)
 
 const totalPoints = computed(() => userStore.totalPoints)
 const currentStreak = computed(() => userStore.currentStreak)
 const username = computed(() => userStore.userProfile?.username || 'User')
 
+function toggleNavbar() {
+  isNavbarOpen.value = !isNavbarOpen.value
+  if (isNavbarOpen.value) {
+    isDropdownOpen.value = false
+  }
+}
+
+function toggleDropdown() {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+function closeNavbar() {
+  isNavbarOpen.value = false
+  isDropdownOpen.value = false
+}
+
+function closeDropdown() {
+  isDropdownOpen.value = false
+}
+
+function handleProfileClick() {
+  closeNavbar()
+}
+
+function handleClickOutside(event) {
+  const navbar = navbarCollapse.value
+  const toggler = event.target.closest('.navbar-toggler')
+  const dropdownBtn = event.target.closest('.user-dropdown-btn')
+  
+  if (navbar && !navbar.contains(event.target) && !toggler) {
+    closeNavbar()
+  }
+  
+  if (isDropdownOpen.value && !dropdownBtn && !event.target.closest('.dropdown-menu')) {
+    closeDropdown()
+  }
+}
+
 async function handleLogout() {
+  closeNavbar()
   await userStore.logout()
   router.push('/')
 }
+
+const unwatchRoute = router.afterEach(() => {
+  closeNavbar()
+})
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  unwatchRoute()
+})
 </script>
 
 <style scoped>
@@ -137,9 +197,8 @@ async function handleLogout() {
   margin: 0;
 }
 
-/* Push navbar down when dev mode is active */
 .navbar.dev-mode {
-  top: 36px; /* Height of dev banner */
+  top: 36px;
 }
 
 /* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
@@ -147,16 +206,113 @@ async function handleLogout() {
   background: #4f9cfa;
 }
 
-/* Mobile view fix: ensures menu background fills whole column */
+.navbar-right-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Mobile view */
 @media (max-width: 992px) {
   .navbar-collapse {
-    background: #4f9cfa;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    width: fit-content;
+    min-width: 200px;
+    max-width: 280px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;    
+    background: #667eea;
+    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.15);
     padding: 1rem;
+    border-radius: 0 0 0 12px;
+    margin-right: 1rem;
   }
+
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .navbar-nav .nav-item {
+    width: 100%;
+  }
+
   .navbar-nav .nav-link {
     color: #fff !important;
     padding: 0.75rem 1rem;
-    border-radius: 15px;
+    width: 100%;
+  }
+
+  .navbar-right-section {
+    flex-direction: column;
+    align-items: stretch !important;
+    width: 100%;
+    margin-top: 1rem;
+    gap: 0.75rem;
+  }
+
+  .stats-row {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .points-display,
+  .streak-display {
+    flex: 1;
+    justify-content: center;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .points-display i,
+  .streak-display i {
+    font-size: 0.9rem;
+  }
+
+  .dropdown {
+    width: 100%;
+  }
+
+  .user-dropdown-btn {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .dropdown-menu {
+    position: static !important;
+    width: 100%;
+    margin-top: 0.5rem !important;
+    box-shadow: none !important;
+  }
+
+  .navbar-collapse::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .navbar-collapse::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .navbar-collapse::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  .navbar-collapse::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
   }
 }
 
@@ -194,18 +350,26 @@ async function handleLogout() {
   padding: 0;
   margin: 0;
   height: 100%;
+  cursor: default;
 }
 
 @keyframes swim {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  25% { transform: translateX(5px) rotate(5deg); }
-  75% { transform: translateX(-5px) rotate(-5deg); }
+  0%, 100% { 
+    transform: translateX(0) rotate(0deg); 
+  }
+  25% { 
+    transform: translateX(5px) rotate(5deg); 
+  }
+  75% { 
+    transform: translateX(-5px) rotate(-5deg); 
+  }
 }
 
 .nav-link {
-  color: rgba(255,255,255,0.9) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
   margin: 0 0.5rem;
   transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .nav-link:hover {
@@ -230,39 +394,105 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   height: fit-content;
+  font-size: 0.9rem;
 }
 
 .points-display i,
 .streak-display i {
-  margin-right: 0.3rem;
+  margin-right: 0.25rem;
+  font-size: 1rem;
 }
 
 .dropdown {
   display: flex;
   align-items: center;
+  position: relative;
 }
 
-.dropdown .btn {
+.user-dropdown-btn {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   height: fit-content;
-  border-radius: 20px;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9) !important;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.user-dropdown-btn:hover {
+  color: white !important;
+  background-color: #4a66e0;
+  border-radius: 15px;
+}
+
+.user-dropdown-btn i {
+  font-size: 1.1rem;
 }
 
 .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
   border: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: #2664f3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: #667eea;
+  min-width: 180px;
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  display: none;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
 }
 
 .dropdown-item {
   color: white;
+  padding: 0.6rem 1.2rem;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
 }
 
 .dropdown-item:hover {
   background: #2664f3;
   transform: translateY(3px);
   color: white;
+}
+
+.dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.2);
+  margin: 0.5rem 0;
+}
+
+.navbar-collapse {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-collapse:not(.show) {
+  display: none;
+}
+
+.navbar-collapse.show {
+  display: block;
+}
+
+@media (min-width: 993px) {
+  .navbar-right-section {
+    display: flex !important;
+  }
 }
 </style>

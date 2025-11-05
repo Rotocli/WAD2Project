@@ -8,24 +8,20 @@
         stroke="#DAA520"
         stroke-width="0.5"
       />
-      <circle v-for="i in 3" :key="i" :cx="x + (i-2)*5" :cy="y" r="1.5" fill="#FF0000"/>
+      <circle  :cx="x -6" :cy="y" r="1.5" fill="#FF0000"/>
+      <circle :cx="x+ 0" :cy="y-2" r="1.5" fill="#FF0000"/>
+      <circle  :cx="x +6" :cy="y" r="1.5" fill="#FF0000"/>
     </g>
 
     <g v-if="type === 'head' && decoration.svg === 'tophat'">
-      <ellipse 
-        :cx="x" 
-        :cy="y+12" 
-        rx="10" 
-        ry="2" 
-        :fill="decoration.color"
-        stroke="#000"
-        stroke-width="0.5"
-      />
+      
+      
+      
       <rect 
         :x="x-6" 
         :y="y-4" 
         width="12" 
-        height="12" 
+        height="14" 
         :fill="decoration.color"
         stroke="#000"
         stroke-width="0.5"
@@ -37,6 +33,15 @@
         width="12" 
         height="2" 
         fill="#8B0000"
+      />
+      <ellipse 
+        :cx="x" 
+        :cy="y+10" 
+        rx="10" 
+        ry="2" 
+        :fill="decoration.color"
+        stroke="#000"
+        stroke-width="0.5"
       />
     </g>
 
@@ -154,7 +159,16 @@
 
     <g v-if="type === 'eye' && decoration.svg === 'stareyes'">
       <path 
-        :d="`M ${x} ${y-4} L ${x+1.5} ${y-1} L ${x+4} ${y-1} L ${x+2} ${y+1} L ${x+2.5} ${y+4} L ${x} ${y+2} L ${x-2.5} ${y+4} L ${x-2} ${y+1} L ${x-4} ${y-1} L ${x-1.5} ${y-1} Z`"
+        :d="`M ${x} ${y-6} 
+        L ${x+2.25} ${y-1.5} 
+        L ${x+6} ${y-1.5} 
+        L ${x+3} ${y+1.5} 
+        L ${x+3.75} ${y+6} 
+        L ${x} ${y+3} 
+        L ${x-3.75} ${y+6} 
+        L ${x-3} ${y+1.5} 
+        L ${x-6} ${y-1.5} 
+        L ${x-2.25} ${y-1.5} Z`"
         :fill="decoration.color"
         stroke="#FFA500"
         stroke-width="0.5"
@@ -216,89 +230,87 @@
     <!-- TRAIL EFFECTS - Using converted viewBox coordinates -->
     <!-- TRAIL EFFECTS -->
 <g v-if="type === 'trail' && decoration.svg === 'bubbles'">
-  <!-- Render trail segments from history -->
-  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
-    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
-      <circle v-for="i in 3" :key="i"
-        :cx="convertToSVGX(pos.x, decoration.currentX) - (i * 3)"
-        :cy="convertToSVGY(pos.y, decoration.currentY) + Math.sin(time + index + i) * 2"
-        :r="1.5 - i * 0.3"
-        :fill="decoration.color"
-        :opacity="(0.7 - i * 0.15) * (1 - index / decoration.trailHistory.length)"
-        stroke="white"
-        stroke-width="0.4"
-      />
-    </g>
-  </g>
-  
-  <!-- Fallback if no history yet -->
-  <g v-else>
-    <circle v-for="i in 3" :key="i"
-      :cx="x - (i * 3)"
-      :cy="y + Math.sin(time + i) * 2"
-      :r="1.5 - i * 0.3"
-      :fill="decoration.color"
-      :opacity="0.7 - i * 0.15"
-      stroke="white"
-      stroke-width="0.4"
+
+  <g>
+
+
+  <circle 
+    :cx="x-10" 
+    :cy="y" 
+    r="4" 
+    fill="lightblue">
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -25,0`"
+      dur="2s"
+      repeatCount="indefinite"
     />
+    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle 
+    :cx="x-10" 
+    :cy="y+5" 
+    r="4" 
+    fill="lightblue">
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -25,+4`"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle 
+    :cx="x-10" 
+    :cy="y-5" 
+    r="4" 
+    fill="lightblue">
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -25,-4`"
+      dur="2s"
+      repeatCount="indefinite"
+    />
+    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+  </circle>
+    
   </g>
 </g>
 
 <g v-if="type === 'trail' && decoration.svg === 'rainbow'">
-  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
-    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
-      <path v-for="(color, i) in decoration.colors" :key="i"
-        :d="`M ${convertToSVGX(pos.x, decoration.currentX)} ${convertToSVGY(pos.y, decoration.currentY) + (i-3)*1.2} L ${convertToSVGX(pos.x, decoration.currentX) - 8} ${convertToSVGY(pos.y, decoration.currentY) + (i-3)*1.2}`"
-        :stroke="color"
-        stroke-width="1.5"
-        :opacity="(0.8 - i * 0.08) * (1 - index / decoration.trailHistory.length)"
-        stroke-linecap="round"
-      />
-    </g>
-  </g>
-  
-  <g v-else>
-    <path v-for="(color, i) in decoration.colors" :key="i"
-      :d="`M ${x} ${y + (i-3)*1.5} L ${x - 15} ${y + (i-3)*1.5}`"
-      :stroke="color"
-      stroke-width="2"
-      :opacity="0.8 - i * 0.08"
-      stroke-linecap="round"
+  <path v-for="(color, i) in decoration.colors" :key="i"
+    :d="`
+      M ${x-10} ${y + (i - 3) * 2} 
+      L ${x - 25} ${y + (i - 3) * 2}
+    `"
+    :stroke="color"
+    stroke-width="2"
+    :opacity="0.8 - i * 0.08"
+    fill="none"
+    stroke-linecap="round"
+  >
+    <animate
+      attributeName="ry"
+      :values="`${5 - i * 0.6};${6 - i * 0.6};${5 - i * 0.6}`"
+      dur="0.4s"
+      repeatCount="indefinite"
     />
-  </g>
+  </path>
 </g>
 
 <g v-if="type === 'trail' && decoration.svg === 'fire'">
-  <g v-if="decoration.trailHistory && decoration.trailHistory.length > 0">
-    <g v-for="(pos, index) in decoration.trailHistory" :key="index">
-      <g v-for="(color, i) in decoration.colors" :key="i">
-        <ellipse 
-          :cx="convertToSVGX(pos.x, decoration.currentX) - (i * 2)"
-          :cy="convertToSVGY(pos.y, decoration.currentY)"
-          :rx="2.5 - i * 0.3"
-          :ry="4 - i * 0.5"
-          :fill="color"
-          :opacity="(0.8 - i * 0.2) * (1 - index / decoration.trailHistory.length)"
-        >
-          <animate
-            attributeName="ry"
-            :values="`${4 - i * 0.5};${5 - i * 0.5};${4 - i * 0.5}`"
-            dur="0.4s"
-            repeatCount="indefinite"
-          />
-        </ellipse>
-      </g>
-    </g>
-  </g>
   
-  <g v-else>
+  
+  <g >
     <g v-for="(color, i) in decoration.colors" :key="i">
       <ellipse 
-        :cx="x - (i * 3)"
+        :cx="x - (i * 3)-15"
         :cy="y"
-        :rx="3 - i * 0.4"
-        :ry="5 - i * 0.6"
+        :rx="4 - i * 0.4"
+        :ry="6 - i * 0.6"
         :fill="color"
         :opacity="0.8 - i * 0.2"
       >
@@ -344,8 +356,24 @@ const props = defineProps({
   fishColor: {
     type: String,
     default: '#FF6B6B'
+  },
+  trailHistory: {  // ADD THIS
+    type: Array,
+    default: () => []
   }
+
 })
+
+function getRainbowPath(pos, index) {
+  const waveOffset = Math.sin((index + props.time) * 0.5) * 2
+  const length = 8 + index * 1.5
+  
+  return `M ${pos.x * 0.8} ${pos.y * 0.75 + waveOffset} 
+          Q ${pos.x * 0.8 - length/3} ${pos.y * 0.75 + waveOffset - 2} 
+            ${pos.x * 0.8 - length/2} ${pos.y * 0.75 + waveOffset} 
+          Q ${pos.x * 0.8 - length*2/3} ${pos.y * 0.75 + waveOffset + 2} 
+            ${pos.x * 0.8 - length} ${pos.y * 0.75 + waveOffset}`
+}
 
 const patternColor = computed(() => {
   const fishHex = props.fishColor

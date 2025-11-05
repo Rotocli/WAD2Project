@@ -9,12 +9,15 @@ import {
 import { db } from '../services/firebase'
 import { useUserStore } from './userStore'
 
+
+
 export const useFishDecoStore = defineStore('fishdeco', () => {
   const fishDecorations = {
     head: {
       crown: { 
         name: 'Crown', 
-        icon: '👑', 
+        icon: '../assets/crown.svg'
+, 
         cost: 200, 
         effect: 'prestige',
         svg: 'crown',
