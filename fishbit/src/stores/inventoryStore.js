@@ -84,7 +84,6 @@ export const useInventoryStore = defineStore('inventory', () => {
       loading.value = false
     }
   }
-
   async function purchaseItem(itemData) {
     const userStore = useUserStore()
     if (!userStore.currentUserId) {
@@ -100,43 +99,29 @@ export const useInventoryStore = defineStore('inventory', () => {
         throw new Error('Not enough points!')
       }
 
-      // Deduct points from user (negative amount to deduct)
+      // Deduct points from user
       await userStore.updatePoints(-itemData.cost)
 
-      // Create inventory item
+      // Create inventory item (no quantity, each purchase = new slot)
       const inventoryItem = {
-        itemId: itemData.id,
-        itemType: itemData.type || 'aquarium', // 'aquarium' or 'fish'
-        category: itemData.category || null, // For fish decos: 'head', 'eye', etc.
+        itemId: itemData.id + '_' + Date.now(), // Unique ID for each purchase
+        originalItemId: itemData.id, // Store original item ID
+        itemType: itemData.type || 'aquarium',
+        category: itemData.category || null,
         name: itemData.name,
         icon: itemData.icon,
         cost: itemData.cost,
-        quantity: 1,
+        inUse: false, // Track if equipped
         purchasedAt: new Date()
       }
 
-      // Check if item already exists in inventory
-      const existingItem = inventoryItems.value.find(
-        item => item.itemId === itemData.id
-      )
-
       const docRef = doc(db, 'inventory', userStore.currentUserId)
-
-      if (existingItem) {
-        // Increase quantity
-        existingItem.quantity += 1
-        
-        // Update in Firebase
-        await updateDoc(docRef, {
-          items: inventoryItems.value
-        })
-      } else {
-        // Add new item to inventory
-        await updateDoc(docRef, {
-          items: arrayUnion(inventoryItem)
-        })
-        inventoryItems.value.push(inventoryItem)
-      }
+      
+      // Always add as new item (no quantity increase)
+      await updateDoc(docRef, {
+        items: arrayUnion(inventoryItem)
+      })
+      inventoryItems.value.push(inventoryItem)
 
       console.log('✅ Item purchased:', itemData.name)
       return { success: true, message: `${itemData.name} added to inventory!` }
@@ -149,6 +134,7 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
   }
 
+  
   async function useItem(itemId) {
     const userStore = useUserStore()
     if (!userStore.currentUserId) return
@@ -186,6 +172,31 @@ export const useInventoryStore = defineStore('inventory', () => {
   }
 
   async function removeItem(itemId) {
+      const userStore = useUserStore()
+      if (!userStore.currentUserId) return
+
+      const item = inventoryItems.value.find(i => i.itemId === itemId)
+      if (!item) return
+
+      // Prevent deletion if item is in use
+      if (item.inUse) {
+        throw new Error('Cannot delete item that is currently equipped!')
+      }
+
+      try {
+        const docRef = doc(db, 'inventory', userStore.currentUserId)
+        await updateDoc(docRef, {
+          items: arrayRemove(item)
+        })
+        
+        inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
+        console.log('✅ Item removed from inventory')
+      } catch (err) {
+        error.value = err.message
+        throw err
+      }
+    }
+    async function markItemInUse(itemId, inUse = true) {
     const userStore = useUserStore()
     if (!userStore.currentUserId) return
 
@@ -193,18 +204,22 @@ export const useInventoryStore = defineStore('inventory', () => {
     if (!item) return
 
     try {
+      item.inUse = inUse
+      
       const docRef = doc(db, 'inventory', userStore.currentUserId)
       await updateDoc(docRef, {
-        items: arrayRemove(item)
+        items: inventoryItems.value
       })
       
-      inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
-      console.log('✅ Item removed from inventory')
+      console.log(`✅ Item ${inUse ? 'marked as in use' : 'freed'}`)
     } catch (err) {
-      error.value = err.message
+      console.error('Error updating item usage:', err)
       throw err
     }
   }
+
+  // ADD to return statement:
+  
 
   async function placeAquariumDecoration(itemId, gridIndex) {
     const aquariumStore = useAquariumStore()
@@ -282,6 +297,7 @@ export const useInventoryStore = defineStore('inventory', () => {
     useItem,
     removeItem,
     placeAquariumDecoration,
-    equipFishDecoration
+    equipFishDecoration,
+    markItemInUse
   }
 })
