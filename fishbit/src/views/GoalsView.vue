@@ -1,8 +1,6 @@
 <template>
   <div class="goals-view">
     <div class="container-fluid p-4">
-      <h2>🏆 Achievements</h2>
-      <p>Track your progress and unlock badges!</p>
 
       <div class="stats-summary">
         <div class="stat-card">
@@ -35,12 +33,6 @@
         </div>
       </div>
     </div>
-    <transition name="fade">
-      <div v-if="showCopyNotification" class="copy-notification">
-        {{ shareMessage }}
-      </div>
-    </transition>
-
   </div>
 </template>
 
@@ -56,7 +48,6 @@ const userStore = useUserStore()
 const habitStore = useHabitStore()
 const userAchievements = ref({})
 
-// Load user's unlocked achievements
 onMounted(async () => {
   if (userStore.currentUserId) {
     await loadAchievements()
@@ -80,7 +71,6 @@ async function loadAchievements() {
   }
 }
 
-// Check and unlock achievements
 async function checkAchievements() {
   if (!userStore.currentUserId) return
 
@@ -88,10 +78,8 @@ async function checkAchievements() {
   let totalPointsEarned = 0
 
   achievements.value.forEach(async (achievement) => {
-    // If already unlocked, skip
     if (userAchievements.value[achievement.id]) return
 
-    // If newly attained, unlock it
     if (achievement.attained) {
       newUnlocks.push(achievement.id)
       totalPointsEarned += achievement.points
@@ -103,7 +91,6 @@ async function checkAchievements() {
     }
   })
 
-  // Save to Firestore if there are new unlocks
   if (newUnlocks.length > 0) {
     try {
       await setDoc(
@@ -114,15 +101,14 @@ async function checkAchievements() {
 
       await userStore.addPoints(totalPointsEarned)
     
-      console.log('🏆 New achievements unlocked:', newUnlocks)
-      console.log(`💰 Points earned: ${totalPointsEarned}`)
+      console.log('New achievements unlocked:', newUnlocks)
+      console.log(`Points earned: ${totalPointsEarned}`)
     } catch (error) {
       console.error('Error saving achievements:', error)
     }
   }
 }
 
-// Watch for changes and check achievements
 watch(
   () => [userStore.currentStreak, userStore.totalPoints, habitStore.habits],
   () => {
@@ -154,7 +140,7 @@ const achievements = computed(() => [
     id: 'first-complete',
     name: 'First Step',
     description: 'Complete your first habit',
-    emoji: '✨',
+    emoji: '👣',
     points: 15,
     attained: habitStore.habits.some(h => h.completedCount >= 1),
     unlockedAt: userAchievements.value['first-complete']?.unlockedAt
@@ -257,7 +243,7 @@ const progressPercentage = computed(() =>
 <style scoped>
 .goals-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  background: linear-gradient(#fbe7cd,#ddf5bc);
 }
 
 .stats-summary {
@@ -268,18 +254,18 @@ const progressPercentage = computed(() =>
 }
 
 .stat-card {
-  background: white;
   padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
+  box-shadow: #f3895c33 10px 10px 2px 2px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+  }
 
 .stat-number {
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: #4a66e0;
+  color: #f3895c;
 }
 
 .stat-label {
@@ -310,12 +296,12 @@ const progressPercentage = computed(() =>
 
 .achievement-row.attained {
   opacity: 1;
-  border-left: 6px solid #10b981;
+  border-left: 6px solid #98d35a;
   transform: scale(1);
 }
 
 .achievement-row.attained:hover {
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 12px rgba(185, 106, 16, 0.2);
 }
 
 .emoji {
@@ -340,20 +326,13 @@ const progressPercentage = computed(() =>
 .title {
   font-weight: 700;
   font-size: 1.2rem;
-  color: #111827;
+  color: #0b2869;
 }
 
 .desc {
   color: #6b7280;
   margin-top: 4px;
   font-size: 0.95rem;
-}
-
-.unlocked-date {
-  color: #10b981;
-  font-size: 0.85rem;
-  margin-top: 6px;
-  font-weight: 600;
 }
 
 @media (max-width: 768px) {
@@ -375,8 +354,6 @@ const progressPercentage = computed(() =>
   }
 }
 
-/* Add to your <style scoped> */
-
 .achievement-actions {
   display: flex;
   gap: 0.5rem;
@@ -384,39 +361,11 @@ const progressPercentage = computed(() =>
   margin-right: 1rem;
 }
 
-.copy-notification {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: #10b981;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-  z-index: 9999;
-  font-weight: 600;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-
-/* Responsive */
+/* respinsivity */
 @media (max-width: 768px) {
   .achievement-row {
     flex-wrap: wrap;
   }
-
 }
 
 .points-badge {
@@ -431,7 +380,7 @@ const progressPercentage = computed(() =>
 }
 
 .achievement-row.attained .points-badge {
-  background: #d1fae5;
-  color: #065f46;
+  background: linear-gradient(90deg,#bfea92, #91dd85); ;
+  color: #0d4905;
 }
 </style>
