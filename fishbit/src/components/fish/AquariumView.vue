@@ -2,7 +2,7 @@
   <div class="aquarium-container" :style="aquariumStyle">
     <!-- Aquarium Label -->
     <div class="aquarium-label">
-      🐟 Your Habit Aquarium - {{ fishCount }} Fish
+      Your Habit Aquarium - {{ fishCount }} Fish
     </div>
 
     <!-- Water Surface Effect -->
@@ -68,7 +68,9 @@
 
     <!-- Empty State -->
     <div v-if="!loading && fishCount === 0" class="empty-state">
-      <span class="empty-icon">🐠</span>
+      <span class="empty-icon">
+        <img src="@/assets/image.png" alt="FishBit Logo" width="100" height="100"/>
+      </span>
       <h3>Your aquarium is empty!</h3>
       <p>Create your first habit to get your first fish</p>
       <router-link to="/habits" class="btn btn-primary">
@@ -122,7 +124,7 @@ const substrateStyle = computed(() => ({
 
 const backLayerFish = computed(() => {
   const filtered = fishStore.activeFish.filter(f => f.position.layer === 0)
-  console.log('🎯 backLayerFish computed:', filtered.map(f => f.customName))
+  console.log('backLayerFish computed:', filtered.map(f => f.customName))
   return filtered
 })
 
@@ -165,24 +167,24 @@ function createBubbles() {
 // Load aquarium data
 async function loadAquariumData() {
   const userId = userStore.currentUserId
-  console.log('🌊 AquariumView: loadAquariumData called with userId:', userId)
+  console.log('AquariumView: loadAquariumData called with userId:', userId)
   
   if (!userId) {
-    console.warn('⚠️ AquariumView: No userId available, skipping load')
+    console.warn('AquariumView: No userId available, skipping load')
     loading.value = false
     return
   }
   
   loading.value = true
   try {
-    console.log('🐠 AquariumView: Fetching fish and aquarium settings...')
+    console.log('AquariumView: Fetching fish and aquarium settings...')
     await Promise.all([
       fishStore.fetchFish(userId),
       aquariumStore.fetchSettings(userId)
     ])
     
-    console.log('✅ AquariumView: Data loaded. Fish count:', fishStore.fish.length, 'Active fish:', fishStore.activeFish.length)
-    console.log('🎨 Layer distribution:', {
+    console.log('AquariumView: Data loaded. Fish count:', fishStore.fish.length, 'Active fish:', fishStore.activeFish.length)
+    console.log('Layer distribution:', {
       back: fishStore.activeFish.filter(f => f.position.layer === 0).map(f => f.customName),
       mid: fishStore.activeFish.filter(f => f.position.layer === 1).map(f => f.customName),
       front: fishStore.activeFish.filter(f => f.position.layer === 2).map(f => f.customName),
@@ -190,7 +192,7 @@ async function loadAquariumData() {
     })
     createBubbles()
   } catch (error) {
-    console.error('❌ AquariumView: Error loading aquarium:', error)
+    console.error('AquariumView: Error loading aquarium:', error)
   } finally {
     loading.value = false
   }
@@ -200,7 +202,7 @@ async function loadAquariumData() {
 watch(
   () => userStore.currentUserId,
   (userId, oldUserId) => {
-    console.log('👤 AquariumView: User ID changed from', oldUserId, 'to', userId)
+    console.log('AquariumView: User ID changed from', oldUserId, 'to', userId)
     if (userId) {
       loadAquariumData()
     }
@@ -210,13 +212,13 @@ watch(
 
 // Lifecycle - also try to load on mount as a fallback
 onMounted(async () => {
-  console.log('🎬 AquariumView: Component mounted. User authenticated:', userStore.isAuthenticated, 'User ID:', userStore.currentUserId)
+  console.log('AquariumView: Component mounted. User authenticated:', userStore.isAuthenticated, 'User ID:', userStore.currentUserId)
   
   // Small delay to ensure auth state is settled
   await new Promise(resolve => setTimeout(resolve, 100))
   
   if (userStore.currentUserId && fishStore.fish.length === 0) {
-    console.log('🔄 AquariumView: Triggering load from onMounted')
+    console.log('AquariumView: Triggering load from onMounted')
     loadAquariumData()
   }
 })
@@ -225,12 +227,17 @@ onMounted(async () => {
 <style scoped>
 .aquarium-container {
   position: relative;
-  width: 100%;
-  height: 450px;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 50vh;
   overflow: hidden;
-  border-radius: 15px 15px 0 0;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2);
-  transition: all 0.5s ease;
+}
+
+@media (max-width: 600px) {
+  .aquarium-container {
+    height: 35vh;
+  }
 }
 
 /* Water Surface Effect */
@@ -240,11 +247,6 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 60px;
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.3) 0%, 
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
   animation: shimmer 3s ease-in-out infinite;
   z-index: 10;
   pointer-events: none;
@@ -330,15 +332,14 @@ onMounted(async () => {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
+  background: transparent;
   padding: 10px 25px;
   border-radius: 20px;
-  font-weight: bold;
-  color: #1e3a8a;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-weight: 400;
+  color: white;
   z-index: 11;
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: 15px;
   pointer-events: none;
 }
 
@@ -386,7 +387,7 @@ onMounted(async () => {
 .empty-icon {
   font-size: 80px;
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   animation: float 3s ease-in-out infinite;
 }
 
@@ -433,7 +434,6 @@ onMounted(async () => {
   
   .aquarium-label {
     font-size: 12px;
-    padding: 8px 20px;
   }
   
   .empty-icon {

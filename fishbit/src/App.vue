@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- Developer Mode Banner - Shows at top for dev accounts -->
+    <!-- dev mod banner -->
     <DeveloperBadge />
     
     <NavBar v-if="isAuthenticated" />
@@ -12,13 +12,12 @@
       </router-view>
     </main>
     
-    <!-- Time Machine - Only visible for developer accounts -->
+    <!-- time machine -->
     <TimeMachine />
 
     <!-- loading screen --> 
     <div v-if="userStore.loading" class="loading-screen"> 
       <div class="loading-content"> 
-        <!-- Animated Fish --> 
          <div class="loading-fish"> 
           <span class="fish">🐠</span> 
           <span class="fish">🐟</span> 
@@ -27,7 +26,6 @@
           <h2 class="loading-title">Habit Aquarium</h2> 
           <p class="loading-text">Setting up your tank...</p>
           
-          <!-- Progress dots --> 
           <div class="loading-dots"> 
             <span></span> 
             <span></span> 
@@ -54,14 +52,14 @@ const habitStore = useHabitStore()
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 
 /**
- * Perform daily checks for streak breaks and resets
+ * check for streak breaks and resets
  */
 async function performDailyChecks() {
   if (!userStore.currentUserId) return
   
   devLog('🔍 Checking if daily checks needed...')
   
-  // Check if it's a new day since last check
+  // check for new day since last check
   if (timeService.isNewDay()) {
     devLog('📅 New day detected! Running daily checks...')
     
@@ -204,13 +202,17 @@ onMounted(() => {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: none;
+  padding: 0;
+  border: none;
 }
 
 .main-content {
-  padding-top: 70px; /* Standard navbar height */
+  padding-top: 54px; 
   min-height: calc(100vh - 70px);
   transition: padding-top 0.3s ease;
+  background: none;
+  border: none;
 }
 
 /* Add extra padding when developer banner is shown */

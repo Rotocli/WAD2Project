@@ -1,11 +1,6 @@
 <template>
   <div class="dashboard-view">
     <div class="container-fluid p-0">
-      <!-- Welcome Section -->
-      <div class="p-4">
-        <WelcomeSection :motivationalQuote="motivationalQuote" :username="username" :activeHabitsCount="activeHabitsCount" 
-          :fishCount="fishCount"/>
-      </div>
 
       <!-- AQUARIUM - Full Width -->
       <div class="aquarium-section">
@@ -14,8 +9,6 @@
 
       <!-- Stats Cards -->
       <div class="p-4">
-        
-        
         <div class="row g-4 mt-2">
           <!-- Today's Habits -->
           <HabitDisplay :todaysHabits="todaysHabits" />
@@ -64,6 +57,7 @@ import WelcomeSection from '../components/DashboardView/WelcomeSection.vue'
 import StatCard from '../components/DashboardView/StatCard.vue'
 import HabitDisplay from '../components/DashboardView/HabitDisplay.vue'
 import AquariumView from '../components/fish/AquariumView.vue'
+import { useAquariumStore } from '../stores/aquariumStore'
 
 const userStore = useUserStore()
 const habitStore = useHabitStore()
@@ -154,44 +148,88 @@ onMounted(() => {
 
 <style scoped>
 .dashboard-view {
-  min-height: calc(100vh - 70px);
-  background: #f8f9fa;
-}
+  position: relative;
+  min-height: 100vh; 
+  width: 100%;
+  background: linear-gradient(to top, #805621 0%, #f3ca96 50%);
+  overflow: hidden; }
 
-/* Aquarium Section */
 .aquarium-section {
-  background: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  top: 0;
+  border-radius: 0;
+  
 }
 
-/* Quick Actions */
 .quick-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
 
-.action-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.bubble-container {
+  display: grid;
   justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+  align-items: center;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  transition: all 0.6s ease-in-out;
+  padding: 1rem;
 }
 
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #99d3ff, white);
+  border: 2px solid #99d3ff;
+  color: #57a4f1;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 10%;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 200px; /* keeps them bubble-sized */
+  margin: 0 auto;
+  transition: 
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    all 0.6s ease-in-out; /* added smoothness */
+}
+
+/* hover expand inflate */
 .action-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-  color: white;
+  transform: scale(1.08);
+}
+
+/* click pop */
+.action-btn:active {
+  animation: bubble-pop 0.25s ease-out;
+}
+
+@keyframes bubble-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* responsiveness */
+@media (max-width: 992px) {
+  .bubble-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .bubble-container {
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
+    gap: 1rem;
+  }
+    .action-btn {
+    max-width: 120px;
+  }
 }
 
 .action-btn i {
@@ -205,15 +243,15 @@ onMounted(() => {
 }
 
 .dashboard-card {
-  background: white;
+  background: hsla(0, 0%, 100%, 0.5); ;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  color: white;
+  border: 3px solid white;
   overflow: hidden;
 }
 
 .card-header {
   padding: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -229,18 +267,22 @@ onMounted(() => {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .quick-actions {
-    grid-template-columns: 1fr;
+@media (max-width: 900px) {
+  .bubble-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 per row */
   }
-  
   .action-btn {
-    padding: 15px;
+    width: clamp(100px, 25vw, 150px);
   }
-  
-  .action-btn i {
-    font-size: 20px;
+}
+
+@media (max-width: 500px) {
+  .bubble-container {
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .action-btn {
+    width: clamp(80px, 35vw, 120px);
   }
 }
 </style>
-z

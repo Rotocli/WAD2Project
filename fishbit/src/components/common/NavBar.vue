@@ -4,7 +4,9 @@
       
         
       <span class="navbar-brand d-flex align-items-center" to="/dashboard">
-        <span class="fish-icon">🐠</span>
+        <span class="fish-icon">
+          <img src="@/assets/image.png" alt="FishBit Logo" width="40" height="40"/>
+        </span>
         <span class="brand-text">FishBit</span>
       </span>
       
@@ -118,7 +120,7 @@ async function handleLogout() {
 
 <style scoped>
 .navbar {
-  background: #667eea;
+  background: #4f9cfa;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0;
   transition: top 0.3s ease;
@@ -142,19 +144,19 @@ async function handleLogout() {
 
 /* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
 .navbar-collapse, .collapse.show {
-  background: #667eea;
+  background: #4f9cfa;
 }
 
 /* Mobile view fix: ensures menu background fills whole column */
 @media (max-width: 992px) {
   .navbar-collapse {
-    background: #667eea;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+    background: #4f9cfa;
     padding: 1rem;
   }
   .navbar-nav .nav-link {
     color: #fff !important;
     padding: 0.75rem 1rem;
+    border-radius: 15px;
   }
 }
 
@@ -208,7 +210,7 @@ async function handleLogout() {
 
 .nav-link:hover {
   color: white !important;
-  background-color: #4a66e0;
+  background-color: #2664f3;
   border-radius: 15px;
   transform: translateY(-2px);
 }
@@ -220,7 +222,7 @@ async function handleLogout() {
 
 .points-display,
 .streak-display {
-  background: #4a66e0;
+  background: #78bcff;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   color: white;
@@ -245,12 +247,13 @@ async function handleLogout() {
   align-items: center;
   padding: 0.5rem 1rem;
   height: fit-content;
+  border-radius: 20px;
 }
 
 .dropdown-menu {
   border: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: #667eea;
+  background: #2664f3;
 }
 
 .dropdown-item {
@@ -258,7 +261,8 @@ async function handleLogout() {
 }
 
 .dropdown-item:hover {
-  background: #4a66e0;
+  background: #2664f3;
+  transform: translateY(3px);
   color: white;
 }
 </style>

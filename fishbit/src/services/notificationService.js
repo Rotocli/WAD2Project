@@ -1,4 +1,3 @@
-// src/services/notificationService.js
 import { messaging } from './firebase'
 import { getToken, onMessage } from 'firebase/messaging'
 
@@ -19,7 +18,7 @@ export const notificationService = {
         return null
       }
 
-      // ← FIX: Wait for service worker to be READY, not just registered
+      // wait for service worker to be ready
       let registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
       
       if (!registration) {
@@ -27,7 +26,7 @@ export const notificationService = {
         registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
       }
       
-      // ← FIX: Wait for it to become active
+      // wait for it to become active
       if (registration.installing || registration.waiting) {
         console.log('⏳ Waiting for service worker to activate...')
         await new Promise((resolve) => {
@@ -93,15 +92,15 @@ export const notificationService = {
 
   //put time for daily reminder
   scheduleDailyReminders(habits, progress) {
-    // Prevent duplicate scheduling
+    // 
     if (this._remindersScheduled) {
       console.log('⚠️ Reminders already scheduled, skipping...')
       return
     }
 
-    // Set your reminder times here
+    // set reminder time
     const reminderTimes = [
-      { hour: 18, minute: 0 },  // TEST TIME
+      { hour: 18, minute: 0 },  
     ]
 
     console.log('🔔 Setting up daily reminders...')
@@ -121,7 +120,7 @@ export const notificationService = {
       const delayMinutes = Math.floor(delay / 1000 / 60)
       console.log(`⏰ Reminder scheduled for ${reminderTime.toLocaleString()} (in ${delayMinutes} minutes)`)
       
-      setTimeout(async () => {  // ← MAKE THIS ASYNC
+      setTimeout(async () => { 
         console.log('🔔 Time to send scheduled reminder!')
         
         // ← FIX: FETCH FRESH DATA FROM STORES

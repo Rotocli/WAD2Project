@@ -3,7 +3,7 @@
           <div class="dashboard-card">
             <div class="card-header">
               <h4>Today's Habits</h4>
-              <router-link to="/habits" class="btn btn-sm btn-outline-primary">
+              <router-link to="/habits" class="view-all btn btn-sm btn-outline-primary">
                 View All
               </router-link>
             </div>
@@ -204,15 +204,15 @@ onMounted(() => {
 
 <style scoped>
 .dashboard-card {
-  background: white;
+  background: hsla(0, 0%, 100%, 0.35); ;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  color: white;
+  border: 2px solid white;
   overflow: hidden;
 }
 
 .card-header {
   padding: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -238,7 +238,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: linear-gradient(90deg,#65b1ff, #e7f5ff);
   border-radius: 10px;
   transition: all 0.3s ease;
   position:relative;
@@ -246,7 +246,7 @@ onMounted(() => {
 }
 
 .habit-item:hover {
-  background: #e9ecef;
+  background: linear-gradient(90deg,#65b1ff, #e7f5ff);;
   transform: translateX(5px);
 }
 
@@ -263,17 +263,21 @@ onMounted(() => {
 }
 
 .habit-check .form-check-input:checked {
-  background-color: #28a745;
-  border-color: #28a745;
+  background-color: #b6ec7b;
+  border-color: #70e45f;
 }
 
 .habit-streak {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  color: #ff6b6b;
+  color: #f68432;
   font-weight: bold;
 }
 
-
+.view-all {
+  color: white;
+  font-weight: 600;
+  border: 1.5px solid rgb(255, 255, 255);
+}
 </style>

@@ -3,7 +3,6 @@
     <div class="container-fluid p-4">
       <h2 class="mb-4">Profile Settings</h2>
       
-      <!-- Notification Section -->
       <div class="settings-section">
         <h3>🔔 Notifications</h3>
         
@@ -32,7 +31,7 @@
           </div>
         </div>
 
-        <!-- Test Buttons -->
+        <!-- test button -->
         <div v-if="fcmToken" class="setting-item">
           <div class="setting-info">
             <p>Test notifications</p>
@@ -41,10 +40,10 @@
           
           <div class="btn-group">
             <button @click="sendTestNotification" class="btn btn-success">
-              🧪 Simple Test
+              Simple Test
             </button>
             <button @click="sendHabitReminder" class="btn btn-warning">
-              📊 Habit Progress
+              Habit Progress
             </button>
           </div>
         </div>
@@ -64,7 +63,7 @@ const habitStore = useHabitStore()
 const fcmToken = ref(null)
 
 onMounted(async () => {
-  // Load saved token
+  // load saved token
   if (userStore.currentUserId) {
     try {
       const { doc, getDoc } = await import('firebase/firestore')
@@ -80,7 +79,7 @@ onMounted(async () => {
     }
   }
 
-  // Listen for foreground messages
+  // foreground messages
   notificationService.onMessageListener().then((payload) => {
     console.log('Received foreground message:', payload)
     notificationService.sendNotification(
@@ -110,7 +109,7 @@ async function enableNotifications() {
   }
 }
 
-// Disable notifications
+// disabling notifs 
 async function disableNotifications() {
   if (!confirm('Are you sure you want to disable notifications?')) return;
 
@@ -126,7 +125,7 @@ async function disableNotifications() {
       console.log('✅ Firestore token cleared')
     }
 
-    // Unregister Firebase service worker
+    // disabling notifs -> unregister firebase service worker
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
       if (registration) {
@@ -135,7 +134,7 @@ async function disableNotifications() {
       }
     }
 
-    // Delete FCM token from client
+    // disabling notifs -> delete fcm token
     const { getMessaging, deleteToken } = await import('firebase/messaging')
     const messaging = getMessaging()
     await deleteToken(messaging)
@@ -164,7 +163,7 @@ function sendHabitReminder() {
 </script>
 
 <style scoped>
-/* Same styles as before */
+
 .profile-view {
   min-height: calc(100vh - 70px);
   background: #f8f9fa;
