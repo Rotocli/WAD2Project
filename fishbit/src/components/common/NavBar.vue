@@ -232,11 +232,14 @@ body, html { overflow-x: hidden; }
 
 .nav-link:hover { 
   color: white; 
+  border-radius: 15px;
   background-color: #2664f3; 
+  border-bottom: 0px;
 }
 
 .router-link-active { 
   color: white; 
+  border-radius: 0px;
   border-bottom: 2px solid white; 
 }
 
@@ -337,6 +340,7 @@ body, html { overflow-x: hidden; }
     width: auto;
     min-width: 250px;
     max-width: 280px;
+    
     border-radius: 0 0 0 12px;
     box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.15);
     overflow: visible;
@@ -367,7 +371,7 @@ body, html { overflow-x: hidden; }
     color: #fff !important;
     padding: 0.75rem 1rem;
     width: 100%;
-    border-radius: 15px;
+    border-radius: 0px;
     transition: all 0.3s ease;
   }
 
@@ -385,6 +389,7 @@ body, html { overflow-x: hidden; }
     padding-bottom: 1rem;
     gap: 0.75rem;
   }
+
 
   .dropdown {
     width: 100%;

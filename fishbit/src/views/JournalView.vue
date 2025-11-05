@@ -1,7 +1,8 @@
 <template>
   <div class="journal-view">
     <!-- Insights Section -->
-    <div class="container mb-4">
+
+    <div class="container mb-4" v-if="insightsYes">
       <div class="card shadow-sm">
         <div class="card-body">
           <h2 class="mb-4">Your Insights</h2>
@@ -47,6 +48,13 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="container mb-4 " v-else>
+      <img class="table_img mt-5" src="../assets/table.svg" alt="">
+
+
+
+
     </div>
 
     <div class="container">
@@ -224,6 +232,7 @@ const generatingWeekly = ref(false)
 const generatingMonthly = ref(false)
 const loadingMore = ref(false)
 const summariesUsedToday = ref(0)
+const insightYes=ref (false)
 
 const entryForm = ref({
   entry: '',
@@ -413,8 +422,9 @@ onMounted(async () => {
 <style scoped>
 .journal-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  
   padding: 2rem 0;
+  background: linear-gradient(#f1d884,#decd94);
 }
 
 .insight-card {
@@ -443,5 +453,8 @@ onMounted(async () => {
   border-radius: 8px;
   text-align: center;
   font-style: italic;
+}
+.table_img{
+  width: 25%;
 }
 </style>
