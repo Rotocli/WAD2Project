@@ -419,7 +419,7 @@ function saveInventory() {
 <style scoped>
 .shop-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  background: linear-gradient(#d3faf5,#489eea);
 }
 
 /* Coins Display */
@@ -440,11 +440,12 @@ function saveInventory() {
 }
 
 .coin-amount {
-  color: #667eea;
+  color: black;
 }
 
 /* Search Section */
 .search-section {
+  padding: 1rem;
   position: relative;
   margin-bottom: 2rem;
 }
@@ -468,7 +469,7 @@ function saveInventory() {
 
 .search-bar:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #78c3bd;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -478,7 +479,7 @@ function saveInventory() {
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.3rem;
-  color: #6b7280;
+  color: grey;
 }
 
 .search-results {
@@ -490,12 +491,13 @@ function saveInventory() {
   max-width: 800px;
   max-height: 400px;
   overflow-y: auto;
-  background: white;
+  background: transparent;
+  backdrop-filter: blur(20px);
   border: 2px solid #e5e7eb;
   border-radius: 15px;
   margin-top: 0.5rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  z-index: 50;
 }
 
 .search-empty {
@@ -506,9 +508,9 @@ function saveInventory() {
 
 .search-category-header {
   padding: 0.75rem 1.5rem;
-  background: #f3f4f6;
+  background: #78c3bd;
   font-weight: bold;
-  color: #374151;
+  color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -523,7 +525,7 @@ function saveInventory() {
 }
 
 .search-result-item:hover {
-  background: #f9fafb;
+  background: rgba(26, 85, 78, 0.1);
 }
 
 .search-item-icon {
@@ -540,7 +542,7 @@ function saveInventory() {
 
 .search-item-price {
   font-weight: 600;
-  color: #667eea;
+  color: black;
 }
 
 /* Category Filters */
@@ -678,7 +680,7 @@ function saveInventory() {
   gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: black;
 }
 
 .coin-icon {
@@ -719,9 +721,9 @@ function saveInventory() {
 }
 
 .carousel-nav:hover {
-  background: #667eea;
+  background: #78c3bd;
   color: white;
-  border-color: #667eea;
+  border-color: #78c3bd;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -743,7 +745,7 @@ function saveInventory() {
   padding: 1rem 3rem;
   font-size: 1.3rem;
   font-weight: bold;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #78c3bd;
   color: white;
   border: none;
   border-radius: 50px;
@@ -764,8 +766,8 @@ function saveInventory() {
 
 /* Inventory Section */
 .inventory-section {
-  background: white;
-  border-radius: 20px;
+  background: rgba(217, 197, 252, 0.5);
+  border-radius: 30px;
   padding: 2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
@@ -773,7 +775,8 @@ function saveInventory() {
 .inventory-section h2 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #1f2937;
+  font-weight: 600;
+  color: #5568d3;
 }
 
 .inventory-grid {
@@ -804,7 +807,7 @@ function saveInventory() {
 
 .inventory-slot.has-item {
   background: white;
-  border-color: #667eea;
+  border-color: #78c3bd;
 }
 
 .inventory-slot.selected {

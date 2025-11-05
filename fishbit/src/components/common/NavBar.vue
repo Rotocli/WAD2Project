@@ -1,26 +1,25 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top" :class="{ 'dev-mode': userStore.isDeveloper }">
     <div class="container-fluid">
-      <span class="navbar-brand d-flex align-items-center" to="/dashboard">
+      <!-- Brand -->
+      <span class="navbar-brand d-flex align-items-center">
         <span class="fish-icon">
           <img src="@/assets/image.png" alt="FishBit Logo" width="40" height="40"/>
         </span>
         <span class="brand-text">FishBit</span>
       </span>
-      
-      <button 
-        class="navbar-toggler" 
-        type="button" 
-        @click="toggleNavbar"
-        aria-label="Toggle navigation"
-      >
+
+      <!-- Hamburger -->
+      <button class="navbar-toggler" type="button" @click="toggleNavbar" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
+
+      <!-- Collapsible menu -->
       <div 
         ref="navbarCollapse"
-        class="collapse navbar-collapse" 
-        :class="{ show: isNavbarOpen }"
+        class="navbar-collapse"
+        :class="{ 'mobile-open': isNavbarOpen }"
+        :style="{ height: isMobile ? collapseHeight : 'auto' }"
       >
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
@@ -59,27 +58,22 @@
             </router-link>
           </li>
         </ul>
-        
+
+        <!-- Right section -->
         <div class="navbar-right-section">
           <div class="stats-row">
             <div class="points-display">
               <i class="bi bi-coin"></i>
               <span>{{ totalPoints }}</span>
             </div>
-            
             <div class="streak-display">
               <i class="bi bi-fire"></i>
               <span>{{ currentStreak }}</span>
             </div>
           </div>
-          
+
           <div class="dropdown">
-            <button 
-              class="btn btn-link nav-link dropdown-toggle user-dropdown-btn" 
-              type="button"
-              @click="toggleDropdown"
-              aria-expanded="false"
-            >
+            <button class="btn btn-link nav-link dropdown-toggle user-dropdown-btn" type="button" @click="toggleDropdown">
               <i class="bi bi-person-circle"></i>
               <span class="ms-1">{{ username }}</span>
             </button>
@@ -104,17 +98,18 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/userStore'
 
 const router = useRouter()
-const route = useRoute()
 const userStore = useUserStore()
 
+const isMobile = ref(window.innerWidth < 992)
 const isNavbarOpen = ref(false)
 const isDropdownOpen = ref(false)
 const navbarCollapse = ref(null)
+const collapseHeight = ref('0px')
 
 const totalPoints = computed(() => userStore.totalPoints)
 const currentStreak = computed(() => userStore.currentStreak)
@@ -122,41 +117,28 @@ const username = computed(() => userStore.userProfile?.username || 'User')
 
 function toggleNavbar() {
   isNavbarOpen.value = !isNavbarOpen.value
+  if (isNavbarOpen.value) isDropdownOpen.value = false
+
+  const el = navbarCollapse.value
+  if (!el) return
+
   if (isNavbarOpen.value) {
-    isDropdownOpen.value = false
+    el.style.display = 'block'
+    nextTick(() => {
+      collapseHeight.value = el.scrollHeight + 'px'
+    })
+  } else {
+    collapseHeight.value = '0px'
+    setTimeout(() => {
+      el.style.display = 'none'
+    }, 250)
   }
 }
 
-function toggleDropdown() {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
-
-function closeNavbar() {
-  isNavbarOpen.value = false
-  isDropdownOpen.value = false
-}
-
-function closeDropdown() {
-  isDropdownOpen.value = false
-}
-
-function handleProfileClick() {
-  closeNavbar()
-}
-
-function handleClickOutside(event) {
-  const navbar = navbarCollapse.value
-  const toggler = event.target.closest('.navbar-toggler')
-  const dropdownBtn = event.target.closest('.user-dropdown-btn')
-  
-  if (navbar && !navbar.contains(event.target) && !toggler) {
-    closeNavbar()
-  }
-  
-  if (isDropdownOpen.value && !dropdownBtn && !event.target.closest('.dropdown-menu')) {
-    closeDropdown()
-  }
-}
+function toggleDropdown() { isDropdownOpen.value = !isDropdownOpen.value }
+function closeNavbar() { isNavbarOpen.value = false; isDropdownOpen.value = false }
+function closeDropdown() { isDropdownOpen.value = false }
+function handleProfileClick() { closeNavbar() }
 
 async function handleLogout() {
   closeNavbar()
@@ -164,92 +146,234 @@ async function handleLogout() {
   router.push('/')
 }
 
-const unwatchRoute = router.afterEach(() => {
-  closeNavbar()
-})
+function handleClickOutside(event) {
+  const navbar = navbarCollapse.value
+  const toggler = event.target.closest('.navbar-toggler')
+  const dropdownBtn = event.target.closest('.user-dropdown-btn')
+
+  // Fix: Check if navbar is actually open before closing
+  if (isNavbarOpen.value && navbar && !navbar.contains(event.target) && !toggler) {
+    closeNavbar()
+  }
+  if (isDropdownOpen.value && !dropdownBtn && !event.target.closest('.dropdown-menu')) {
+    closeDropdown()
+  }
+}
+
+function updateViewport() {
+  isMobile.value = window.innerWidth < 992
+}
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', updateViewport)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', updateViewport)
 })
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  unwatchRoute()
-})
+onMounted(() => { document.addEventListener('click', handleClickOutside) })
+onUnmounted(() => { document.removeEventListener('click', handleClickOutside) })
 </script>
 
 <style scoped>
+.fish-icon {
+  font-size: 1.8rem;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  animation: swim 3s ease-in-out infinite; /* add this line */
+}
+
+@keyframes swim {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(5px) rotate(5deg); }
+  75% { transform: translateX(-5px) rotate(-5deg); }
+}
+
+body, html { overflow-x: hidden; }
+
 .navbar {
   background: #4f9cfa;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0;
-  transition: top 0.3s ease;
   height: 70px;
   z-index: 100;
+  overflow: visible;
 }
 
-.container-fluid {
-  padding: 0 1.5rem;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  max-width: 100%;
-  margin: 0;
+.container-fluid { 
+  padding: 0 1.5rem; 
+  display: flex; 
+  align-items: center; 
+  max-width: 100%; 
+  margin: 0; 
 }
 
-.navbar.dev-mode {
-  top: 36px;
+.navbar.dev-mode { 
+  top: 36px; 
 }
 
-/* Ensures the collapsed/expanded side menu or mobile dropdown has a full background */
-.navbar-collapse, .collapse.show {
-  background: #4f9cfa;
+.navbar-collapse {
+  background: transparent;
+  overflow: visible !important;
+  transition: height 0.25s ease;
+  position: relative;
 }
 
-.navbar-right-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.nav-link { 
+  color: rgba(255,255,255,0.9); 
+  margin: 0 0.5rem; 
+  padding: 0.5rem 1rem; 
+  border-radius: 15px; 
+  transition: all 0.3s ease; 
+  text-decoration: none; 
 }
 
-.stats-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.nav-link:hover { 
+  color: white; 
+  background-color: #2664f3; 
 }
 
-/* Mobile view */
+.router-link-active { 
+  color: white; 
+  border-bottom: 2px solid white; 
+}
+
+.navbar-right-section { 
+  display: flex; 
+  align-items: center; 
+  gap: 1rem; 
+}
+.stats-row { 
+  display: flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+}
+
+.points-display, .streak-display { 
+  background: #78bcff; 
+  padding: 0.5rem 1rem; 
+  border-radius: 20px; 
+  color: white; 
+  font-weight: bold; 
+  display: flex; 
+  align-items: center; 
+  font-size: 0.9rem; 
+}
+
+.dropdown { 
+  position: relative; 
+  display: flex; 
+  align-items: center; 
+  color: white;
+}
+
+.user-dropdown-btn { 
+  display: flex; 
+  align-items: center; 
+  padding: 0.4rem 0.8rem; 
+  border: none; 
+  background: transparent; 
+  color: rgba(255,255,255,0.9); 
+  cursor: pointer; 
+  border-radius: 10px; 
+}
+
+.user-dropdown-btn:hover { 
+  color: white; 
+  background-color: #78bcff; 
+}
+
+.dropdown-menu { 
+  position: absolute !important; 
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 180px;
+  margin-top: 0.5rem !important;
+  background: rgba(79, 156, 250, 0.95);
+  backdrop-filter: blur(6px); 
+  border-radius: 15px; 
+  padding: 0.5rem 0; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block; 
+  opacity: 0; 
+  transform: translateY(-5px); 
+  pointer-events: none; 
+  transition: all 0.25s ease; 
+  z-index: 2000;
+  transform: translateY(-5px);
+}
+
+.dropdown-menu.show { 
+  opacity: 1; 
+  transform: translateY(0); 
+  pointer-events: auto; 
+}
+
+.dropdown-item {
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: transparent;
+  transform: translateX(5px); 
+  transition: all 0.25s ease; 
+  color: white;
+}
+
+/* mobile view */
 @media (max-width: 992px) {
   .navbar-collapse {
+    display: none;
     position: absolute;
-    top: 100%;
+    background: rgba(79, 156, 250, 0.98);
+    backdrop-filter: blur(20px);
+    top: 70px;
     right: 0;
-    left: auto;
-    width: fit-content;
-    min-width: 200px;
+    width: auto;
+    min-width: 250px;
     max-width: 280px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;    
-    background: #667eea;
-    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.15);
-    padding: 1rem;
     border-radius: 0 0 0 12px;
-    margin-right: 1rem;
+    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.15);
+    overflow: visible;
+    transition: height 0.25s ease, opacity 0.2s ease;
+    height: 0;
+    padding: 0 1.5rem; 
+  }
+  .navbar-collapse:not(.mobile-open) { 
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .navbar-collapse.mobile-open {
+    display: block;
+    opacity: 1;
   }
 
-  .navbar-nav {
+  .navbar-nav { 
     flex-direction: column;
-    width: 100%;
+    padding-top: 1rem;
   }
 
   .navbar-nav .nav-item {
     width: 100%;
   }
 
-  .navbar-nav .nav-link {
+  .navbar-nav .nav-link { 
     color: #fff !important;
     padding: 0.75rem 1rem;
     width: 100%;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: white !important;
+    background-color: #78bcff;
+    transform: translateX(5px); 
   }
 
   .navbar-right-section {
@@ -257,242 +381,28 @@ onUnmounted(() => {
     align-items: stretch !important;
     width: 100%;
     margin-top: 1rem;
+    padding-bottom: 1rem;
     gap: 0.75rem;
-  }
-
-  .stats-row {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  .points-display,
-  .streak-display {
-    flex: 1;
-    justify-content: center;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-  }
-
-  .points-display i,
-  .streak-display i {
-    font-size: 0.9rem;
   }
 
   .dropdown {
     width: 100%;
-  }
-
-  .user-dropdown-btn {
-    width: 100%;
-    justify-content: flex-start;
-    padding: 0.75rem 1rem !important;
+    position: relative;
   }
 
   .dropdown-menu {
-    position: static !important;
+    position: absolute !important;
+    right:0;
+    top: calc(100% + 6px);
+    z-index: 1000;
     width: 100%;
-    margin-top: 0.5rem !important;
+    background-color: transparent;
     box-shadow: none !important;
+    transform: translateX(-5px);
   }
 
-  .navbar-collapse::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .navbar-collapse::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-  }
-
-  .navbar-collapse::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-  }
-
-  .navbar-collapse::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.navbar-nav {
-  display: flex;
-  align-items: center;
-  margin: 0;
-}
-
-.navbar-nav .nav-item {
-  display: flex;
-  align-items: center;
-}
-
-.fish-icon {
-  font-size: 1.8rem;
-  margin-right: 0.5rem;
-  animation: swim 3s ease-in-out infinite;
-  display: inline-flex;
-  align-items: center;
-}
-
-.brand-text {
-  font-size: 1.5rem;
-  margin-right: 0.8rem;
-  font-weight: bold;
-  color: white;
-  line-height: 1;
-  font-style: oblique;
-}
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  cursor: default;
-}
-
-@keyframes swim {
-  0%, 100% { 
-    transform: translateX(0) rotate(0deg); 
-  }
-  25% { 
-    transform: translateX(5px) rotate(5deg); 
-  }
-  75% { 
-    transform: translateX(-5px) rotate(-5deg); 
-  }
-}
-
-.nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  margin: 0 0.5rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.nav-link:hover {
-  color: white !important;
-  background-color: #2664f3;
-  border-radius: 15px;
-  transform: translateY(-2px);
-}
-
-.router-link-active {
-  color: white !important;
-  border-bottom: 2px solid white;
-}
-
-.points-display,
-.streak-display {
-  background: #78bcff;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  height: fit-content;
-  font-size: 0.9rem;
-}
-
-.points-display i,
-.streak-display i {
-  margin-right: 0.25rem;
-  font-size: 1rem;
-}
-
-.dropdown {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.user-dropdown-btn {
-  display: flex;
-  align-items: center;
-  padding: 0.4rem 0.8rem;
-  height: fit-content;
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.9) !important;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.user-dropdown-btn:hover {
-  color: white !important;
-  background-color: #4a66e0;
-  border-radius: 15px;
-}
-
-.user-dropdown-btn i {
-  font-size: 1.1rem;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: #667eea;
-  min-width: 180px;
-  border-radius: 8px;
-  padding: 0.5rem 0;
-  display: none;
-  z-index: 1000;
-}
-
-.dropdown-menu.show {
-  display: block;
-}
-
-.dropdown-item {
-  color: white;
-  padding: 0.6rem 1.2rem;
-  transition: background 0.2s ease;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.dropdown-item:hover {
-  background: #2664f3;
-  transform: translateY(3px);
-  color: white;
-}
-
-.dropdown-divider {
-  border-color: rgba(255, 255, 255, 0.2);
-  margin: 0.5rem 0;
-}
-
-.navbar-collapse {
-  transition: all 0.3s ease-in-out;
-}
-
-.navbar-collapse:not(.show) {
-  display: none;
-}
-
-.navbar-collapse.show {
-  display: block;
-}
-
-@media (min-width: 993px) {
-  .navbar-right-section {
-    display: flex !important;
+  .dropdown-menu.show {
+    transform: translateX(0);
   }
 }
 </style>

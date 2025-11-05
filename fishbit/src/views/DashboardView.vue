@@ -2,18 +2,14 @@
   <div class="dashboard-view">
     <div class="container-fluid p-0">
 
-      <!-- AQUARIUM - Full Width -->
       <div class="aquarium-section">
         <AquariumView @fish-clicked="handleFishClick" />
       </div>
 
-      <!-- Stats Cards -->
       <div class="p-4">
         <div class="row g-4 mt-2">
-          <!-- Today's Habits -->
           <HabitDisplay :todaysHabits="todaysHabits" />
-          
-          <!-- Quick Actions Card -->
+
           <div class="col-lg-4">
             <div class="dashboard-card">
               <div class="card-header">
@@ -63,7 +59,7 @@ const userStore = useUserStore()
 const habitStore = useHabitStore()
 const fishStore = useFishStore()
 
-// Fetch user habits
+
 watch(
   () => userStore.currentUserId,
   (uid) => {
@@ -80,7 +76,6 @@ watch(
   { immediate: true }
 )
 
-// Computed properties
 const username = computed(() => userStore.userProfile?.username || 'Friend')
 const currentStreak = computed(() => userStore.currentStreak)
 const totalPoints = computed(() => userStore.totalPoints)
@@ -88,7 +83,6 @@ const activeHabitsCount = computed(() => habitStore.activeHabits.length)
 const todaysHabits = computed(() => habitStore.todaysHabits)
 const fishCount = computed(() => fishStore.activeFish.length)
 
-// Local state
 const motivationalQuote = ref("Every journey begins with a single step. Keep going!")
 
 const quotes = [
@@ -100,31 +94,25 @@ const quotes = [
   "Today's efforts are tomorrow's achievements."
 ]
 
-// Event handlers
 function handleFishClick(fish) {
   console.log('Fish clicked:', fish)
 }
 
-// FIXED: Single onMounted with all initialization
 onMounted(() => {
   console.log('🚀 Dashboard mounted')
   
-  // Set random motivational quote
   motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
   
-  // Track if reminders have been scheduled
   let remindersScheduled = false
   
-  // Schedule reminders when habits AND progress are loaded
   watch(
     () => [userStore.currentUserId, habitStore.activeHabits, habitStore.progress],
     async ([userId, habits, progress]) => {
-      // Prevent multiple scheduling
+      // stop multiple schedules
       if (remindersScheduled) return
       
       if (userId && habits.length > 0) {
         
-        // Ensure progress is loaded
         if (!progress || progress.length === 0) {
           console.log('⏳ Waiting for progress to load...')
           await habitStore.fetchProgress(userId)
@@ -135,7 +123,6 @@ onMounted(() => {
           console.log('✅ Scheduling daily reminders with', habits.length, 'habits and', habitStore.progress.length, 'progress entries')
           notificationService.scheduleDailyReminders(habits, habitStore.progress)
           
-          // Mark as scheduled
           remindersScheduled = true
         }
       }
@@ -152,12 +139,12 @@ onMounted(() => {
   min-height: 100vh; 
   width: 100%;
   background: linear-gradient(to top, #805621 0%, #f3ca96 50%);
-  overflow: hidden; }
+  overflow: hidden; 
+}
 
 .aquarium-section {
   top: 0;
   border-radius: 0;
-  
 }
 
 .quick-actions {
@@ -176,7 +163,6 @@ onMounted(() => {
   padding: 1rem;
 }
 
-
 .action-btn {
   display: flex;
   align-items: center;
@@ -191,12 +177,12 @@ onMounted(() => {
   padding: 10%;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-width: 200px; /* keeps them bubble-sized */
+  max-width: 200px; 
   margin: 0 auto;
   transition: 
     transform 0.25s ease,
     box-shadow 0.25s ease,
-    all 0.6s ease-in-out; /* added smoothness */
+    all 0.6s ease-in-out; 
 }
 
 /* hover expand inflate */
@@ -204,7 +190,7 @@ onMounted(() => {
   transform: scale(1.08);
 }
 
-/* click pop */
+/* click 'pop' */
 .action-btn:active {
   animation: bubble-pop 0.25s ease-out;
 }
@@ -227,8 +213,8 @@ onMounted(() => {
     grid-template-columns: repeat(2, minmax(100px, 1fr));
     gap: 1rem;
   }
-    .action-btn {
-    max-width: 120px;
+  .action-btn {
+  max-width: 120px;
   }
 }
 
@@ -266,10 +252,9 @@ onMounted(() => {
   padding: 1.25rem;
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .bubble-container {
-    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+    grid-template-columns: repeat(2, 1fr); 
   }
   .action-btn {
     width: clamp(100px, 25vw, 150px);
