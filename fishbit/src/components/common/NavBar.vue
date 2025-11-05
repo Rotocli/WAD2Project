@@ -62,12 +62,12 @@
         
         <div class="navbar-right-section">
           <div class="stats-row">
-            <div class="points-display">
+            <div class="points-display" title="Your Points">
               <i class="bi bi-coin"></i>
               <span>{{ totalPoints }}</span>
             </div>
             
-            <div class="streak-display">
+            <div class="streak-display" title="Your Streak">
               <i class="bi bi-fire"></i>
               <span>{{ currentStreak }}</span>
             </div>
@@ -218,6 +218,193 @@ onUnmounted(() => {
   gap: 0.5rem;
 }
 
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.navbar-nav .nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.fish-icon {
+  font-size: 1.8rem;
+  margin-right: 0.5rem;
+  animation: swim 3s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  margin-right: 0.8rem;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+  font-style: oblique;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  cursor: default;
+}
+
+@keyframes swim {
+  0%, 100% { 
+    transform: translateX(0) rotate(0deg); 
+  }
+  25% { 
+    transform: translateX(5px) rotate(5deg); 
+  }
+  75% { 
+    transform: translateX(-5px) rotate(-5deg); 
+  }
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0 0.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: white !important;
+  background-color: #2664f3;
+  border-radius: 15px;
+  transform: translateY(-2px);
+}
+
+.router-link-active {
+  color: white !important;
+  border-bottom: 2px solid white;
+}
+
+.points-display,
+.streak-display {
+  background: #3591ed;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.points-display:hover,
+.streak-display:hover {
+  background: #2664f3;
+  transform: translateY(-2px);
+}
+
+.points-display i,
+.streak-display i {
+  margin-right: 0.25rem;
+  font-size: 1rem;
+}
+
+.dropdown {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.user-dropdown-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  height: fit-content;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9) !important;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.user-dropdown-btn:hover {
+  color: white !important;
+  background-color: #2664f3;
+  border-radius: 15px;
+}
+
+.user-dropdown-btn i {
+  font-size: 1.1rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: #4f9cfa;
+  min-width: 180px;
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  display: none;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  color: white;
+  padding: 0.6rem 1.2rem;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background: #2664f3;
+  transform: translateY(3px);
+  color: white;
+}
+
+.dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.2);
+  margin: 0.5rem 0;
+}
+
+.navbar-collapse {
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-collapse:not(.show) {
+  display: none;
+}
+
+.navbar-collapse.show {
+  display: block;
+}
+
+@media (min-width: 993px) {
+  .navbar-right-section {
+    display: flex !important;
+  }
+}
+
 /* Mobile view */
 @media (max-width: 992px) {
   .navbar-collapse {
@@ -313,186 +500,6 @@ onUnmounted(() => {
 
   .navbar-collapse::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.navbar-nav {
-  display: flex;
-  align-items: center;
-  margin: 0;
-}
-
-.navbar-nav .nav-item {
-  display: flex;
-  align-items: center;
-}
-
-.fish-icon {
-  font-size: 1.8rem;
-  margin-right: 0.5rem;
-  animation: swim 3s ease-in-out infinite;
-  display: inline-flex;
-  align-items: center;
-}
-
-.brand-text {
-  font-size: 1.5rem;
-  margin-right: 0.8rem;
-  font-weight: bold;
-  color: white;
-  line-height: 1;
-  font-style: oblique;
-}
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  cursor: default;
-}
-
-@keyframes swim {
-  0%, 100% { 
-    transform: translateX(0) rotate(0deg); 
-  }
-  25% { 
-    transform: translateX(5px) rotate(5deg); 
-  }
-  75% { 
-    transform: translateX(-5px) rotate(-5deg); 
-  }
-}
-
-.nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  margin: 0 0.5rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.nav-link:hover {
-  color: white !important;
-  background-color: #2664f3;
-  border-radius: 15px;
-  transform: translateY(-2px);
-}
-
-.router-link-active {
-  color: white !important;
-  border-bottom: 2px solid white;
-}
-
-.points-display,
-.streak-display {
-  background: #78bcff;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  height: fit-content;
-  font-size: 0.9rem;
-}
-
-.points-display i,
-.streak-display i {
-  margin-right: 0.25rem;
-  font-size: 1rem;
-}
-
-.dropdown {
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.user-dropdown-btn {
-  display: flex;
-  align-items: center;
-  padding: 0.4rem 0.8rem;
-  height: fit-content;
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.9) !important;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.user-dropdown-btn:hover {
-  color: white !important;
-  background-color: #4a66e0;
-  border-radius: 15px;
-}
-
-.user-dropdown-btn i {
-  font-size: 1.1rem;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: #667eea;
-  min-width: 180px;
-  border-radius: 8px;
-  padding: 0.5rem 0;
-  display: none;
-  z-index: 1000;
-}
-
-.dropdown-menu.show {
-  display: block;
-}
-
-.dropdown-item {
-  color: white;
-  padding: 0.6rem 1.2rem;
-  transition: background 0.2s ease;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.dropdown-item:hover {
-  background: #2664f3;
-  transform: translateY(3px);
-  color: white;
-}
-
-.dropdown-divider {
-  border-color: rgba(255, 255, 255, 0.2);
-  margin: 0.5rem 0;
-}
-
-.navbar-collapse {
-  transition: all 0.3s ease-in-out;
-}
-
-.navbar-collapse:not(.show) {
-  display: none;
-}
-
-.navbar-collapse.show {
-  display: block;
-}
-
-@media (min-width: 993px) {
-  .navbar-right-section {
-    display: flex !important;
   }
 }
 </style>
