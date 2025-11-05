@@ -32,7 +32,7 @@
                   @click="selectSearchItem(item)"
                 >
                   
-                  <span class="search-item-icon">{{ item.icon }}</span>
+                  <span ><img class="search-item-icon" :src="item.icon" alt=""></span>
                   <span class="search-item-name">{{ item.name }}</span>
                   <span class="search-item-price">💰 {{ item.cost }}</span>
                 </div>
@@ -85,7 +85,7 @@
           <!-- Left Item -->
           <div class="custom-carousel-item carousel-item-left" @click="previousItem">
             <div class="item-preview">
-              <span class="item-icon small">{{ getPreviousItem().icon }}</span>
+              <span><img class="item-icon small" :src="getPreviousItem().icon" alt=""></span>
             </div>
           </div>
 
@@ -93,7 +93,7 @@
           <div class="custom-carousel-item carousel-item-center">
             <div class="item-card">
               <div class="item-display">
-                <span class="item-icon large"><img class="item-icon large" src="../assets/fire.svg" alt=""></span>
+                <span class="item-icon large"><img class="item-icon large" :src="getCurrentItem().icon" alt=""></span>
               </div>
               <div class="item-info">
                 <h3 class="item-name">{{ getCurrentItem().name }}</h3>
@@ -111,7 +111,7 @@
           <!-- Right Item -->
           <div class="custom-carousel-item carousel-item-right" @click="nextItem">
             <div class="item-preview">
-              <span class="item-icon large">{{ getNextItem().icon }}</span>
+              <span><img class="item-icon small" :src="getNextItem().icon" alt=""></span>
             </div>
           </div>
 
@@ -145,9 +145,10 @@
             }"
             @click="handleSlotClick(index)"
           >
-            <div v-if="item" class="inventory-item" :class="{ 'in-use': item.inUse }">
-              <span class="inventory-icon">{{ item.icon }}</span>
-              <!-- Remove quantity badge completely -->
+            <div v-if="item" class="inventory-item py-1 pt-3" :class="{ 'in-use': item.inUse }">
+              <span ><img class="inventory-icon mb-3 mt-1 mx-auto d-block text-center" :src="item.icon" alt=""></span>
+              <span class="d-block text-center ">{{ item.name }}</span>
+              
               <button 
                 v-if="editMode && !item.inUse" 
                 class="delete-slot-btn" 
@@ -218,9 +219,9 @@ onMounted(async () => {
 
 // Load inventory items into slots (15 slots total)
 function loadInventoryIntoSlots() {
-  inventorySlots.value = Array.from({ length: 15 }, () => null);
+  inventorySlots.value = Array.from({ length: 30 }, () => null);
   inventoryStore.inventoryItems.forEach((item, index) => {
-    if (index < 15) {
+    if (index < 30) {
       inventorySlots.value[index] = item;
     }
   });
@@ -653,6 +654,7 @@ function saveInventory() {
 
 .item-icon.small {
   font-size: 3rem;
+  min-width: 100%;
 }
 
 .item-icon.large {
@@ -819,7 +821,7 @@ function saveInventory() {
 .inventory-item {
   width: 100%;
   height: 100%;
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: center;
   position: relative;
@@ -827,7 +829,9 @@ function saveInventory() {
 
 .inventory-icon {
   font-size: 2.5rem;
+  min-width: 100%;
 }
+
 
 .quantity-badge {
   position: absolute;

@@ -188,7 +188,7 @@
                 @dragstart="handleDragStart(idx, $event)"
                 @dragend="handleDragEnd"
               >
-                <span class="deco-icon">{{ cell.decoration.icon }}</span>
+                <span ><img class="deco-icon" :src=" cell.decoration.icon" alt=""></span>
                 <div class="deco-label">{{ cell.decoration.name }}</div>
                 <button 
                   class="delete-btn" 
@@ -765,11 +765,12 @@ async function handleDeleteDecoration(idx) {
 }
 
 .deco-icon {
-  font-size: clamp(2rem, 4vw, 3rem);
+  width: clamp(40px, 8vw, 120px);  /* scales between 40px and 120px */
+  height: auto;                     /* keep aspect ratio */
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   margin-bottom: 4px;
+  display: block;
 }
-
 .deco-label {
   font-size: clamp(0.65rem, 1vw, 0.85rem);
   color: white;

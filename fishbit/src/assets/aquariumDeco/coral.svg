@@ -1,0 +1,14 @@
+<svg width="40" height="20" viewBox="0 0 40 20" xmlns="http://www.w3.org/2000/svg">
+  <!-- Base ellipse -->
+  <ellipse cx="20" cy="18" rx="15" ry="3" fill="#8b5a3c"/>
+
+  <!-- Coral stems -->
+  <path d="M 10 18 Q 7 13 8 8 Q 10 3 11 1" stroke="#d946ef" stroke-width="0.8" fill="none"/>
+  <path d="M 20 18 Q 19 10 20 4 Q 21 2 20 0" stroke="#ec4899" stroke-width="1" fill="none"/>
+  <path d="M 30 18 Q 31 13 30 8 Q 29 3 30 1" stroke="#f472b6" stroke-width="0.8" fill="none"/>
+
+  <!-- Coral tops -->
+  <circle cx="11" cy="3" r="1.2" fill="#f472b6"/>
+  <circle cx="20" cy="1" r="1.4" fill="#ec4899"/>
+  <circle cx="30" cy="3" r="1.2" fill="#d946ef"/>
+</svg>
