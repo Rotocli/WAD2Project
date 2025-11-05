@@ -263,7 +263,9 @@ function getDecoConfig(slot, decoId) {
       glitter: { svg: 'glitter', type: 'pattern', animate: true }
     },
     trail: {
+      fart: { svg: 'fart', color: '#7A5630', animate: true },
       rainbow: { 
+        
         svg: 'rainbow', 
         colors: ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'] 
       },

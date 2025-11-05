@@ -16,8 +16,8 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
     head: {
       crown: { 
         name: 'Crown', 
-        icon: '../assets/crown.svg'
-, 
+        icon:  new URL('@/assets/crown.svg', import.meta.url).href,
+
         cost: 200, 
         effect: 'prestige',
         svg: 'crown',
@@ -27,7 +27,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       topHat: { 
         name: 'Top Hat', 
-        icon: '🎩', 
+        icon:  new URL('@/assets/topHat.svg', import.meta.url).href, 
         cost: 150, 
         effect: 'prestige',
         svg: 'tophat',
@@ -37,7 +37,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       bow: { 
         name: 'Bow', 
-        icon: '🎀', 
+        icon:new URL('@/assets/bow.svg', import.meta.url).href, 
         cost: 100, 
         effect: 'cute',
         svg: 'bow',
@@ -55,7 +55,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
     eye: {
       sunglasses: { 
         name: 'Sunglasses', 
-        icon: '🕶️', 
+        icon: new URL('@/assets/sunglasses.svg', import.meta.url).href, 
         cost: 120, 
         effect: 'cool',
         svg: 'sunglasses',
@@ -65,7 +65,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       monocle: { 
         name: 'Monocle', 
-        icon: '🧐', 
+        icon: new URL('@/assets/monocle.svg', import.meta.url).href, 
         cost: 100, 
         effect: 'classy',
         svg: 'monocle',
@@ -75,7 +75,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       starEyes: { 
         name: 'Star Eyes', 
-        icon: '🌟', 
+        icon: new URL('@/assets/starEyes.svg', import.meta.url).href, 
         cost: 80, 
         effect: 'cute',
         svg: 'stareyes',
@@ -93,7 +93,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
     body: {
       stripes: { 
         name: 'Stripes', 
-        icon: '', 
+        icon: new URL('@/assets/stripes.svg', import.meta.url).href, 
         cost: 50, 
         effect: 'pattern',
         svg: 'stripes',
@@ -101,7 +101,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       spots: { 
         name: 'Spots', 
-        icon: '', 
+        icon: new URL('@/assets/spots.svg', import.meta.url).href, 
         cost: 50, 
         effect: 'pattern',
         svg: 'spots',
@@ -109,7 +109,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       glitter: { 
         name: 'Glitter', 
-        icon: '', 
+        icon: new URL('@/assets/glitter.svg', import.meta.url).href, 
         cost: 150, 
         effect: 'sparkle',
         svg: 'glitter',
@@ -124,9 +124,20 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       }
     },
     trail: {
+      fart:{
+       
+        name: 'Fart Trail', 
+        icon: new URL('@/assets/fart.svg', import.meta.url).href, 
+        cost: 10, 
+        effect: 'cloud',
+        svg: 'fart',
+        color: '#7A5630',
+        animate: true
+     
+      },
       rainbow: { 
         name: 'Rainbow Trail', 
-        icon: '', 
+        icon: new URL('@/assets/rainbow.svg', import.meta.url).href, 
         cost: 200, 
         effect: 'sparkle',
         svg: 'rainbow',
@@ -135,8 +146,8 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       bubbles: { 
         name: 'Bubbles Trail', 
-        icon: '', 
-        cost: 100, 
+        icon: new URL('@/assets/bubbles.svg', import.meta.url).href, 
+        cost: 100,
         effect: 'bubbly',
         svg: 'bubbles',
         color: '#87CEEB',
@@ -145,7 +156,7 @@ export const useFishDecoStore = defineStore('fishdeco', () => {
       },
       fire: { 
         name: 'Fire Trail', 
-        icon: '', 
+        icon: new URL('@/assets/fire.svg', import.meta.url).href, 
         cost: 250, 
         effect: 'cool',
         svg: 'fire',

@@ -231,53 +231,70 @@
     <!-- TRAIL EFFECTS -->
 <g v-if="type === 'trail' && decoration.svg === 'bubbles'">
 
-  <g>
-
-
+<g>
+  <!-- Bubble 1 -->
   <circle 
-    :cx="x-10" 
+    :cx="x" 
     :cy="y" 
     r="4" 
-    fill="lightblue">
+    fill="lightblue"
+    opacity="0.8"
+  >
+    <!-- Moves diagonally relative to x,y -->
     <animateTransform
       attributeName="transform"
       type="translate"
-      :values="`0,0; -25,0`"
-      dur="2s"
+      :values="`0,0; -25,-10`" 
+      dur="1s"
       repeatCount="indefinite"
+      begin="0s"
     />
-    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+    <!-- Shrink radius as it moves -->
+    <animate attributeName="r" :values="`4;2`" dur="1s" repeatCount="indefinite"/>
+    <!-- Fade out -->
+    <animate attributeName="opacity" values="0.8;0" dur="1s" repeatCount="indefinite"/>
   </circle>
+
+  <!-- Bubble 2 -->
   <circle 
-    :cx="x-10" 
+    :cx="x" 
     :cy="y+5" 
     r="4" 
-    fill="lightblue">
+    fill="lightblue"
+    opacity="0.8"
+  >
     <animateTransform
       attributeName="transform"
       type="translate"
-      :values="`0,0; -25,+4`"
-      dur="2s"
+      :values="`0,0; -27,-12`"
+      dur="1s"
       repeatCount="indefinite"
+      begin="0.3s"
     />
-    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="r" :values="`4;2`" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0" dur="1s" repeatCount="indefinite"/>
   </circle>
+
+  <!-- Bubble 3 -->
   <circle 
-    :cx="x-10" 
+    :cx="x" 
     :cy="y-5" 
     r="4" 
-    fill="lightblue">
+    fill="lightblue"
+    opacity="0.8"
+  >
     <animateTransform
       attributeName="transform"
       type="translate"
-      :values="`0,0; -25,-4`"
-      dur="2s"
+      :values="`0,0; -23,-8`"
+      dur="1s"
       repeatCount="indefinite"
+      begin="0.5s"
     />
-    <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="r" :values="`4;2`" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0" dur="1s" repeatCount="indefinite"/>
   </circle>
-    
-  </g>
+</g>
 </g>
 
 <g v-if="type === 'trail' && decoration.svg === 'rainbow'">
@@ -300,6 +317,90 @@
     />
   </path>
 </g>
+
+<g v-if="type === 'trail' && decoration.svg === 'fart'">
+  <!-- Brown SBD Puff 1 -->
+  <path 
+    :d="`
+      M ${x-5} ${y}
+      c 4 -2 4 -6 0 -6
+      c -3 0 -4 4 -1 5
+      c -3 1 -3 5 1 5
+      c 4 0 4 -4 0 -4 z
+    `"
+    fill="#7a5630"
+    opacity="0.9"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -20,0`"
+      dur="2.2s"
+      repeatCount="indefinite"
+    />
+    <animate 
+      attributeName="opacity"
+      values="0.9;0"
+      dur="2.2s"
+      repeatCount="indefinite"
+    />
+  </path>
+
+  <!-- Puff 2 Above -->
+  <path 
+    :d="`
+      M ${x-10} ${y - 3}
+      c 3 -2 3 -5 0 -5
+      c -2 0 -3 3 -1 4
+      c -2 1 -2 4 1 4
+      c 3 0 3 -3 0 -3 z
+    `"
+    fill="#6a4a29"
+    opacity="0.8"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -22,-1`"
+      dur="2.4s"
+      repeatCount="indefinite"
+    />
+    <animate 
+      attributeName="opacity"
+      values="0.8;0"
+      dur="2.4s"
+      repeatCount="indefinite"
+    />
+  </path>
+
+  <!-- Puff 3 Below -->
+  <path 
+    :d="`
+      M ${x-15} ${y + 3}
+      c 3 -2 3 -5 0 -5
+      c -2 0 -3 3 -1 4
+      c -2 1 -2 4 1 4
+      c 3 0 3 -3 0 -3 z
+    `"
+    fill="#5a3e23"
+    opacity="0.7"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      :values="`0,0; -24,1`"
+      dur="2.6s"
+      repeatCount="indefinite"
+    />
+    <animate 
+      attributeName="opacity"
+      values="0.7;0"
+      dur="2.6s"
+      repeatCount="indefinite"
+    />
+  </path>
+</g>
+
 
 <g v-if="type === 'trail' && decoration.svg === 'fire'">
   

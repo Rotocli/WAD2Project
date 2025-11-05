@@ -1,7 +1,10 @@
-<svg width="80" height="40" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg">
-  <rect x="20" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
-  <rect x="28" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
-  <rect x="36" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
-  <rect x="44" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
-  <rect x="52" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+<svg width="40" height="20" viewBox="0 0 40 20" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(-17.5, -20)">
+    <rect x="20" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+    <rect x="28" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+    <rect x="36" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+    <rect x="44" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+    <rect x="52" y="22" width="3" height="16" fill="#0000FF" opacity="0.6"/>
+  </g>
 </svg>
+

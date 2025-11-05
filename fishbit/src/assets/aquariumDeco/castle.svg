@@ -1,0 +1,19 @@
+<svg width="40" height="20" viewBox="0 0 40 20" xmlns="http://www.w3.org/2000/svg">
+  <!-- Castle base -->
+  <rect x="4" y="13" width="32" height="7" fill="#64748b"/>
+  
+  <!-- Towers -->
+  <rect x="8" y="8" width="10" height="5" fill="#94a3b8"/>
+  <rect x="22" y="8" width="10" height="5" fill="#94a3b8"/>
+  
+  <!-- Roofs -->
+  <polygon points="13,6 8,8 18,8" fill="#475569"/>
+  <polygon points="27,6 22,8 32,8" fill="#475569"/>
+  
+  <!-- Door -->
+  <rect x="16" y="14" width="8" height="6" fill="#334155"/>
+  
+  <!-- Windows -->
+  <circle cx="13" cy="10" r="2" fill="#fbbf24"/>
+  <circle cx="27" cy="10" r="2" fill="#fbbf24"/>
+</svg>

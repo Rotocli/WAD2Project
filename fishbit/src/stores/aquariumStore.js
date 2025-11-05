@@ -94,7 +94,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     seaweed: {
       name: 'Seaweed',
       category: 'plant',
-      icon: '🌿',
+      icon: new URL('@/assets/aquariumDeco/seaweed.svg', import.meta.url).href,
       size: { width: 30, height: 120 },
       cost: 50,
       effect: 'oxygen' // For future health mechanics
@@ -102,7 +102,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     coral: {
       name: 'Coral',
       category: 'plant',
-      icon: '🪸',
+      icon: new URL('@/assets/aquariumDeco/coral.svg', import.meta.url).href,
       size: { width: 60, height: 70 },
       cost: 150,
       effect: 'hiding'
@@ -110,7 +110,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     kelp: {
       name: 'Kelp',
       category: 'plant',
-      icon:  '🍃',
+      icon:  new URL('@/assets/aquariumDeco/kelp.svg', import.meta.url).href,
       size: { width: 25, height: 150 },
       cost: 75,
       effect: 'oxygen'
@@ -120,7 +120,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     rock: {
       name: 'Rock',
       category: 'structure',
-      icon:  '🪨',
+      icon:  new URL('@/assets/aquariumDeco/rock.svg', import.meta.url).href,
       size: { width: 80, height: 60 },
       cost: 100,
       effect: 'hiding'
@@ -128,7 +128,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     castle: {
       name: 'Castle',
       category: 'structure',
-      icon:  '🏰',
+      icon: new URL('@/assets/aquariumDeco/castle.svg', import.meta.url).href,
       size: { width: 100, height: 120 },
       cost: 300,
       effect: 'hiding'
@@ -136,7 +136,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     treasure: {
       name: 'Treasure Chest',
       category: 'structure',
-      icon:  '💰',
+      icon:  new URL('@/assets/aquariumDeco/treasureChest.svg', import.meta.url).href,
       size: { width: 70, height: 50 },
       cost: 200,
       effect: 'decoration'
@@ -146,7 +146,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     bubbler: {
       name: 'Bubble Stone',
       category: 'special',
-      icon:  '💧',
+      icon:  new URL('@/assets/aquariumDeco/bubbler.svg', import.meta.url).href,
       size: { width: 40, height: 30 },
       cost: 100,
       effect: 'oxygen'
@@ -154,7 +154,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
     shipwreck: {
       name: 'Shipwreck',
       category: 'structure',
-      icon:  '🚢',
+      icon:  new URL('@/assets/aquariumDeco/shipwreck.svg', import.meta.url).href,
       size: { width: 150, height: 100 },
       cost: 400,
       effect: 'hiding'
