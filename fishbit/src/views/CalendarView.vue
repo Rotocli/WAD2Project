@@ -246,17 +246,20 @@ watch(
 </script>
 
 <style>
-/* Your existing VueCal styles */
+.calendar-view {
+  color: white;
+  background: linear-gradient(#1a459b 40%, #67bbdc);
+}
 .vuecal__event.habit-completed,
 .vuecal__event--habit-completed {
-  background-color: #a8f0a3 !important;
-  color: #000 !important;
+  background-color: rgba(70, 213, 165, 0.612) !important;
+  color: white !important;
 }
 
 .vuecal__event.habit-pending,
 .vuecal__event--habit-pending {
-  background-color: #f8c0c0 !important;
-  color: #000 !important;
+  background-color: rgba(246, 157, 157, 0.78) !important;
+  color: rgb(132, 36, 11) !important;
 }
 
 .vuecal__event {
@@ -283,13 +286,11 @@ watch(
   min-height: 100px !important;
 }
 
-/* Responsive Calendar */
 .responsive-calendar {
   height: 500px;
   width: 100%;
 }
 
-/* Navigation buttons */
 .calendar-nav {
   display: flex;
   justify-content: center;
@@ -303,33 +304,31 @@ watch(
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 600;
   transition: all 0.2s;
   font-size: 1rem;
 }
 
 .nav-btn {
-  background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
-  color: #374151;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #e5e7eb;
+  color: #000000;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
 }
 
 .nav-btn:hover {
-  background: linear-gradient(to bottom, #e5e7eb, #d1d5db);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.15);
 }
 
 .today-btn {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: #66badb;
   color: white;
-  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.3);
 }
 
 .today-btn:hover {
-  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  background: #66badb;
   transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 6px 10px rgba(95, 171, 229, 0.4);
 }
 
 /* Show/hide text based on screen size */
@@ -409,14 +408,13 @@ watch(
 .modal-close:hover {
   background: #e5e7eb;
   color: #374151;
-  transform: rotate(90deg);
 }
 
 .modal-content h3 {
   margin: 0 0 0.75rem 0;
   font-size: 2rem;
   color: #111827;
-  font-weight: 800;
+  font-weight: 700;
   padding-right: 2rem;
 }
 
@@ -437,16 +435,16 @@ watch(
 .modal-section strong {
   display: block;
   margin-bottom: 0.75rem;
-  color: #374151;
+  color: #66badb;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .modal-section p {
-  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  background: linear-gradient(90deg, #64b6ed, #ace0f5);
   padding: 1.25rem;
   border-radius: 16px;
-  color: #4c1d95;
+  color: white;
   line-height: 1.6;
   margin: 0;
 }
@@ -454,22 +452,20 @@ watch(
 .status-completed {
   display: inline-block;
   padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, #86efac 0%, #10b981 100%);
+  background: #55bab0;
   color: #fff;
   border-radius: 12px;
-  font-weight: 700;
-  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
-  font-size: 1.1rem;
+  font-weight: 600;
+   font-size: 1.1rem;
 }
 
 .status-pending {
   display: inline-block;
   padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+  background: #f6b2bd;
   color: #fff;
   border-radius: 12px;
-  font-weight: 700;
-  box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+  font-weight: 600;
   font-size: 1.1rem;
 }
 

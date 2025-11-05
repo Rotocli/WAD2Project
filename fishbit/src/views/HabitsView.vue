@@ -17,7 +17,8 @@
 
       <!-- Active Habits Tab -->
       <div v-if="activeTab === 'active'">
-        <h2 class="mb-4">My Habits</h2>
+        <h2 class="habittitle mb-4">My Habits</h2>
+        <p>View and edit your habits</p>
         <!-- Add New Habit Form Card -->
         <div class="dashboard-card mb-4">
           <div class="card-header">
@@ -137,7 +138,7 @@
 
       <!-- Archived Habits Tab -->
       <div v-if="activeTab === 'archived'">
-        <h2 class="mb-4">Archived Habits</h2>
+        <h2 class="mb-4 habittitle">Archived Habits</h2>
         <div class="dashboard-card">
           <div class="card-header">
             <h4>Archived Habits</h4>
@@ -277,22 +278,34 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+p{
+  color: white;
+}
 .habits-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  background: linear-gradient(#58b6a8, #e7febb);
+}
+
+.habittitle {
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard-card {
-  background: white;
+  background: rgb(255, 255, 255, 0.5);
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   overflow: hidden;
   margin-bottom: 20px;
 }
 
+.btn-primary {
+  background-color: #58b1a3;
+  border-color: #58b1a3;
+}
+
 .card-header {
   padding: 1.25rem;
-  border-bottom: 1px solid #e9ecef;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -319,6 +332,7 @@ onMounted(async () => {
   padding: 12px;
   border-bottom: 1px solid #e9ecef;
   transition: background 0.2s;
+  border-radius: 15px;
 }
 
 .habit-item:hover {
@@ -332,10 +346,12 @@ onMounted(async () => {
 
 .nav-tabs .nav-link {
   cursor: pointer;
+  color: white;
 }
 
 .nav-tabs .nav-link.active {
   font-weight: 600;
+  color: #58b1a3;
 }
 
 .btn-outline-warning:hover {

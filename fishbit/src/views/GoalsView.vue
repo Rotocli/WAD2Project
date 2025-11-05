@@ -1,7 +1,9 @@
 <template>
   <div class="goals-view">
     <div class="container-fluid p-4">
-
+      <h2>Goals</h2>
+      <p>Work towards something new!</p>
+      
       <div class="stats-summary">
         <div class="stat-card">
           <span class="stat-number">{{ unlockedCount }}</span>

@@ -2,6 +2,9 @@
   <div class="shop-view">
     <div class="container-fluid p-4">
       <!-- Search Bar -->
+      <h2>Shop</h2>
+      <p>Look for your next favourite item:</p>
+      
       <div class="search-section">
         <div class="search-bar-container">
           <input 
@@ -470,7 +473,7 @@ function saveInventory() {
 
 .search-bar:focus {
   outline: none;
-  border-color: #78c3bd;
+  border-color: #81c1e9;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -480,7 +483,7 @@ function saveInventory() {
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.3rem;
-  color: grey;
+  color: #81c1e9;
 }
 
 .search-results {
@@ -509,7 +512,7 @@ function saveInventory() {
 
 .search-category-header {
   padding: 0.75rem 1.5rem;
-  background: #78c3bd;
+  background: #81c1e9;
   font-weight: bold;
   color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
@@ -573,12 +576,13 @@ function saveInventory() {
 }
 
 .filter-btn:hover {
-  border-color: #667eea;
-  background-color: rgba(217, 197, 252, 0.4);
+  border-color: #c18159;
+  background-color: #9e5e36;
+  color: white;
 }
 
 .filter-btn.active {
-  background: #667eea;
+  background: #c18159;
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
@@ -723,9 +727,8 @@ function saveInventory() {
 }
 
 .carousel-nav:hover {
-  background: #78c3bd;
+  background: #81c1e9;
   color: white;
-  border-color: #78c3bd;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -747,18 +750,18 @@ function saveInventory() {
   padding: 1rem 3rem;
   font-size: 1.3rem;
   font-weight: bold;
-  background: #58b8b0;
+  background: #81c1e9;
   color: white;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 15px rgba(16, 92, 185, 0.4);
 }
 
 .buy-button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 6px 20px rgba(16, 109, 185, 0.5);
 }
 
 .buy-button:disabled {
@@ -768,7 +771,7 @@ function saveInventory() {
 
 /* Inventory Section */
 .inventory-section {
-  background: rgba(217, 197, 252, 0.5);
+  background: #c18159;
   border-radius: 30px;
   padding: 2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -778,7 +781,7 @@ function saveInventory() {
   text-align: center;
   margin-bottom: 2rem;
   font-weight: 600;
-  color: #5568d3;
+  color: #743712;
 }
 
 .inventory-grid {
@@ -791,9 +794,9 @@ function saveInventory() {
 
 .inventory-slot {
   aspect-ratio: 1;
-  border: 3px solid #e5e7eb;
+  border: 3px solid #834721;
   border-radius: 12px;
-  background: #f9fafb;
+  background: #9e5e36;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -803,24 +806,25 @@ function saveInventory() {
 }
 
 .inventory-slot:hover {
-  border-color: #cbd5e1;
+  border-color: #834721;
   transform: scale(1.05);
 }
 
 .inventory-slot.has-item {
-  background: white;
-  border-color: #78c3bd;
+  background: #9e5e36;
+  border-color: #834721;
 }
 
 .inventory-slot.selected {
-  background: #9eabf9;
-  border-color: #5568d3;
+  background: #e1986add;
+  border-color: rgb(247, 170, 121);
 }
 
 .inventory-item {
   width: 100%;
   height: 100%;
   display: flex;
+  color: white;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -842,30 +846,13 @@ function saveInventory() {
   object-fit: contain;
 }
 
-.quantity-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #667eea;
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-  border: 2px solid white;
-}
-
 .delete-slot-btn {
   position: absolute;
   top: -8px;
   right: -8px;
-  background: #ef4444;
-  color: white;
-  border: 2px solid white;
+  background: #fff9f9;
+  color: rgb(252, 118, 92);
+  border: 2px solid rgb(252, 118, 92);
   border-radius: 50%;
   width: 28px;
   height: 28px;
@@ -881,7 +868,7 @@ function saveInventory() {
 }
 
 .delete-slot-btn:hover {
-  background: #dc2626;
+  background: #dc6326;
   transform: scale(1.1);
 }
 
@@ -904,26 +891,24 @@ function saveInventory() {
 }
 
 .edit-btn {
-  background: #667eea;
+  background: #9e5e36;
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .edit-btn:hover {
-  background: #5568d3;
+  background: #834721;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
 .save-btn {
-  background: #58b8b0;
+  background: #834721;
   color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(82, 32, 12, 0.3);
 }
 
 .save-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 16px rgba(73, 40, 15, 0.4);
 }
 
 .inventory-item.in-use {
@@ -936,7 +921,7 @@ function saveInventory() {
   bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  background: #ea963c;
+  background: rgb(252, 118, 92);
   color: white;
   padding: 2px 6px;
   border-radius: 8px;

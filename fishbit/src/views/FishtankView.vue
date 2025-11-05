@@ -2,6 +2,8 @@
   <div class="fishtank-view">
     <div class="container-fluid p-4">
       <h2>My Fishes</h2>
+      <p>Customise your fish and tank:</p>
+      
       <div>
         <div v-if="!fishStore.fish || fishStore.fish.length === 0" class="no-fish-msg">
           <div class="no-fish-card">
@@ -606,7 +608,7 @@ async function handleDeleteDecoration(idx) {
 <style scoped>
 .fishtank-view {
   min-height: calc(100vh - 70px);
-  background: #f8f9fa;
+  background: linear-gradient(rgb(255, 230, 199), #fcb5be);
 }
 
 .fish-list {
@@ -618,13 +620,12 @@ async function handleDeleteDecoration(idx) {
 }
 
 .fish-card {
-  background: #fff;
-  border: 2px solid #bbb;
+  background: rgb(255, 245, 238, 0.5);
   border-radius: 12px;
   padding: 1rem 1.5rem;
-  min-width: 0; /* allow grid shrink */
+  min-width: 0; 
   position: relative;
-  box-shadow: 0 2px 8px #0001;
+  box-shadow: 0 2px 8px rgba(79, 8, 8, 0.067);
   display: flex;
   flex-direction: column;
 }
@@ -633,12 +634,14 @@ async function handleDeleteDecoration(idx) {
   font-size: 1.35rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
+  color: black;
 }
 .fish-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  color: black;
 }
 
 .fish-details {
@@ -690,22 +693,6 @@ async function handleDeleteDecoration(idx) {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.2);
 }
-
-/* Water Surface Effect */
-.water-surface-preview {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.3) 0%, 
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 100%);
-  pointer-events: none;
-  z-index: 10;
-}
-
 /* Decoration Grid Overlay */
 .decoration-grid-overlay {
   position: absolute;
@@ -761,7 +748,7 @@ async function handleDeleteDecoration(idx) {
 }
 
 .decoration-item:active {
-  cursor: grabbing;
+  cursor: pointer;
 }
 
 .deco-icon {
@@ -916,7 +903,7 @@ async function handleDeleteDecoration(idx) {
 }
 
 .modal-dialog {
-  background: #fff;
+  background: #fee4c5;
   border-radius: 15px;
   padding: 2rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -929,7 +916,7 @@ async function handleDeleteDecoration(idx) {
 
 .modal-content h4 {
   margin: 0 0 1.5rem 0;
-  color: #1e3a8a;
+  color: #070e21;
   font-size: 1.5rem;
 }
 
@@ -952,14 +939,14 @@ async function handleDeleteDecoration(idx) {
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background: white;
+  background: #ffffff;
   color: #1f2937;
   box-sizing: border-box;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #374151;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -993,7 +980,7 @@ async function handleDeleteDecoration(idx) {
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #92dd85;
   color: white;
 }
 
@@ -1003,12 +990,14 @@ async function handleDeleteDecoration(idx) {
 }
 
 .btn-secondary {
-  background: #6b7280;
+  background: rgb(231, 93, 62);
   color: white;
 }
 
 .btn-secondary:hover {
-  background: #4b5563;
+  background: white;
+  color: rgb(231, 93, 62);
+
 }
 
 .btn-sm {
@@ -1018,12 +1007,12 @@ async function handleDeleteDecoration(idx) {
 
 .btn-outline-primary {
   background: white;
-  color: #3b82f6;
-  border: 2px solid #3b82f6;
+  color: rgb(231, 93, 62);
+  border: 2px solid rgb(231, 93, 62);
 }
 
 .btn-outline-primary:hover {
-  background: #3b82f6;
+  background: rgb(231, 93, 62);
   color: white;
 }
 </style>
