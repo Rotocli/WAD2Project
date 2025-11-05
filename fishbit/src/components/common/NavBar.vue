@@ -62,11 +62,12 @@
         <!-- Right section -->
         <div class="navbar-right-section">
           <div class="stats-row">
-            <div class="points-display">
+            <div class="points-display" title="Your Points">
               <i class="bi bi-coin"></i>
               <span>{{ totalPoints }}</span>
             </div>
-            <div class="streak-display">
+            
+            <div class="streak-display" title="Your Streak">
               <i class="bi bi-fire"></i>
               <span>{{ currentStreak }}</span>
             </div>
