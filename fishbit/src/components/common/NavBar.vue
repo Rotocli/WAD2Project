@@ -64,12 +64,12 @@
           <div class="stats-row">
             <div class="points-display" title="Your Points">
               <i class="bi bi-coin"></i>
-              <span>{{ totalPoints }}</span>
+              <span>&nbsp{{ totalPoints }}</span>
             </div>
             
             <div class="streak-display" title="Your Streak">
               <i class="bi bi-fire"></i>
-              <span>{{ currentStreak }}</span>
+              <span>&nbsp{{ currentStreak }}</span>
             </div>
           </div>
 
@@ -194,7 +194,7 @@ onUnmounted(() => { document.removeEventListener('click', handleClickOutside) })
 body, html { overflow-x: hidden; }
 
 .navbar {
-  background: #223243;
+  background: #244260;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0;
   height: 70px;
@@ -263,6 +263,7 @@ body, html { overflow-x: hidden; }
   display: flex; 
   align-items: center; 
   font-size: 0.9rem; 
+  cursor: pointer;
 }
 
 .dropdown { 
@@ -294,7 +295,7 @@ body, html { overflow-x: hidden; }
   top: calc(100% + 6px);
   min-width: 180px;
   margin-top: 0.5rem !important;
-  background: #223243;
+  background: #244260;
   backdrop-filter: blur(6px); 
   border-radius: 15px; 
   padding: 0.5rem 0; 
@@ -317,15 +318,21 @@ body, html { overflow-x: hidden; }
 .dropdown-item {
   color: white;
   padding: 0.6rem 1.2rem;
-  border-radius: 8px;
   transition: background 0.2s ease;
+  
 }
 
 .dropdown-item:hover {
   background: transparent;
-  transform: translateX(5px); 
   transition: all 0.25s ease; 
   color: white;
+  background-color: #547da7;
+  border-radius: 8px;
+  border-bottom: 0px;
+}
+.dropdown-item:active{
+  border-bottom: 2px white;
+  border-radius: 0px;
 }
 
 /* mobile view */
@@ -333,7 +340,7 @@ body, html { overflow-x: hidden; }
   .navbar-collapse {
     display: none;
     position: absolute;
-    background: #223243;
+    background: #244260;
     backdrop-filter: blur(20px);
     top: 70px;
     right: 0;
@@ -378,7 +385,7 @@ body, html { overflow-x: hidden; }
   .navbar-nav .nav-link:hover {
     color: white !important;
     background-color: #547da7;
-    transform: translateX(5px); 
+    border-radius: 15px;
   }
 
   .navbar-right-section {

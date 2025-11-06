@@ -43,8 +43,7 @@
                     @undo="undoHabit"
                     @viewMore="viewMoreHabit"
                     @delete="deleteHabit"
-                    
-                    
+                    @click.stop
                     >
                   </PopupPanel>
                   <Teleport to="body"> 
@@ -75,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useUserStore } from '../../stores/userStore'
 import { useHabitStore } from '../../stores/habitStore'
 import PopupPanel from '../common/PopupPanel.vue'
@@ -89,7 +88,7 @@ const habitStore = useHabitStore()
 const completedHabits = ref(new Set())
 const loading = ref(false)
 const error = ref(null)
-const activeHabitId = ref(null)  // keeps track of which habit’s popup is open
+const activeHabitId = ref(null)  // keeps track of which habit's popup is open
 const popupWidth=180
 const modalId=ref(null)
 
@@ -99,6 +98,22 @@ const props = defineProps({
   todaysHabits: Array
 })
 
+const handleClickOutside = (event) => {
+  if (activeHabitId.value !== null) {
+    activeHabitId.value = null
+  }
+}
+
+onMounted(() => {
+  fetchComplete()
+  document.addEventListener('click', handleClickOutside)
+  console.log('Initial completedHabits:', completedHabits.value) // This will show empty
+  // But in template it will update reactively when data loads!
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 function openModal(habitId){
   modalId.value=habitId
@@ -140,6 +155,7 @@ const undoHabit = async (habitId) => {
 
 
 const togglePopup = (habitId, event) => {
+  event.stopPropagation()
   if (activeHabitId.value === habitId) {
     activeHabitId.value = null
   } else {
@@ -194,12 +210,6 @@ const fetchComplete = async () => {
     loading.value = false
   }
 }
-
-onMounted(() => {
-  fetchComplete()
-  console.log('Initial completedHabits:', completedHabits.value) // This will show empty
-  // But in template it will update reactively when data loads!
-})
 </script>
 
 <style scoped>
