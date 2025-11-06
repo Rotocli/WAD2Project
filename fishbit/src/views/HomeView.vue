@@ -70,12 +70,12 @@
               
               <!-- CTA Buttons -->
               <div class="cta-buttons">
-                <router-link to="/register" class="btn btn-lg btn-primary btn-cta">
+                <button @click="openRegister" class="btn btn-lg btn-primary btn-cta">
                   Get Started Free
-                </router-link>
-                <router-link to="/login" class="btn btn-lg btn-outline-light btn-cta" style="margin-left: 20px;">
+                </button>
+                <button @click="openLogin" class="btn btn-lg btn-outline-light btn-cta" style="margin-left: 20px;">
                   Login
-                </router-link>
+                </button>
               </div>
             </div>
           </div>
@@ -216,22 +216,263 @@
       <div class="container text-center">
         <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Habits?</h2>
         <p class="lead text-white mb-5">Join thousands of users building better habits with FishBit today!</p>
-        <router-link to="/register" class="btn btn-lg btn-light btn-cta-large">
+        <button @click="openRegister" class="btn btn-lg btn-light btn-cta-large">
           <img src="@/assets/image-dark.png" alt="FishBit" class="btn-logo" />
           Start Your Free Aquarium
-        </router-link>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div v-if="showLoginModal" class="modal-overlay" @click.self="closeModals">
+      <div class="modal-container">
+        <button class="modal-close" @click="closeModals">&times;</button>
+        
+        <div class="modal-header-content">
+          <img src="@/assets/image-dark.png" alt="FishBit" class="modal-logo" />
+          <h2>Welcome Back!</h2>
+          <p>Login to continue your habit journey</p>
+        </div>
+
+        <form @submit.prevent="handleLogin" class="modal-form">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input 
+              type="email" 
+              id="login-email"
+              v-model="loginForm.email"
+              required
+              placeholder="your@email.com"
+              class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input 
+              type="password" 
+              id="login-password"
+              v-model="loginForm.password"
+              required
+              placeholder="••••••••"
+              class="form-input"
+            >
+          </div>
+
+          <div v-if="loginError" class="error-message">
+            {{ loginError }}
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn-submit"
+            :disabled="loginLoading"
+          >
+            <span v-if="loginLoading">
+              <span class="spinner"></span>
+              Logging in...
+            </span>
+            <span v-else>Login</span>
+          </button>
+
+          <div class="modal-footer-content">
+            <p>
+              Don't have an account? 
+              <a href="#" @click.prevent="openRegister">Sign up</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div v-if="showRegisterModal" class="modal-overlay" @click.self="closeModals">
+      <div class="modal-container">
+        <button class="modal-close" @click="closeModals">&times;</button>
+        
+        <div class="modal-header-content">
+          <img src="@/assets/image-dark.png" alt="FishBit" class="modal-logo" />
+          <h2>Start Your Journey</h2>
+          <p>Create an account to begin tracking habits</p>
+        </div>
+
+        <form @submit.prevent="handleRegister" class="modal-form">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <input 
+              type="text" 
+              id="register-username"
+              v-model="registerForm.username"
+              required
+              placeholder="FishLover123"
+              class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="register-email">Email</label>
+            <input 
+              type="email" 
+              id="register-email"
+              v-model="registerForm.email"
+              required
+              placeholder="your@email.com"
+              class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <input 
+              type="password" 
+              id="register-password"
+              v-model="registerForm.password"
+              required
+              placeholder="••••••••"
+              minlength="6"
+              class="form-input"
+            >
+            <small class="form-hint">At least 6 characters</small>
+          </div>
+
+          <div class="form-group">
+            <label for="register-confirm">Confirm Password</label>
+            <input 
+              type="password" 
+              id="register-confirm"
+              v-model="registerForm.confirmPassword"
+              required
+              placeholder="••••••••"
+              class="form-input"
+            >
+          </div>
+
+          <div v-if="registerError" class="error-message">
+            {{ registerError }}
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn-submit"
+            :disabled="registerLoading"
+          >
+            <span v-if="registerLoading">
+              <span class="spinner"></span>
+              Creating account...
+            </span>
+            <span v-else>Create Account</span>
+          </button>
+
+          <div class="modal-footer-content">
+            <p>
+              Already have an account? 
+              <a href="#" @click.prevent="openLogin">Login</a>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/userStore'
 
 const router = useRouter()
 const userStore = useUserStore()
+
+const showLoginModal = ref(false)
+const showRegisterModal = ref(false)
+
+const loginForm = ref({
+  email: '',
+  password: ''
+})
+
+const registerForm = ref({
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: ''
+})
+
+const loginLoading = ref(false)
+const registerLoading = ref(false)
+const loginError = ref(null)
+const registerError = ref(null)
+
+function openLogin() {
+  showLoginModal.value = true
+  showRegisterModal.value = false
+  loginError.value = null
+}
+
+function openRegister() {
+  showRegisterModal.value = true
+  showLoginModal.value = false
+  registerError.value = null
+}
+
+function closeModals() {
+  showLoginModal.value = false
+  showRegisterModal.value = false
+  loginError.value = null
+  registerError.value = null
+}
+
+async function handleLogin() {
+  loginLoading.value = true
+  loginError.value = null
+
+  try {
+    await userStore.login(loginForm.value.email, loginForm.value.password)
+    closeModals()
+    router.push('/dashboard')
+  } catch (err) {
+    loginError.value = 'Invalid email or password. Please try again.'
+  } finally {
+    loginLoading.value = false
+  }
+}
+
+async function handleRegister() {
+  registerLoading.value = true
+  registerError.value = null
+
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    registerError.value = 'Passwords do not match'
+    registerLoading.value = false
+    return
+  }
+
+  if (registerForm.value.password.length < 6) {
+    registerError.value = 'Password must be at least 6 characters'
+    registerLoading.value = false
+    return
+  }
+
+  try {
+    await userStore.register(
+      registerForm.value.email,
+      registerForm.value.password,
+      registerForm.value.username
+    )
+    closeModals()
+    router.push('/dashboard')
+  } catch (err) {
+    if (err.message.includes('email-already-in-use')) {
+      registerError.value = 'This email is already registered'
+    } else if (err.message.includes('weak-password')) {
+      registerError.value = 'Password is too weak'
+    } else {
+      registerError.value = 'Failed to create account. Please try again.'
+    }
+  } finally {
+    registerLoading.value = false
+  }
+}
 
 onMounted(() => {
   if (userStore.isAuthenticated) {
@@ -245,7 +486,7 @@ onMounted(() => {
 .home-view {
   min-height: 100vh;
   background: #1e3a8a;
-  margin-top: -54px; /* Override App.vue's .main-content padding-top */
+  margin-top: -54px;
   padding-top: 0;
 }
 
@@ -501,6 +742,8 @@ onMounted(() => {
   border-radius: 12px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border: none;
+  cursor: pointer;
 }
 
 .btn-cta:hover {
@@ -510,11 +753,13 @@ onMounted(() => {
 
 .btn-primary.btn-cta {
   background: #223243;
-  border: none;
+  color: white;
 }
 
 .btn-outline-light.btn-cta {
   border: 2px solid white;
+  background: transparent;
+  color: white;
 }
 
 /* Preview Card */
@@ -759,6 +1004,10 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  background: white;
+  color: #1e293b;
+  border: none;
+  cursor: pointer;
 }
 
 .btn-cta-large:hover {
@@ -769,6 +1018,209 @@ onMounted(() => {
 .btn-logo {
   width: 32px;
   height: 32px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-container {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 450px;
+  width: 100%;
+  position: relative;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #64748b;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.modal-header-content {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.modal-logo {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.modal-header-content h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.modal-header-content p {
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-hint {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.btn-submit {
+  background: #223243;
+  color: white;
+  border: none;
+  padding: 0.875rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.modal-footer-content {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.modal-footer-content p {
+  color: #64748b;
+  margin: 0;
+}
+
+.modal-footer-content a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.modal-footer-content a:hover {
+  text-decoration: underline;
 }
 
 /* Responsive */
@@ -815,6 +1267,17 @@ onMounted(() => {
   
   .rock-1 {
     height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    padding: 1.5rem;
+  }
+  
+  .modal-logo {
+    width: 50px;
+    height: 50px;
   }
 }
 </style>

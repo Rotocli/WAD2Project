@@ -12,8 +12,6 @@ const FishtankView = () => import('../views/FishtankView.vue')
 const ShopView = () => import('../views/ShopView.vue')
 const ProfileView = () => import('../views/ProfileView.vue')
 const GoalsView = () => import('../views/GoalsView.vue')
-const LoginView = () => import('../views/LoginView.vue')
-const RegisterView = () => import('../views/RegisterView.vue')
 const JournalView=()=> import('../views/JournalView.vue')
 
 const routes = [
@@ -21,18 +19,6 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: RegisterView,
     meta: { requiresAuth: false }
   },
   {
@@ -108,7 +94,7 @@ router.beforeEach(async (to, from, next) => {
   }
   
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    next('/login')
+    next('/home')
   } else if ((to.name === 'login' || to.name === 'register') && userStore.isAuthenticated) {
     next('/dashboard')
   } else {
