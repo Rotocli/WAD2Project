@@ -235,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed ,toRaw} from "vue";
 import { useFishStore } from "../stores/fishStore";
 import { useHabitStore } from "../stores/habitStore";
 import { useAquariumStore } from "../stores/aquariumStore";
@@ -515,7 +515,10 @@ async function handleDrop(targetIdx) {
     const xPosition = (column * 12.5) + 6.25;
     temp.x = xPosition;
     temp.gridIndex = targetIdx;
+    sourceCell.decoration.x=xPosition;
+    sourceCell.decoration.gridIndex=targetIdx;
   }
+ 
   
   if (targetCell.decoration) {
     const sourceColumn = draggedIndex.value % 8;
@@ -523,9 +526,15 @@ async function handleDrop(targetIdx) {
     targetCell.decoration.x = sourceXPosition;
     targetCell.decoration.gridIndex = draggedIndex.value;
   }
+  
+  
+  const raw = toRaw(targetCell.decoration);
+  
+
+  
 
   aquariumStore.grid[targetIdx].decoration = temp;
-  aquariumStore.grid[draggedIndex.value].decoration = targetCell.decoration;
+  aquariumStore.grid[draggedIndex.value].decoration = raw;
 
   // Sync to store
   aquariumStore.syncGridToDecorations();
