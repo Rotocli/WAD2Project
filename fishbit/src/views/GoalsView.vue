@@ -41,78 +41,22 @@
 <script setup>
 import { useUserStore } from '../stores/userStore'
 import { useHabitStore } from '../stores/habitStore'
-import { computed, onMounted, ref, watch } from 'vue'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
-import { db } from '../services/firebase'
-
+import { useAchievements } from '../services/useAchievements'
+import { computed, onMounted, watch } from 'vue'
 
 const userStore = useUserStore()
 const habitStore = useHabitStore()
-const userAchievements = ref({})
+const { userAchievements, loadAchievements, checkAchievements } = useAchievements()
 
 onMounted(async () => {
   if (userStore.currentUserId) {
     await loadAchievements()
+    await checkAchievements()
   }
 })
 
-async function loadAchievements() {
-  try {
-    const docRef = doc(db, 'achievements', userStore.currentUserId)
-    const docSnap = await getDoc(docRef)
-    
-    if (docSnap.exists()) {
-      userAchievements.value = docSnap.data()
-    }
-  } catch (error) {
-    console.error('Error loading achievements:', error)
-    if (error.code === 'permission-denied') {
-      console.log('No achievements yet - will be created on first unlock')
-      userAchievements.value = {}
-    }
-  }
-}
-
-async function checkAchievements() {
-  if (!userStore.currentUserId) return
-
-  const newUnlocks = []
-  let totalPointsEarned = 0
-
-  achievements.value.forEach(async (achievement) => {
-    if (userAchievements.value[achievement.id]) return
-
-    if (achievement.attained) {
-      newUnlocks.push(achievement.id)
-      totalPointsEarned += achievement.points
-      userAchievements.value[achievement.id] = {
-        unlockedAt: new Date(),
-        name: achievement.name,
-        pointsAwarded: achievement.points
-      }
-    }
-  })
-
-  if (newUnlocks.length > 0) {
-    try {
-      await setDoc(
-        doc(db, 'achievements', userStore.currentUserId),
-        userAchievements.value,
-        { merge: true }
-      )
-
-      await userStore.addPoints(totalPointsEarned)
-    
-      console.log('New achievements unlocked:', newUnlocks)
-      console.log(`Points earned: ${totalPointsEarned}`)
-    } catch (error) {
-      console.error('Error saving achievements:', error)
-    }
-  }
-}
-
 watch(
-  () => [userStore.currentStreak, userStore.totalPoints, habitStore.habits],
+  () => [userStore.currentStreak, habitStore.habits.length, habitStore.habits.map(h => h.completedCount)],
   () => {
     checkAchievements()
   },
@@ -216,7 +160,7 @@ const achievements = computed(() => [
     description: 'Complete all habits before 9 AM',
     emoji: '🌅',
     points: 50,
-    attained: false, // TODO: Implement time tracking
+    attained: false,
     unlockedAt: userAchievements.value['early-bird']?.unlockedAt
   },
   {
@@ -225,21 +169,20 @@ const achievements = computed(() => [
     description: 'Complete all daily habits for 7 days straight',
     emoji: '⭐',
     points: 200,
-    attained: false, // TODO: Implement tracking
+    attained: false,
     unlockedAt: userAchievements.value['perfect-week']?.unlockedAt
   },
 ])
 
-const unlockedCount = computed(() => 
+const unlockedCount = computed(() =>
   achievements.value.filter(a => a.attained).length
 )
 
 const totalAchievements = computed(() => achievements.value.length)
 
-const progressPercentage = computed(() => 
+const progressPercentage = computed(() =>
   Math.round((unlockedCount.value / totalAchievements.value) * 100)
-)
-
+)   
 </script>
 
 <style scoped>

@@ -113,12 +113,8 @@
               <input v-model="editFishData.customName" class="form-control" type="text" />
             </div>
             <div class="form-group">
-              <label>Species:</label>
-              <select v-model="editFishData.species" class="form-control">
-                <option v-for="(details, sp) in fishStore.fishSpecies" :key="sp" :value="sp">
-                  {{ details.name }}
-                </option>
-              </select>
+              <label>Colour:</label>
+              <input type="color" v-model="editFishData.baseColor" class="form-control color-input" />
             </div>
             <div class="form-group">
               <label>Head:</label>
@@ -151,10 +147,6 @@
                   {{ deco.name }}
                 </option>
               </select>
-            </div>
-             <div class="form-group">
-              <label>Colour:</label>
-              <input type="color" v-model="editFishData.baseColor" class="form-control color-input" />
             </div>
             <div class="modal-footer">
               <button class="btn btn-success" @click="confirmEdit">Save</button>
