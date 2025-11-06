@@ -217,7 +217,7 @@
         <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Habits?</h2>
         <p class="lead text-white mb-5">Join thousands of users building better habits with FishBit today!</p>
         <router-link to="/register" class="btn btn-lg btn-light btn-cta-large">
-          <img src="@/assets/image.png" alt="FishBit" class="btn-logo" />
+          <img src="@/assets/image-dark.png" alt="FishBit" class="btn-logo" />
           Start Your Free Aquarium
         </router-link>
       </div>
