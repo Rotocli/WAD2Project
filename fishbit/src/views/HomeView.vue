@@ -128,39 +128,49 @@
           </div>
         </div>
       </div>
+
+      <!-- Scroll Indicator Chevrons -->
+      <div class="scroll-indicator">
+        <svg class="chevron-svg" width="40" height="40" viewBox="0 0 40 40">
+          <path d="M 10 15 L 20 25 L 30 15" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <!-- <svg class="chevron-svg" width="40" height="40" viewBox="0 0 40 40">
+          <path d="M 10 15 L 20 25 L 30 15" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg> -->
+      </div>
     </div>
 
     <!-- Features Section -->
     <div class="features-section">
       <div class="container">
-        <h2 class="section-title text-center mb-5">How FishBit Works</h2>
-        
+        <h2 class="section-title text-center mb-5 scroll-animate">How FishBit Works</h2>
+
         <div class="row g-4">
-          <div class="col-md-3">
+          <div class="col-md-3 scroll-animate" data-delay="0">
             <div class="feature-card">
               <div class="feature-number">1</div>
               <h4>Create Habits</h4>
               <p>Set up daily or weekly habits you want to build. Each habit gets its own fish!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="100">
             <div class="feature-card">
               <div class="feature-number">2</div>
               <h4>Check In Daily</h4>
               <p>Mark habits as complete to earn coins and maintain streaks. Keep your fish happy!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="200">
             <div class="feature-card">
               <div class="feature-number">3</div>
               <h4>Feed Your Fish</h4>
               <p>Your consistency keeps your virtual fish thriving. Break streaks and they get sad!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="300">
             <div class="feature-card">
               <div class="feature-number">4</div>
               <h4>Level Up</h4>
@@ -175,34 +185,34 @@
     <div class="why-section">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-lg-6">
+          <div class="col-lg-6 scroll-animate">
             <h2 class="section-title mb-4">Why Gamified Habits Work</h2>
             <p class="section-subtitle mb-4">Research shows that gamification significantly improves habit formation and long-term adherence.</p>
           </div>
-          
+
           <div class="col-lg-6">
             <div class="benefits-grid">
-              <div class="benefit-card">
+              <div class="benefit-card scroll-animate" data-delay="0">
                 <h5>Turn Progress Into Habit</h5>
                 <p>“Gamification uses core game mechanics like challenges, competitions, and rewards to drive motivation and engagement … resulting in deeper engagement.”</p>
                 <div class="benefit-source">“Gamification & Its Impacts: A Comprehensive Guide”</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="100">
                 <h5>Motivation That Lasts</h5>
                 <p>"Gamification can provide the structure to engage, motivate, and focus … whether they are employees, customers, or communities of interest."</p>
                 <div class="benefit-source">Brian Burke -- Gamify: How Gamification Motivates People to Do Extraordinary Things</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="200">
                 <h5>Engagement Through Feeling Smart</h5>
                 <p>"People do not take actions that are necessarily the most economical, but actions that make them feel the smartest."</p>
                 <div class="benefit-source">Yu-Kai Chou -- Actionable Gamification: Beyond Points, Badges & Leaderboards</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="300">
                 <h5>Feedback Fuels Long-Term Use</h5>
-                <p>“Gamification is positively associated with … experiences of affective feedback … which are strongly associated with user perceived benefits and continued use intentions.”</p>
+                <p>"Gamification is positively associated with … experiences of affective feedback … which are strongly associated with user perceived benefits and continued use intentions."</p>
                 <div class="benefit-source">S. Loijas et al., study in International Journal of Information Management</div>
               </div>
             </div>
@@ -213,7 +223,7 @@
 
     <!-- Final CTA Section -->
     <div class="final-cta-section">
-      <div class="container text-center">
+      <div class="container text-center scroll-animate">
         <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Habits?</h2>
         <p class="lead text-white mb-5">Join thousands of users building better habits with FishBit today!</p>
         <button @click="openRegister" class="btn btn-lg btn-light btn-cta-large">
@@ -534,7 +544,36 @@ onMounted(() => {
   if (userStore.isAuthenticated) {
     router.push('/dashboard')
   }
+
+  // Initialize scroll animations
+  initScrollAnimations()
 })
+
+function initScrollAnimations() {
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Element is visible - add animation (only once, don't remove on scroll up)
+        const delay = entry.target.dataset.delay || 0
+        setTimeout(() => {
+          entry.target.classList.add('is-visible')
+        }, delay)
+        // Stop observing once animated
+        observer.unobserve(entry.target)
+      }
+    })
+  }, observerOptions)
+
+  // Observe all elements with scroll-animate class
+  const animatedElements = document.querySelectorAll('.scroll-animate')
+  animatedElements.forEach(el => observer.observe(el))
+}
 </script>
 
 <style scoped>
@@ -1332,19 +1371,70 @@ onMounted(() => {
   text-decoration: underline;
 }
 
+/* Scroll Indicator Chevrons */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: -10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.chevron-svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  animation: chevron-float 2s ease-in-out infinite;
+}
+
+.chevron-svg:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.chevron-svg:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes chevron-float {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll Animations */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-animate.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .hero-content h1 {
     font-size: 3rem;
   }
-  
+
   .logo-image {
     width: 60px;
     height: 60px;
   }
-  
+
   .preview-card {
     margin-top: 3rem;
+    margin-bottom: 3rem;
   }
 }
 
