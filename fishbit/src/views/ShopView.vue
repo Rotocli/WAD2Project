@@ -475,7 +475,7 @@ function saveInventory() {
 
 .search-bar:focus {
   outline: none;
-  border-color: #81c1e9;
+  border-color: #547da7;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -485,7 +485,7 @@ function saveInventory() {
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.3rem;
-  color: #81c1e9;
+  color: #547da7;
 }
 
 .search-results {
@@ -514,9 +514,9 @@ function saveInventory() {
 
 .search-category-header {
   padding: 0.75rem 1.5rem;
-  background: #81c1e9;
+  background: #ffffff;
   font-weight: bold;
-  color: #ffffff;
+  color: #547da7;
   border-bottom: 1px solid #e5e7eb;
 }
 

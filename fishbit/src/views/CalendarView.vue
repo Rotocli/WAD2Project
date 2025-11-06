@@ -252,14 +252,14 @@ watch(
 }
 .vuecal__event.habit-completed,
 .vuecal__event--habit-completed {
-  background-color: rgba(70, 213, 165, 0.612) !important;
+  background-color: rgba(32, 161, 118, 0.612) !important;
   color: white !important;
 }
 
 .vuecal__event.habit-pending,
 .vuecal__event--habit-pending {
-  background-color: rgba(246, 157, 157, 0.78) !important;
-  color: rgb(132, 36, 11) !important;
+  background-color: rgba(220, 103, 103, 0.78) !important;
+  color: white;
 }
 
 .vuecal__event {

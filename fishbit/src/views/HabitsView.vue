@@ -125,8 +125,8 @@
                       <label for="customFrequency" class="form-label ms-1">Days</label>
                     </div>
 
-                    <button @click="handleUpdate(habit.id)" class="btn btn-sm btn-success me-2">Save</button>
-                    <button @click="cancelEdit" class="btn btn-sm btn-outline-secondary">Cancel</button>
+                    <button @click="handleUpdate(habit.id)" class="btn btn-sm btn-primary me-2">Save</button>
+                    <button @click="cancelEdit" class="btn btn-sm btn-secondary">Cancel</button>
                   </template>
                 </li>
               </ul>
@@ -162,8 +162,8 @@
                     <span class="badge bg-secondary ms-2">Archived</span>
                   </div>
                   <div>
-                    <button @click="handleUnarchive(habit.id)" class="btn btn-sm btn-outline-success me-2">Restore</button>
-                    <button @click="confirmDelete(habit.id)" class="btn btn-sm btn-outline-danger">Delete</button>
+                    <button @click="handleUnarchive(habit.id)" class="btn btn-sm btn-success me-2">Restore</button>
+                    <button @click="confirmDelete(habit.id)" class="btn btn-sm btn-danger">Delete</button>
                   </div>
                 </li>
               </ul>
@@ -301,7 +301,8 @@ p{
 }
 
 .btn-primary {
-  background-color: #547da7;
+  background-color: #68b08f;
+  border: none;
 }
 
 .card-header {
@@ -352,11 +353,5 @@ p{
 .nav-tabs .nav-link.active {
   font-weight: 600;
   color: #3d5976;
-}
-
-.btn-outline-warning:hover {
-  color: #fff;
-  background-color: #ffc107;
-  border-color: #ffc107;
 }
 </style>
