@@ -29,18 +29,6 @@ body {
   border-radius: 5px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Utility Classes */
-.text-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .shadow-soft {
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }

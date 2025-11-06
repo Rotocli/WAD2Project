@@ -252,13 +252,13 @@ watch(
 }
 .vuecal__event.habit-completed,
 .vuecal__event--habit-completed {
-  background-color: rgba(32, 161, 118, 0.612) !important;
+  background-color: rgb(96, 162, 106) !important;
   color: white !important;
 }
 
 .vuecal__event.habit-pending,
 .vuecal__event--habit-pending {
-  background-color: rgba(220, 103, 103, 0.78) !important;
+  background-color: rgb(190, 105, 105) !important;
   color: white;
 }
 
@@ -436,13 +436,13 @@ watch(
 .modal-section strong {
   display: block;
   margin-bottom: 0.75rem;
-  color: #66badb;
+  color: black;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
 .modal-section p {
-  background: linear-gradient(90deg, #64b6ed, #ace0f5);
+  background: #547da7;
   padding: 1.25rem;
   border-radius: 16px;
   color: white;
@@ -453,7 +453,7 @@ watch(
 .status-completed {
   display: inline-block;
   padding: 0.625rem 1.25rem;
-  background: #55bab0;
+  background: #68b08f;
   color: #fff;
   border-radius: 12px;
   font-weight: 600;
@@ -463,7 +463,7 @@ watch(
 .status-pending {
   display: inline-block;
   padding: 0.625rem 1.25rem;
-  background: #f6b2bd;
+  background: #db7979;
   color: #fff;
   border-radius: 12px;
   font-weight: 600;
