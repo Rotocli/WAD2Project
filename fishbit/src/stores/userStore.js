@@ -1,3 +1,4 @@
+// useUserStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { 
@@ -97,6 +98,21 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function addPoints(points) {
+  if (!currentUserId.value) return
+  
+  try {
+    const newPoints = totalPoints.value + points
+    await updateDoc(doc(db, 'users', currentUserId.value), {
+      totalPoints: newPoints
+    })
+    userProfile.value.totalPoints = newPoints
+    console.log(`💰 Added ${points} points. Total: ${newPoints}`)
+  } catch (err) {
+    console.error('Error adding points:', err)
+  }
+}
+
   async function updatePoints(points) {
     if (!currentUserId.value) return
     
@@ -166,13 +182,14 @@ function initAuthListener() {
     currentUserId,
     totalPoints,
     currentStreak,
-    isDeveloper, // ← NEW: Export isDeveloper
+    isDeveloper, 
     
     // Actions
     login,
     register,
     logout,
     fetchUserProfile,
+    addPoints,
     updatePoints,
     updateStreak,
     initAuthListener

@@ -1,3 +1,4 @@
+// useHabitStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { 
@@ -15,6 +16,7 @@ import {
 import { db } from '../services/firebase'
 import { useUserStore } from './userStore'
 import { timeService } from '../services/timeService'
+import { useAchievements } from '../services/useAchievements'
 
 export const useHabitStore = defineStore('habit', () => {
   // ========================================
@@ -193,6 +195,14 @@ export const useHabitStore = defineStore('habit', () => {
         // Don't fail habit creation if fish creation fails
         console.warn('⚠️ Could not create fish for habit:', fishErr)
       }
+
+      try {
+      const { checkAchievements } = useAchievements()
+      await checkAchievements()
+      console.log('✅ Checked achievements after habit creation')
+    } catch (achErr) {
+      console.warn('⚠️ Could not check achievements:', achErr)
+    }
 
       return docRef.id
     } catch (err) {
@@ -395,6 +405,14 @@ export const useHabitStore = defineStore('habit', () => {
       } else if (newStreak === 30) {
         await userStore.updatePoints(200) // Month streak bonus
       }
+
+      try {
+      const { checkAchievements } = useAchievements()
+      await checkAchievements()
+      console.log('✅ Checked achievements after habit completion')
+    } catch (achErr) {
+      console.warn('⚠️ Could not check achievements:', achErr)
+    }
 
       return true
     } catch (err) {
