@@ -183,27 +183,27 @@
           <div class="col-lg-6">
             <div class="benefits-grid">
               <div class="benefit-card">
-                <h5>Visual Progress Tracking</h5>
-                <p>"Seeing my fish thrive gave me a tangible representation of my progress. It made abstract goals feel real and achievable."</p>
-                <div class="benefit-source">— Stanford Behavior Design Lab</div>
+                <h5>Turn Progress Into Habit</h5>
+                <p>“Gamification uses core game mechanics like challenges, competitions, and rewards to drive motivation and engagement … resulting in deeper engagement.”</p>
+                <div class="benefit-source">“Gamification & Its Impacts: A Comprehensive Guide”</div>
               </div>
               
               <div class="benefit-card">
-                <h5>Increased Motivation</h5>
-                <p>"Gamified systems tap into our intrinsic motivation by providing immediate feedback and creating emotional investment in outcomes."</p>
-                <div class="benefit-source">— Journal of Behavioral Psychology</div>
+                <h5>Motivation That Lasts</h5>
+                <p>"Gamification can provide the structure to engage, motivate, and focus … whether they are employees, customers, or communities of interest."</p>
+                <div class="benefit-source">Brian Burke -- Gamify: How Gamification Motivates People to Do Extraordinary Things</div>
               </div>
               
               <div class="benefit-card">
-                <h5>Sustained Engagement</h5>
-                <p>"Users of gamified habit trackers show 40% higher long-term retention compared to traditional tracking methods."</p>
-                <div class="benefit-source">— Digital Health Research</div>
+                <h5>Engagement Through Feeling Smart</h5>
+                <p>"People do not take actions that are necessarily the most economical, but actions that make them feel the smartest."</p>
+                <div class="benefit-source">Yu-Kai Chou -- Actionable Gamification: Beyond Points, Badges & Leaderboards</div>
               </div>
               
               <div class="benefit-card">
-                <h5>Behavioral Reinforcement</h5>
-                <p>"The combination of visual rewards and streak mechanics creates powerful behavioral loops that reinforce positive habits."</p>
-                <div class="benefit-source">— Habit Formation Studies</div>
+                <h5>Feedback Fuels Long-Term Use</h5>
+                <p>“Gamification is positively associated with … experiences of affective feedback … which are strongly associated with user perceived benefits and continued use intentions.”</p>
+                <div class="benefit-source">S. Loijas et al., study in International Journal of Information Management</div>
               </div>
             </div>
           </div>
@@ -752,7 +752,7 @@ onMounted(() => {
 }
 
 .btn-primary.btn-cta {
-  background: #223243;
+  background: #244260;
   color: white;
 }
 
@@ -922,7 +922,7 @@ onMounted(() => {
 .feature-number {
   width: 60px;
   height: 60px;
-  background: #223243;
+  background: #244260;
   color: white;
   font-size: 2rem;
   font-weight: bold;
@@ -991,7 +991,7 @@ onMounted(() => {
 /* Final CTA Section */
 .final-cta-section {
   padding: 6rem 0;
-  background: #223243;
+  background: #244260;
 }
 
 .btn-cta-large {
@@ -1164,7 +1164,7 @@ onMounted(() => {
 }
 
 .btn-submit {
-  background: #223243;
+  background: #244260;
   color: white;
   border: none;
   padding: 0.875rem;
