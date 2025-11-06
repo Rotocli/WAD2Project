@@ -69,13 +69,10 @@
     <!-- Empty State -->
     <div v-if="!loading && fishCount === 0" class="empty-state">
       <span class="empty-icon">
-        <img src="@/assets/image.png" alt="FishBit Logo" width="100" height="100"/>
+        <img src="@/assets/image.png" alt="FishBit Logo" width="50" height="50"/>
       </span>
       <h3>Your aquarium is empty!</h3>
       <p>Create your first habit to get your first fish</p>
-      <router-link to="/habits" class="btn btn-primary">
-        Create Habit
-      </router-link>
     </div>
   </div>
 </template>
@@ -250,6 +247,31 @@ onMounted(async () => {
   animation: shimmer 3s ease-in-out infinite;
   z-index: 10;
   pointer-events: none;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem; /* adds vertical space */
+  margin-top: 2rem; /* pushes everything down */
+}
+
+
+.empty-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem; /* space between icon and text */
+  transform: translateY(10px); /* nudges the icon slightly downward */
+}
+
+.empty-icon img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
 }
 
 @keyframes shimmer {

@@ -295,4 +295,8 @@ const fetchComplete = async () => {
   color: white;
   text-decoration: none;
 }
+
+.btn-primary {
+  background-color: #547da7;
+}
 </style>

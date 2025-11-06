@@ -15,7 +15,7 @@
             <button 
               v-if="!fcmToken"
               @click="enableNotifications" 
-              class="btn btn-primary"
+              class="btn enablebtn"
             >
               Enable Notifications
             </button>
@@ -238,7 +238,12 @@ function sendHabitReminder() {
 }
 
 .disablebtn {
-  background-color: #547da7;
+  background-color: #eb6840;
+  color: white;
+}
+
+.enablebtn {
+  background-color: #68b08f;
   color: white;
 }
 
