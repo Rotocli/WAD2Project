@@ -1,14 +1,15 @@
 // useUserStore.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signInWithPopup
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore'
-import { auth, db } from '../services/firebase'
+import { auth, db, googleProvider } from '../services/firebase'
 
 
 export const useUserStore = defineStore('user', () => {
@@ -62,6 +63,44 @@ export const useUserStore = defineStore('user', () => {
       await setDoc(doc(db, 'users', credential.user.uid), userDoc)
       userProfile.value = userDoc
       
+      return credential.user
+    } catch (err) {
+      error.value = err.message
+      throw err
+    }
+  }
+
+  async function loginWithGoogle() {
+    try {
+      error.value = null
+      const credential = await signInWithPopup(auth, googleProvider)
+
+      // Check if user profile exists, if not create one
+      const userDocRef = doc(db, 'users', credential.user.uid)
+      const userDocSnap = await getDoc(userDocRef)
+
+      if (!userDocSnap.exists()) {
+        // First time Google login - create profile
+        const userDoc = {
+          userId: credential.user.uid,
+          email: credential.user.email,
+          username: credential.user.displayName || 'User',
+          createdAt: new Date(),
+          totalPoints: 0,
+          currentStreak: 0,
+          longestStreak: 0,
+          isDeveloper: false,
+          preferences: {
+            emailReminders: true,
+            reminderTime: '09:00'
+          }
+        }
+        await setDoc(userDocRef, userDoc)
+        userProfile.value = userDoc
+      } else {
+        await fetchUserProfile(credential.user.uid)
+      }
+
       return credential.user
     } catch (err) {
       error.value = err.message
@@ -187,6 +226,7 @@ function initAuthListener() {
     // Actions
     login,
     register,
+    loginWithGoogle,
     logout,
     fetchUserProfile,
     addPoints,
