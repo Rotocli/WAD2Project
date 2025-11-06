@@ -236,6 +236,7 @@ import { useFishDecoStore } from "../stores/fishDecoStore";
 import { useInventoryStore } from "../stores/inventoryStore";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
+import {alertSuccess,alertError,alertInfo} from '../services/alert';
 
 const fishStore = useFishStore();
 const habitStore = useHabitStore();
@@ -408,7 +409,7 @@ async function confirmEdit() {
     closeEdit()
   } catch (err) {
     console.error('Failed to update fish', err)
-    alert('Unable to update fish. Try again.')
+    alertError('Unable to update fish. Try again.')
   }
 }
 
@@ -558,13 +559,13 @@ function editDecoration(idx) {
 async function confirmDeco() {
   const type = selectedDecoType.value
   if (!type) {
-    alert('Please select a decoration.')
+    alertError('Please select a decoration.')
     return
   }
   
   const deco = aquariumStore.decorationTypes[type]
   if (!deco) {
-    alert('Invalid decoration selected.')
+    alertError('Invalid decoration selected.')
     return
   }
   

@@ -176,6 +176,7 @@ import { useUserStore } from '../stores/userStore'
 import { useJournalStore } from '../stores/journalStore'
 import { summarizeText } from '../services/llmService'
 import { timeService } from '../services/timeService'
+import {alertSuccess,alertError,alertInfo,promptSwal} from '@/services/alert';
 
 const userStore = useUserStore()
 const journalStore = useJournalStore()
@@ -272,9 +273,9 @@ async function saveEntry() {
     }
     
     isEditing.value = false
-    alert('✅ Entry saved successfully!')
+    alertSuccess('Entry saved successfully!')
   } catch (err) {
-    alert('❌ Failed to save entry: ' + err.message)
+    alertError('Failed to save entry: ' + err.message)
   } finally {
     saving.value = false
   }
@@ -296,7 +297,7 @@ function cancelEditing() {
 
 async function generateSummary() {
   if (!todayEntry.value || summariesUsedToday.value >= 3) {
-    alert('⚠️ You have reached the daily limit of 3 summaries')
+    alertError('You have reached the daily limit of 3 summaries')
     return
   }
   
@@ -314,9 +315,9 @@ async function generateSummary() {
       summariesUsedToday.value.toString()
     )
     
-    alert('✨ Summary generated!')
+    alertSuccess(' AI Summary generated!')
   } catch (err) {
-    alert('❌ Failed to generate summary: ' + err.message)
+    alertError(' Failed to generate summary: ' + err.message)
   } finally {
     generatingSummary.value = false
   }

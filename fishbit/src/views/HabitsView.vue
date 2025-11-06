@@ -179,6 +179,7 @@
 import { ref, onMounted } from 'vue'
 import { useHabitStore } from '../stores/habitStore'
 import { useUserStore } from '../stores/userStore'
+import { promptSwal } from '../services/alert'
 
 const store = useHabitStore()
 const userStore = useUserStore()
@@ -243,7 +244,7 @@ async function handleUpdate(habitId) {
 }
 
 async function handleArchive(habitId) {
-  if (confirm('Archive this habit? Fish will still be visible but habit won\'t appear in your active list.')) {
+  if (await promptSwal('Archive this habit? Fish will still be visible but habit won\'t appear in your active list.')) {
     try {
       await store.archiveHabit(habitId)
     } catch (err) {
@@ -261,7 +262,8 @@ async function handleUnarchive(habitId) {
 }
 
 async function confirmDelete(habitId) {
-  if (confirm('Permanently delete this habit? This will also delete the associated fish.')) {
+  
+  if ( await promptSwal('Permanently delete this habit? This will also delete the associated fish.')) {
     try {
       await store.deleteHabit(habitId)
     } catch (err) {

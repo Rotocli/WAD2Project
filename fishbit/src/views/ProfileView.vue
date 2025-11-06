@@ -55,6 +55,7 @@ import { ref, onMounted } from 'vue'
 import { notificationService } from '../services/notificationService'
 import { useUserStore } from '../stores/userStore'
 import { useHabitStore } from '../stores/habitStore'
+import {alertSuccess,alertError,alertInfo,promptSwal} from '@/services/alert';
 
 const userStore = useUserStore()
 const habitStore = useHabitStore()
@@ -101,15 +102,16 @@ async function enableNotifications() {
       body: 'You will now receive habit reminders'
     })
     
-    alert('Notifications enabled successfully!')
+    alertSuccess('Notifications enabled successfully!')
   } else {
-    alert('Failed to enable notifications. Please check your browser settings.')
+    alertError('Failed to enable notifications. Please check your browser settings.')
   }
 }
 
 // disabling notifs 
 async function disableNotifications() {
-  if (!confirm('Are you sure you want to disable notifications?')) return;
+  const confirmed = await promptSwal('Are you sure you want to disable notifications?');
+  if (!confirmed) return;
 
   try {
     if (userStore.currentUserId) {
@@ -138,10 +140,10 @@ async function disableNotifications() {
     await deleteToken(messaging)
     console.log('FCM token deleted from device')
 
-    alert('Notifications have been fully disabled.')
+    alertSuccess('Notifications have been fully disabled.')
   } catch (error) {
     console.error('Error disabling notifications:', error)
-    alert('Error disabling notifications.')
+    alertError('Error disabling notifications.')
   }
 }
 

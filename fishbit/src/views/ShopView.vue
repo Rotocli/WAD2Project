@@ -184,6 +184,7 @@ import { useAquariumStore } from '../stores/aquariumStore';
 import { useUserStore } from '../stores/userStore';
 import { useFishDecoStore } from '../stores/fishDecoStore';
 import { useInventoryStore } from '../stores/inventoryStore';
+import {alertSuccess,alertError,alertInfo,promptSwal} from '@/services/alert';
 
 const fishDecoStore = useFishDecoStore();
 const aquariumStore = useAquariumStore();
@@ -368,7 +369,7 @@ const canBuy = computed(() => {
 
 async function buyItem() {
   if (!canBuy.value) {
-    alert('Not enough coins!');
+    alertError('Not enough coins!');
     return;
   }
 
@@ -376,11 +377,11 @@ async function buyItem() {
   
   try {
     const result = await inventoryStore.purchaseItem(item);
-    alert(result.message);
+    alertSuccess(result.message);
     // Reload inventory into slots after purchase
     loadInventoryIntoSlots();
   } catch (err) {
-    alert(err.message);
+    alertError(err.message);
   }
 }
 
@@ -404,7 +405,7 @@ async function removeFromSlot(index) {
     await inventoryStore.removeItem(item.itemId);
     inventorySlots.value[index] = null;
   } catch (err) {
-    alert('Error removing item: ' + err.message);
+    alertError('Error removing item: ' + err.message);
   }
 }
 
@@ -416,7 +417,7 @@ function enterEditMode() {
 function saveInventory() {
   editMode.value = false;
   selectedSlots.value = [];
-  alert('Inventory saved!');
+  alertSuccess('Inventory saved!');
 }
 </script>
 
