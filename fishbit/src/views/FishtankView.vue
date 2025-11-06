@@ -608,7 +608,9 @@ async function handleDeleteDecoration(idx) {
 <style scoped>
 .fishtank-view {
   min-height: calc(100vh - 70px);
-  background: linear-gradient(rgb(255, 237, 165), #f58c9a);
+  background: #547da7;
+  color: white;
+  padding: 2rem;
 }
 
 .fish-list {
@@ -620,7 +622,7 @@ async function handleDeleteDecoration(idx) {
 }
 
 .fish-card {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 12px;
   padding: 1rem 1.5rem;
   min-width: 0; 
@@ -691,7 +693,6 @@ async function handleDeleteDecoration(idx) {
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  border: 3px solid rgba(255, 255, 255, 0.2);
 }
 /* Decoration Grid Overlay */
 .decoration-grid-overlay {
@@ -871,7 +872,7 @@ async function handleDeleteDecoration(idx) {
 }
 .no-fish-card {
   background: #eef7fb;
-  border: 1px solid #c3e1f7;
+  border: 1px solid #547da7;
   border-radius: 14px;
   padding: 1.3rem 2rem;
   box-shadow: 0 2px 10px rgba(50,130,182,0.06);
@@ -910,8 +911,14 @@ async function handleDeleteDecoration(idx) {
   min-width: 400px;
   max-width: 500px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
+  position: relative;
+  margin: auto;
+}
+
+body.modal-open {
+  overflow: hidden;
 }
 
 .modal-content h4 {
@@ -980,23 +987,23 @@ async function handleDeleteDecoration(idx) {
 }
 
 .btn-success {
-  background: #92dd85;
+  background: #547da7;
   color: white;
 }
 
 .btn-success:hover {
     background: white;
-    color: #92dd85;
+    color: #547da7;
 }
 
 .btn-secondary {
-  background: rgb(231, 93, 62);
+  background: #022b3a;
   color: white;
 }
 
 .btn-secondary:hover {
   background: white;
-  color: rgb(231, 93, 62);
+  color: #022b3a;
 
 }
 
@@ -1007,11 +1014,11 @@ async function handleDeleteDecoration(idx) {
 
 .btn-outline-primary {
   background: white;
-  color: rgb(231, 93, 62);
+  color: #547da7;
 }
 
 .btn-outline-primary:hover {
-  background: rgb(231, 93, 62);
+  background: #547da7;
   color: white;
 }
 </style>

@@ -17,7 +17,7 @@
 
       <!-- Active Habits Tab -->
       <div v-if="activeTab === 'active'">
-        <h2 class="habittitle mb-4">My Habits</h2>
+        <h2 class="habittitle">My Habits</h2>
         <p>View and edit your habits</p>
         <!-- Add New Habit Form Card -->
         <div class="dashboard-card mb-4">
@@ -282,8 +282,9 @@ p{
   color: white;
 }
 .habits-view {
+  padding: 2rem;
   min-height: calc(100vh - 70px);
-  background: linear-gradient(#58b6a8, #e7febb);
+  background: #547da7;
 }
 
 .habittitle {
@@ -292,7 +293,7 @@ p{
 }
 
 .dashboard-card {
-  background: rgb(255, 255, 255, 0.5);
+  background: rgb(255, 255, 255, 0.9);
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   overflow: hidden;
@@ -300,8 +301,7 @@ p{
 }
 
 .btn-primary {
-  background-color: #58b1a3;
-  border-color: #58b1a3;
+  background-color: #547da7;
 }
 
 .card-header {
@@ -351,7 +351,7 @@ p{
 
 .nav-tabs .nav-link.active {
   font-weight: 600;
-  color: #58b1a3;
+  color: #3d5976;
 }
 
 .btn-outline-warning:hover {

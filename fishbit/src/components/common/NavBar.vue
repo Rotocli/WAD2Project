@@ -194,7 +194,7 @@ onUnmounted(() => { document.removeEventListener('click', handleClickOutside) })
 body, html { overflow-x: hidden; }
 
 .navbar {
-  background: #4f9cfa;
+  background: #223243;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   padding: 0;
   height: 70px;
@@ -233,7 +233,7 @@ body, html { overflow-x: hidden; }
 .nav-link:hover { 
   color: white; 
   border-radius: 15px;
-  background-color: #2664f3; 
+  background-color: #547da7; 
   border-bottom: 0px;
 }
 
@@ -255,7 +255,7 @@ body, html { overflow-x: hidden; }
 }
 
 .points-display, .streak-display { 
-  background: #78bcff; 
+  background: #547da7; 
   padding: 0.5rem 1rem; 
   border-radius: 20px; 
   color: white; 
@@ -285,7 +285,7 @@ body, html { overflow-x: hidden; }
 
 .user-dropdown-btn:hover { 
   color: white; 
-  background-color: #78bcff; 
+  background-color: #547da7; 
 }
 
 .dropdown-menu { 
@@ -294,7 +294,7 @@ body, html { overflow-x: hidden; }
   top: calc(100% + 6px);
   min-width: 180px;
   margin-top: 0.5rem !important;
-  background: rgba(79, 156, 250, 0.95);
+  background: #223243;
   backdrop-filter: blur(6px); 
   border-radius: 15px; 
   padding: 0.5rem 0; 
@@ -333,7 +333,7 @@ body, html { overflow-x: hidden; }
   .navbar-collapse {
     display: none;
     position: absolute;
-    background: rgba(79, 156, 250, 0.98);
+    background: #223243;
     backdrop-filter: blur(20px);
     top: 70px;
     right: 0;
@@ -377,7 +377,7 @@ body, html { overflow-x: hidden; }
 
   .navbar-nav .nav-link:hover {
     color: white !important;
-    background-color: #78bcff;
+    background-color: #547da7;
     transform: translateX(5px); 
   }
 

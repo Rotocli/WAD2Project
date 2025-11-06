@@ -423,7 +423,9 @@ function saveInventory() {
 <style scoped>
 .shop-view {
   min-height: calc(100vh - 70px);
-  background: linear-gradient(#d3faf5,#489eea);
+  background: #547da7;
+  color: white;
+  padding: 2rem;
 }
 
 /* Coins Display */
@@ -576,16 +578,15 @@ function saveInventory() {
 }
 
 .filter-btn:hover {
-  border-color: #c18159;
-  background-color: #9e5e36;
+  border-color: #223243;
+  background-color: #223243;
   color: white;
 }
 
 .filter-btn.active {
-  background: #c18159;
+  border-color: #223243;
+  background-color: #223243;
   color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* Carousel Section */
@@ -727,7 +728,7 @@ function saveInventory() {
 }
 
 .carousel-nav:hover {
-  background: #81c1e9;
+  background: #223243;
   color: white;
   transform: translateY(-50%) scale(1.1);
 }
@@ -750,7 +751,7 @@ function saveInventory() {
   padding: 1rem 3rem;
   font-size: 1.3rem;
   font-weight: bold;
-  background: #81c1e9;
+  background: #223243;
   color: white;
   border: none;
   border-radius: 50px;
@@ -771,7 +772,7 @@ function saveInventory() {
 
 /* Inventory Section */
 .inventory-section {
-  background: #c18159;
+  background: #b48249;
   border-radius: 30px;
   padding: 2rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);

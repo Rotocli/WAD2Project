@@ -238,7 +238,7 @@ watch(
   ([habits, progress]) => {
     if (habits && progress) {
       calendarEvents.value = generateEventsFromHabits(habits, progress)
-      console.log("🟢 calendarEvents updated:", calendarEvents.value.length)
+      console.log("calendarEvents updated:", calendarEvents.value.length)
     }
   },
   { deep: true, immediate: true }
@@ -248,7 +248,7 @@ watch(
 <style>
 .calendar-view {
   color: white;
-  background: linear-gradient(#1a459b 40%, #67bbdc);
+  background: #547da7;
 }
 .vuecal__event.habit-completed,
 .vuecal__event--habit-completed {
@@ -289,6 +289,8 @@ watch(
 .responsive-calendar {
   height: 500px;
   width: 100%;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .calendar-nav {
@@ -321,17 +323,17 @@ watch(
 }
 
 .today-btn {
-  background: #66badb;
+  background: #223243;
   color: white;
 }
 
 .today-btn:hover {
-  background: #66badb;
+  background: #223243;
+  color: white;
   transform: translateY(-2px);
   box-shadow: 0 6px 10px rgba(95, 171, 229, 0.4);
 }
 
-/* Show/hide text based on screen size */
 .mobile-text {
   display: none;
 }
@@ -340,7 +342,6 @@ watch(
   display: inline;
 }
 
-/* Modal improvements */
 .modal-overlay {
   position: fixed;
   top: 0;

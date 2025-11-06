@@ -232,7 +232,7 @@ onMounted(() => {
 .dashboard-card {
   background: hsla(0, 0%, 100%, 0.55); ;
   border-radius: 15px;
-  color: #57a4f1;
+    color: black;
   overflow: hidden;
 }
 
