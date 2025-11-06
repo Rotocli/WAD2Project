@@ -1,11 +1,8 @@
 <template>
   <div class="profile-view">
     <div class="container-fluid p-4">
-      <h2 class="mb-4 profiletitle">Profile Settings</h2>
-      <p class="profiletitle">Adjust your settings</p>
-      
       <div class="settings-section">
-        <h3>🔔 Notifications</h3>
+        <h3 class="notifheader">🔔 Notifications</h3>
         
         <div class="setting-item">
           <div class="setting-info">
@@ -25,7 +22,7 @@
             <button 
               v-else
               @click="disableNotifications" 
-              class="btn btn-danger"
+              class="btn disablebtn"
             >
               Disable Notifications
             </button>
@@ -40,10 +37,10 @@
           </div>
           
           <div class="btn-group">
-            <button @click="sendTestNotification" class="btn btn-success">
+            <button @click="sendTestNotification" class="btn simplebtn">
               Simple Test
             </button>
-            <button @click="sendHabitReminder" class="btn btn-warning">
+            <button @click="sendHabitReminder" class="btn progressbtn">
               Habit Progress
             </button>
           </div>
@@ -167,16 +164,18 @@ function sendHabitReminder() {
 
 .profile-view {
   min-height: calc(100vh - 70px);
-  background: linear-gradient(#43399d 20%,#cbadff);
+  background: #547da7;
 }
 
-.profiletitle {
-  color: white;
-  margin: 2rem;
+.notifheader {
+  color: black;
+  font-weight: 500;
 }
 
 .settings-section {
+
   background: rgba(255, 255, 255, 0.5);
+  margin: 2rem;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -236,5 +235,20 @@ function sendHabitReminder() {
 .btn-group .btn {
   padding: 0.625rem 1.25rem;
   font-size: 0.9rem;
+}
+
+.disablebtn {
+  background-color: #547da7;
+  color: white;
+}
+
+.simplebtn {
+  background-color: #547da7;
+  color: white;
+}
+
+.progressbtn {
+  background-color: #547da7;
+  color: white;
 }
 </style>

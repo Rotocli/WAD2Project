@@ -347,8 +347,8 @@ onMounted(async () => {
 
 <style scoped>
 .journal-view {
+  padding: 2rem;
   min-height: 100vh;
-  padding: 0;
   background: #547da7;
   display: flex;
   flex-direction: column;
@@ -372,6 +372,7 @@ onMounted(async () => {
   position: relative;
   width: 100%;
   max-width: 500px;
+  perspective: 800px;
   margin: auto;
   flex: 1;
   display: flex;
@@ -436,14 +437,15 @@ onMounted(async () => {
 .click-hint {
   position: absolute;
   bottom: -30px;
+  transform: translateX(-50%) translateY(10px) rotateX(0deg);
+  backface-visibility: hidden;
   left: 50%;
   transform: translateX(-50%) translateY(10px);
-  background: rgba(255, 255, 255, 0.95);
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #667eea;
+  color: white;
   white-space: nowrap;
   opacity: 0;
   transition: all 0.3s ease;
