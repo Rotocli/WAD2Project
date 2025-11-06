@@ -752,7 +752,7 @@ onMounted(() => {
 }
 
 .btn-primary.btn-cta {
-  background: #223243;
+  background: #244260;
   color: white;
 }
 
@@ -922,7 +922,7 @@ onMounted(() => {
 .feature-number {
   width: 60px;
   height: 60px;
-  background: #223243;
+  background: #244260;
   color: white;
   font-size: 2rem;
   font-weight: bold;
@@ -991,7 +991,7 @@ onMounted(() => {
 /* Final CTA Section */
 .final-cta-section {
   padding: 6rem 0;
-  background: #223243;
+  background: #244260;
 }
 
 .btn-cta-large {
@@ -1164,7 +1164,7 @@ onMounted(() => {
 }
 
 .btn-submit {
-  background: #223243;
+  background: #244260;
   color: white;
   border: none;
   padding: 0.875rem;
