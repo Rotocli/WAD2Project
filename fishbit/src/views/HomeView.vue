@@ -128,39 +128,49 @@
           </div>
         </div>
       </div>
+
+      <!-- Scroll Indicator Chevrons -->
+      <div class="scroll-indicator">
+        <svg class="chevron-svg" width="40" height="40" viewBox="0 0 40 40">
+          <path d="M 10 15 L 20 25 L 30 15" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <!-- <svg class="chevron-svg" width="40" height="40" viewBox="0 0 40 40">
+          <path d="M 10 15 L 20 25 L 30 15" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg> -->
+      </div>
     </div>
 
     <!-- Features Section -->
     <div class="features-section">
       <div class="container">
-        <h2 class="section-title text-center mb-5">How FishBit Works</h2>
-        
+        <h2 class="section-title text-center mb-5 scroll-animate">How FishBit Works</h2>
+
         <div class="row g-4">
-          <div class="col-md-3">
+          <div class="col-md-3 scroll-animate" data-delay="0">
             <div class="feature-card">
               <div class="feature-number">1</div>
               <h4>Create Habits</h4>
               <p>Set up daily or weekly habits you want to build. Each habit gets its own fish!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="100">
             <div class="feature-card">
               <div class="feature-number">2</div>
               <h4>Check In Daily</h4>
               <p>Mark habits as complete to earn coins and maintain streaks. Keep your fish happy!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="200">
             <div class="feature-card">
               <div class="feature-number">3</div>
               <h4>Feed Your Fish</h4>
               <p>Your consistency keeps your virtual fish thriving. Break streaks and they get sad!</p>
             </div>
           </div>
-          
-          <div class="col-md-3">
+
+          <div class="col-md-3 scroll-animate" data-delay="300">
             <div class="feature-card">
               <div class="feature-number">4</div>
               <h4>Level Up</h4>
@@ -175,34 +185,34 @@
     <div class="why-section">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-lg-6">
+          <div class="col-lg-6 scroll-animate">
             <h2 class="section-title mb-4">Why Gamified Habits Work</h2>
             <p class="section-subtitle mb-4">Research shows that gamification significantly improves habit formation and long-term adherence.</p>
           </div>
-          
+
           <div class="col-lg-6">
             <div class="benefits-grid">
-              <div class="benefit-card">
+              <div class="benefit-card scroll-animate" data-delay="0">
                 <h5>Turn Progress Into Habit</h5>
                 <p>“Gamification uses core game mechanics like challenges, competitions, and rewards to drive motivation and engagement … resulting in deeper engagement.”</p>
                 <div class="benefit-source">“Gamification & Its Impacts: A Comprehensive Guide”</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="100">
                 <h5>Motivation That Lasts</h5>
                 <p>"Gamification can provide the structure to engage, motivate, and focus … whether they are employees, customers, or communities of interest."</p>
                 <div class="benefit-source">Brian Burke -- Gamify: How Gamification Motivates People to Do Extraordinary Things</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="200">
                 <h5>Engagement Through Feeling Smart</h5>
                 <p>"People do not take actions that are necessarily the most economical, but actions that make them feel the smartest."</p>
                 <div class="benefit-source">Yu-Kai Chou -- Actionable Gamification: Beyond Points, Badges & Leaderboards</div>
               </div>
-              
-              <div class="benefit-card">
+
+              <div class="benefit-card scroll-animate" data-delay="300">
                 <h5>Feedback Fuels Long-Term Use</h5>
-                <p>“Gamification is positively associated with … experiences of affective feedback … which are strongly associated with user perceived benefits and continued use intentions.”</p>
+                <p>"Gamification is positively associated with … experiences of affective feedback … which are strongly associated with user perceived benefits and continued use intentions."</p>
                 <div class="benefit-source">S. Loijas et al., study in International Journal of Information Management</div>
               </div>
             </div>
@@ -213,7 +223,7 @@
 
     <!-- Final CTA Section -->
     <div class="final-cta-section">
-      <div class="container text-center">
+      <div class="container text-center scroll-animate">
         <h2 class="display-4 fw-bold text-white mb-4">Ready to Transform Your Habits?</h2>
         <p class="lead text-white mb-5">Join thousands of users building better habits with FishBit today!</p>
         <button @click="openRegister" class="btn btn-lg btn-light btn-cta-large">
@@ -263,8 +273,8 @@
             {{ loginError }}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="btn-submit"
             :disabled="loginLoading"
           >
@@ -275,9 +285,27 @@
             <span v-else>Login</span>
           </button>
 
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <button
+            @click="handleGoogleLogin"
+            class="btn-google"
+            type="button"
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4"/>
+              <path d="M24.48 48.0016C30.9529 48.0016 36.4116 45.8764 40.3888 42.2078L32.6549 36.2111C30.5031 37.675 27.7252 38.5039 24.4888 38.5039C18.2275 38.5039 12.9187 34.2798 11.0139 28.6006H3.03296V34.7825C7.10718 42.8868 15.4056 48.0016 24.48 48.0016Z" fill="#34A853"/>
+              <path d="M11.0051 28.6006C9.99973 25.6199 9.99973 22.3922 11.0051 19.4115V13.2296H3.03298C-0.371021 20.0112 -0.371021 28.0009 3.03298 34.7825L11.0051 28.6006Z" fill="#FBBC04"/>
+              <path d="M24.48 9.49932C27.9016 9.44641 31.2086 10.7339 33.6866 13.0973L40.5387 6.24523C36.2 2.17101 30.4414 -0.068932 24.48 0.00161733C15.4055 0.00161733 7.10718 5.11644 3.03296 13.2296L11.005 19.4115C12.901 13.7235 18.2187 9.49932 24.48 9.49932Z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+          </button>
+
           <div class="modal-footer-content">
             <p>
-              Don't have an account? 
+              Don't have an account?
               <a href="#" @click.prevent="openRegister">Sign up</a>
             </p>
           </div>
@@ -351,8 +379,8 @@
             {{ registerError }}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="btn-submit"
             :disabled="registerLoading"
           >
@@ -363,9 +391,27 @@
             <span v-else>Create Account</span>
           </button>
 
+          <div class="divider">
+            <span>or</span>
+          </div>
+
+          <button
+            @click="handleGoogleLogin"
+            class="btn-google"
+            type="button"
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4"/>
+              <path d="M24.48 48.0016C30.9529 48.0016 36.4116 45.8764 40.3888 42.2078L32.6549 36.2111C30.5031 37.675 27.7252 38.5039 24.4888 38.5039C18.2275 38.5039 12.9187 34.2798 11.0139 28.6006H3.03296V34.7825C7.10718 42.8868 15.4056 48.0016 24.48 48.0016Z" fill="#34A853"/>
+              <path d="M11.0051 28.6006C9.99973 25.6199 9.99973 22.3922 11.0051 19.4115V13.2296H3.03298C-0.371021 20.0112 -0.371021 28.0009 3.03298 34.7825L11.0051 28.6006Z" fill="#FBBC04"/>
+              <path d="M24.48 9.49932C27.9016 9.44641 31.2086 10.7339 33.6866 13.0973L40.5387 6.24523C36.2 2.17101 30.4414 -0.068932 24.48 0.00161733C15.4055 0.00161733 7.10718 5.11644 3.03296 13.2296L11.005 19.4115C12.901 13.7235 18.2187 9.49932 24.48 9.49932Z" fill="#EA4335"/>
+            </svg>
+            Sign up with Google
+          </button>
+
           <div class="modal-footer-content">
             <p>
-              Already have an account? 
+              Already have an account?
               <a href="#" @click.prevent="openLogin">Login</a>
             </p>
           </div>
@@ -474,11 +520,60 @@ async function handleRegister() {
   }
 }
 
+async function handleGoogleLogin() {
+  try {
+    await userStore.loginWithGoogle()
+    closeModals()
+    router.push('/dashboard')
+  } catch (err) {
+    if (err.message.includes('popup-closed-by-user')) {
+      // User closed popup - no error message needed
+    } else if (err.message.includes('cancelled-popup-request')) {
+      // User cancelled - no error message needed
+    } else if (err.message.includes('account-exists-with-different-credential')) {
+      loginError.value = 'An account already exists with this email using a different sign-in method'
+      registerError.value = 'An account already exists with this email using a different sign-in method'
+    } else {
+      loginError.value = 'Failed to sign in with Google. Please try again.'
+      registerError.value = 'Failed to sign up with Google. Please try again.'
+    }
+  }
+}
+
 onMounted(() => {
   if (userStore.isAuthenticated) {
     router.push('/dashboard')
   }
+
+  // Initialize scroll animations
+  initScrollAnimations()
 })
+
+function initScrollAnimations() {
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.1
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Element is visible - add animation (only once, don't remove on scroll up)
+        const delay = entry.target.dataset.delay || 0
+        setTimeout(() => {
+          entry.target.classList.add('is-visible')
+        }, delay)
+        // Stop observing once animated
+        observer.unobserve(entry.target)
+      }
+    })
+  }, observerOptions)
+
+  // Observe all elements with scroll-animate class
+  const animatedElements = document.querySelectorAll('.scroll-animate')
+  animatedElements.forEach(el => observer.observe(el))
+}
 </script>
 
 <style scoped>
@@ -1203,6 +1298,59 @@ onMounted(() => {
   to { transform: rotate(360deg); }
 }
 
+/* Divider for "or" between auth methods */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: #94a3b8;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider span {
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Google Sign-In Button */
+.btn-google {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn-google:hover {
+  border-color: #4285f4;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.2);
+  background: #f8fafc;
+}
+
+.btn-google:active {
+  transform: translateY(1px);
+}
+
+.btn-google svg {
+  flex-shrink: 0;
+}
+
 .modal-footer-content {
   text-align: center;
   margin-top: 1rem;
@@ -1223,19 +1371,70 @@ onMounted(() => {
   text-decoration: underline;
 }
 
+/* Scroll Indicator Chevrons */
+.scroll-indicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: -10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.chevron-svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  animation: chevron-float 2s ease-in-out infinite;
+}
+
+.chevron-svg:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.chevron-svg:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes chevron-float {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scroll Animations */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-animate.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .hero-content h1 {
     font-size: 3rem;
   }
-  
+
   .logo-image {
     width: 60px;
     height: 60px;
   }
-  
+
   .preview-card {
     margin-top: 3rem;
+    margin-bottom: 3rem;
   }
 }
 
