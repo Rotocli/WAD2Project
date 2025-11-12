@@ -71,15 +71,11 @@ export const useInventoryStore = defineStore('inventory', () => {
       if (docSnap.exists()) {
         inventoryItems.value = docSnap.data().items || []
       } else {
-        // Initialize empty inventory
         await setDoc(docRef, { items: [] })
         inventoryItems.value = []
       }
-      
-      console.log('✅ Inventory loaded:', inventoryItems.value.length, 'items')
     } catch (err) {
       error.value = err.message
-      console.error('Error fetching inventory:', err)
     } finally {
       loading.value = false
     }
@@ -116,18 +112,15 @@ export const useInventoryStore = defineStore('inventory', () => {
       }
 
       const docRef = doc(db, 'inventory', userStore.currentUserId)
-      
-      // Always add as new item (no quantity increase)
+
       await updateDoc(docRef, {
         items: arrayUnion(inventoryItem)
       })
       inventoryItems.value.push(inventoryItem)
 
-      console.log('✅ Item purchased:', itemData.name)
       return { success: true, message: `${itemData.name} added to inventory!` }
     } catch (err) {
       error.value = err.message
-      console.error('Error purchasing item:', err)
       throw err
     } finally {
       loading.value = false
@@ -145,10 +138,8 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
 
     try {
-      // Decrease quantity
       item.quantity -= 1
 
-      // Remove from inventory if quantity is 0
       if (item.quantity <= 0) {
         const docRef = doc(db, 'inventory', userStore.currentUserId)
         await updateDoc(docRef, {
@@ -156,14 +147,12 @@ export const useInventoryStore = defineStore('inventory', () => {
         })
         inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
       } else {
-        // Update quantity in Firebase
         const docRef = doc(db, 'inventory', userStore.currentUserId)
         await updateDoc(docRef, {
           items: inventoryItems.value
         })
       }
 
-      console.log('✅ Item used:', item.name)
       return { success: true }
     } catch (err) {
       error.value = err.message
@@ -178,7 +167,6 @@ export const useInventoryStore = defineStore('inventory', () => {
       const item = inventoryItems.value.find(i => i.itemId === itemId)
       if (!item) return
 
-      // Prevent deletion if item is in use
       if (item.inUse) {
         throw new Error('Cannot delete item that is currently equipped!')
       }
@@ -188,9 +176,8 @@ export const useInventoryStore = defineStore('inventory', () => {
         await updateDoc(docRef, {
           items: arrayRemove(item)
         })
-        
+
         inventoryItems.value = inventoryItems.value.filter(i => i.itemId !== itemId)
-        console.log('✅ Item removed from inventory')
       } catch (err) {
         error.value = err.message
         throw err
@@ -205,15 +192,12 @@ export const useInventoryStore = defineStore('inventory', () => {
 
     try {
       item.inUse = inUse
-      
+
       const docRef = doc(db, 'inventory', userStore.currentUserId)
       await updateDoc(docRef, {
         items: inventoryItems.value
       })
-      
-      console.log(`✅ Item ${inUse ? 'marked as in use' : 'freed'}`)
     } catch (err) {
-      console.error('Error updating item usage:', err)
       throw err
     }
   }
@@ -230,24 +214,20 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
 
     try {
-      // Get decoration details from aquariumStore
       const decoration = aquariumStore.decorationTypes[itemId]
       if (!decoration) {
         throw new Error('Decoration not found')
       }
 
-      // Place in aquarium
       await aquariumStore.updateGridCell(gridIndex, {
         ...decoration,
         id: itemId
       })
 
-      // Use the item (decrease quantity)
       await useItem(itemId)
 
       return { success: true, message: 'Decoration placed!' }
     } catch (err) {
-      console.error('Error placing decoration:', err)
       throw err
     }
   }
@@ -261,17 +241,14 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
 
     try {
-      // Equip the decoration
       const result = await fishDecoStore.equipDecoration(item.category, itemId)
-      
+
       if (result.success) {
-        // Use the item (decrease quantity)
         await useItem(itemId)
       }
 
       return result
     } catch (err) {
-      console.error('Error equipping decoration:', err)
       throw err
     }
   }

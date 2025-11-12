@@ -123,38 +123,32 @@ export const useUserStore = defineStore('user', () => {
     try {
       const docRef = doc(db, 'users', uid)
       const docSnap = await getDoc(docRef)
-      
+
       if (docSnap.exists()) {
         userProfile.value = docSnap.data()
-        
-        // ← NEW: Log developer status for debugging
-        if (userProfile.value?.isDeveloper) {
-          console.log('🔧 Developer account detected:', userProfile.value.email)
-        }
       }
     } catch (err) {
-      console.error('Error fetching user profile:', err)
+      // Error fetching user profile
     }
   }
 
   async function addPoints(points) {
   if (!currentUserId.value) return
-  
+
   try {
     const newPoints = totalPoints.value + points
     await updateDoc(doc(db, 'users', currentUserId.value), {
       totalPoints: newPoints
     })
     userProfile.value.totalPoints = newPoints
-    console.log(`💰 Added ${points} points. Total: ${newPoints}`)
   } catch (err) {
-    console.error('Error adding points:', err)
+    // Error adding points
   }
 }
 
   async function updatePoints(points) {
     if (!currentUserId.value) return
-    
+
     try {
       const newPoints = totalPoints.value + points
       await updateDoc(doc(db, 'users', currentUserId.value), {
@@ -162,36 +156,31 @@ export const useUserStore = defineStore('user', () => {
       })
       userProfile.value.totalPoints = newPoints
     } catch (err) {
-      console.error('Error updating points:', err)
+      // Error updating points
     }
   }
 
   async function updateStreak(newStreak) {
     if (!currentUserId.value) return
-    
+
     try {
       const updates = {
         currentStreak: newStreak
       }
-      
-      // Update longest streak if necessary
+
       if (newStreak > (userProfile.value?.longestStreak || 0)) {
         updates.longestStreak = newStreak
       }
-      
+
       await updateDoc(doc(db, 'users', currentUserId.value), updates)
       Object.assign(userProfile.value, updates)
     } catch (err) {
-      console.error('Error updating streak:', err)
+      // Error updating streak
     }
   }
 
-  // Initialize auth listener
-function initAuthListener() {
-  console.log("🔐 userStore: Initializing auth listener...")
+  function initAuthListener() {
   onAuthStateChanged(auth, async (firebaseUser) => {
-    console.log("🔐 userStore: Auth state changed:", firebaseUser ? firebaseUser.uid : "No user")
-
     user.value = firebaseUser
     if (firebaseUser) {
       await fetchUserProfile(firebaseUser.uid)
@@ -199,7 +188,6 @@ function initAuthListener() {
       const habitStore = useHabitStore()
       await habitStore.fetchHabits()
       await habitStore.fetchProgress(firebaseUser.uid)
-      console.log("✅ userStore: All user data loaded")
     } else {
       userProfile.value = null
     }

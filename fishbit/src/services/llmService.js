@@ -11,7 +11,6 @@ export async function summarizeText(text) {
     model: "gemini-2.5-flash",
     contents: `Summarize my journal entry in 2-3 sentences. Focus on the main themes, emotions, and key events: ${text} and give me a very nice flow. Thanks`
   });
-  console.log(response);
 
   return response.text;
 }

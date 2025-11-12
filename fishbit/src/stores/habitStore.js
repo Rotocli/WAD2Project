@@ -132,7 +132,6 @@ export const useHabitStore = defineStore('habit', () => {
       }))
     } catch (err) {
       error.value = err.message
-      console.error('Error fetching habits:', err)
     } finally {
       loading.value = false
     }
@@ -149,7 +148,7 @@ export const useHabitStore = defineStore('habit', () => {
       const newHabit = {
         ...habitData,
         userId: userStore.currentUserId,
-        createdAt: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
+        createdAt: getCurrentDate(),
         isActive: true,
         isArchived: false,
         currentStreak: 0,
@@ -165,16 +164,14 @@ export const useHabitStore = defineStore('habit', () => {
         id: docRef.id,
         ...newHabit
       })
-      
-    // AUTO-CREATE FISH FOR THIS HABIT
+
       try {
         const { useFishStore } = await import('./fishStore')
         const fishStore = useFishStore()
-        
-        // Choose a random fish species for variety
+
         const species = ['clownfish', 'blueTang', 'yellowTang', 'angelfish', 'neonTetra', 'goldfish', 'betta', 'guppy']
         const randomSpecies = species[Math.floor(Math.random() * species.length)]
-        
+
         await fishStore.createFish({
           habitId: docRef.id,
           habitName: habitData.name,
@@ -186,22 +183,17 @@ export const useHabitStore = defineStore('habit', () => {
             trail: ''
           }
         })
-        
-        console.log('✅ Fish auto-created for new habit:', habitData.name)
-        
-        // Force refresh fish list to ensure UI updates immediately
+
         await fishStore.fetchFish(userStore.currentUserId)
       } catch (fishErr) {
-        // Don't fail habit creation if fish creation fails
-        console.warn('⚠️ Could not create fish for habit:', fishErr)
+        // Fish creation failed
       }
 
       try {
       const { checkAchievements } = useAchievements()
       await checkAchievements()
-      console.log('✅ Checked achievements after habit creation')
     } catch (achErr) {
-      console.warn('⚠️ Could not check achievements:', achErr)
+      // Achievement check failed
     }
 
       return docRef.id
@@ -237,24 +229,20 @@ export const useHabitStore = defineStore('habit', () => {
     error.value = null
 
     try {
-      // Delete from Firestore
       await deleteDoc(doc(db, 'habits', habitId))
-      
-      // Also delete associated fish
+
       try {
         const { useFishStore } = await import('./fishStore')
         const fishStore = useFishStore()
         const associatedFish = fishStore.fish.filter(f => f.habitId === habitId)
-        
+
         for (const fish of associatedFish) {
           await fishStore.deleteFish(fish.id)
         }
-        console.log('✅ Deleted associated fish for habit:', habitId)
       } catch (fishErr) {
-        console.warn('⚠️ Could not delete associated fish:', fishErr)
+        // Could not delete associated fish
       }
-      
-      // Remove from local state
+
       habits.value = habits.value.filter(h => h.id !== habitId)
     } catch (err) {
       error.value = err.message
@@ -271,16 +259,14 @@ export const useHabitStore = defineStore('habit', () => {
     try {
       await updateDoc(doc(db, 'habits', habitId), {
         isArchived: true,
-        archivedAt: getCurrentDate() // ✅ FIXED: Uses Time Machine time
+        archivedAt: getCurrentDate()
       })
-      
+
       const index = habits.value.findIndex(h => h.id === habitId)
       if (index !== -1) {
         habits.value[index].isArchived = true
-        habits.value[index].archivedAt = getCurrentDate() // ✅ FIXED
+        habits.value[index].archivedAt = getCurrentDate()
       }
-      
-      console.log('✅ Habit archived:', habitId)
     } catch (err) {
       error.value = err.message
       throw err
@@ -298,14 +284,12 @@ export const useHabitStore = defineStore('habit', () => {
         isArchived: false,
         archivedAt: null
       })
-      
+
       const index = habits.value.findIndex(h => h.id === habitId)
       if (index !== -1) {
         habits.value[index].isArchived = false
         habits.value[index].archivedAt = null
       }
-      
-      console.log('✅ Habit unarchived:', habitId)
     } catch (err) {
       error.value = err.message
       throw err
@@ -319,28 +303,25 @@ export const useHabitStore = defineStore('habit', () => {
     const habit = habits.value.find(h => h.id === habitId)
     if (!habit) return
 
-    const today = getTodayString() // ✅ FIXED: Uses Time Machine time
-    
+    const today = getTodayString()
+
     try {
-      // Check if already completed today
       const progressDoc = await getDoc(
         doc(db, 'progress', `${habitId}_${today}`)
       )
-      
+
       if (progressDoc.exists()) {
         const progressRef = doc(db, 'progress', `${habitId}_${today}`)
         await updateDoc(progressRef, { completed: true })
-        console.log(habitId)
         throw new Error('Habit already completed today!')
       }
 
-      // Create progress entry
       await setDoc(doc(db, 'progress', `${habitId}_${today}`), {
         habitId,
         userId: userStore.currentUserId,
         date: today,
         completed: true,
-        timestamp: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
+        timestamp: getCurrentDate(),
         pointsEarned: 10
       })
 
@@ -351,10 +332,9 @@ export const useHabitStore = defineStore('habit', () => {
         completed: true
       })
 
-      // Update habit stats
       const newStreak = calculateStreak(habit)
       await updateHabit(habitId, {
-        lastCompleted: getCurrentDate(), // ✅ FIXED: Uses Time Machine time
+        lastCompleted: getCurrentDate(),
         currentStreak: newStreak,
         bestStreak: Math.max(newStreak, habit.bestStreak || 0),
         completedCount: (habit.completedCount || 0) + 1
@@ -371,11 +351,9 @@ export const useHabitStore = defineStore('habit', () => {
 
       let newUserStreak = 1
       if (progressTodaySnapshot.size > 1) {
-        // Already completed another habit today; don't increment
         newUserStreak = userStore.userProfile.currentStreak || 1
       } else {
-        // Check if user completed any habit yesterday
-        const yesterdayStr = getYesterdayString() // ✅ FIXED: Uses Time Machine time
+        const yesterdayStr = getYesterdayString()
 
         const progressYesterdaySnapshot = await getDocs(
           query(
@@ -409,9 +387,8 @@ export const useHabitStore = defineStore('habit', () => {
       try {
       const { checkAchievements } = useAchievements()
       await checkAchievements()
-      console.log('✅ Checked achievements after habit completion')
     } catch (achErr) {
-      console.warn('⚠️ Could not check achievements:', achErr)
+      // Achievement check failed
     }
 
       return true
@@ -423,13 +400,13 @@ export const useHabitStore = defineStore('habit', () => {
 
   function calculateStreak(habit) {
     if (!habit.lastCompleted) return 1
-    
-    const lastDate = new Date(habit.lastCompleted.seconds ? 
+
+    const lastDate = new Date(habit.lastCompleted.seconds ?
       habit.lastCompleted.seconds * 1000 : habit.lastCompleted)
-    const today = getCurrentDate() // ✅ FIXED: Uses Time Machine time
+    const today = getCurrentDate()
     const diffTime = Math.abs(today - lastDate)
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
+
     if (diffDays === 1) {
       return (habit.currentStreak || 0) + 1
     } else if (diffDays === 0) {
@@ -445,14 +422,12 @@ export const useHabitStore = defineStore('habit', () => {
       const q = query(collection(db, 'progress'), where('userId', '==', userId))
       const snapshot = await getDocs(q)
       progress.value = snapshot.docs.map(doc => doc.data())
-      console.log('✅ Progress fetched:', progress.value.length)
     } catch (err) {
-      console.error('Error fetching progress:', err)
+      // Error fetching progress
     }
   }
 
   function addProgressEntry(entry) {
-    // simple local update to reflect completion immediately
     progress.value.push(entry)
   }
 
@@ -462,10 +437,7 @@ export const useHabitStore = defineStore('habit', () => {
 
     loading.value = true
     error.value = null
-    const today = getTodayString() // ✅ FIXED: Uses Time Machine time
-    console.log(userStore.currentUserId)
-    console.log(today)
-    
+    const today = getTodayString()
 
     const q = query(
         collection(db, 'progress'),
@@ -474,23 +446,14 @@ export const useHabitStore = defineStore('habit', () => {
     )
 
     const querySnapshot = await getDocs(q)
-    if (querySnapshot.empty) {
-        console.log('No documents found for today:', today)
-    }
-    console.log(querySnapshot.docs)
-    
 
-    // Filter only today's completed tasks
     const todaysCompleted = querySnapshot.docs
         .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
         .filter(progress => {
-            // Since your date is stored as string "2025-10-13"
             return progress.date == today
         })
-    console.log(todaysCompleted)
-    
 
-    return todaysCompleted // array of completed tasks
+    return todaysCompleted
   }
   
   async function undoHabit(habitId) {
@@ -501,21 +464,16 @@ export const useHabitStore = defineStore('habit', () => {
     error.value = null
 
     try {
-      const today = getTodayString() // ✅ FIXED: Uses Time Machine time
+      const today = getTodayString()
       const progressRef = doc(db, 'progress', `${habitId}_${today}`)
 
       const progressDoc = await getDoc(progressRef)
       if (!progressDoc.exists()) {
-        console.log('No progress record found for today')
         return
       }
 
-      // Update the 'completed' field to false
       await updateDoc(progressRef, { completed: false })
-
-      console.log('Habit marked as undone for today!')
     } catch (err) {
-      console.error('Error undoing habit:', err)
       error.value = err.message
     } finally {
       loading.value = false

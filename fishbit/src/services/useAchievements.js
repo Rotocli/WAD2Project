@@ -12,18 +12,16 @@ export function useAchievements() {
 
   async function loadAchievements() {
     if (!userStore.currentUserId) return
-    
+
     try {
       const docRef = doc(db, 'achievements', userStore.currentUserId)
       const docSnap = await getDoc(docRef)
-     
+
       if (docSnap.exists()) {
         userAchievements.value = docSnap.data()
       }
     } catch (error) {
-      console.error('Error loading achievements:', error)
       if (error.code === 'permission-denied') {
-        console.log('No achievements yet - will be created on first unlock')
         userAchievements.value = {}
       }
     }
@@ -121,11 +119,7 @@ export function useAchievements() {
         )
 
         await userStore.addPoints(totalPointsEarned)
-     
-        console.log('🏆 New achievements unlocked:', newUnlocks)
-        console.log(`💰 Points earned: ${totalPointsEarned}`)
       } catch (error) {
-        console.error('Error saving achievements:', error)
       }
     }
   }

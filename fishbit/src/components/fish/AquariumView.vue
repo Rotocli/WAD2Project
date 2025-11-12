@@ -115,15 +115,9 @@ const substrateStyle = computed(() => ({
 }))
 
 // Separate fish by layer for depth effect
-// const backLayerFish = computed(() => 
-//   fishStore.activeFish.filter(f => f.position.layer === 0)
-// )
-
-const backLayerFish = computed(() => {
-  const filtered = fishStore.activeFish.filter(f => f.position.layer === 0)
-  console.log('backLayerFish computed:', filtered.map(f => f.customName))
-  return filtered
-})
+const backLayerFish = computed(() =>
+  fishStore.activeFish.filter(f => f.position.layer === 0)
+)
 
 const midLayerFish = computed(() => 
   fishStore.activeFish.filter(f => f.position.layer === 1)
@@ -161,45 +155,32 @@ function createBubbles() {
   bubbles.value = Array(8).fill(null)
 }
 
-// Load aquarium data
 async function loadAquariumData() {
   const userId = userStore.currentUserId
-  console.log('AquariumView: loadAquariumData called with userId:', userId)
-  
+
   if (!userId) {
-    console.warn('AquariumView: No userId available, skipping load')
     loading.value = false
     return
   }
-  
+
   loading.value = true
   try {
-    console.log('AquariumView: Fetching fish and aquarium settings...')
     await Promise.all([
       fishStore.fetchFish(userId),
       aquariumStore.fetchSettings(userId)
     ])
-    
-    console.log('AquariumView: Data loaded. Fish count:', fishStore.fish.length, 'Active fish:', fishStore.activeFish.length)
-    console.log('Layer distribution:', {
-      back: fishStore.activeFish.filter(f => f.position.layer === 0).map(f => f.customName),
-      mid: fishStore.activeFish.filter(f => f.position.layer === 1).map(f => f.customName),
-      front: fishStore.activeFish.filter(f => f.position.layer === 2).map(f => f.customName),
-      other: fishStore.activeFish.filter(f => ![0,1,2].includes(f.position.layer)).map(f => ({name: f.customName, layer: f.position.layer}))
-    })
+
     createBubbles()
   } catch (error) {
-    console.error('AquariumView: Error loading aquarium:', error)
+    // Error handling
   } finally {
     loading.value = false
   }
 }
 
-// Watch for user authentication changes
 watch(
   () => userStore.currentUserId,
-  (userId, oldUserId) => {
-    console.log('AquariumView: User ID changed from', oldUserId, 'to', userId)
+  (userId) => {
     if (userId) {
       loadAquariumData()
     }
@@ -207,15 +188,10 @@ watch(
   { immediate: true }
 )
 
-// Lifecycle - also try to load on mount as a fallback
 onMounted(async () => {
-  console.log('AquariumView: Component mounted. User authenticated:', userStore.isAuthenticated, 'User ID:', userStore.currentUserId)
-  
-  // Small delay to ensure auth state is settled
   await new Promise(resolve => setTimeout(resolve, 100))
-  
+
   if (userStore.currentUserId && fishStore.fish.length === 0) {
-    console.log('AquariumView: Triggering load from onMounted')
     loadAquariumData()
   }
 })

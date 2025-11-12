@@ -214,7 +214,6 @@ async function handleCreate() {
       description: ''
     }
   } catch (err) {
-    console.error('Error creating habit:', err)
   }
 }
 
@@ -240,7 +239,6 @@ async function handleUpdate(habitId) {
     editingId.value = null
     editHabit.value = {}
   } catch (err) {
-    console.error('Error updating habit:', err)
   }
 }
 
@@ -249,7 +247,6 @@ async function handleArchive(habitId) {
     try {
       await store.archiveHabit(habitId)
     } catch (err) {
-      console.error('Error archiving habit:', err)
     }
   }
 }
@@ -258,17 +255,14 @@ async function handleUnarchive(habitId) {
   try {
     await store.unarchiveHabit(habitId)
   } catch (err) {
-    console.error('Error unarchiving habit:', err)
   }
 }
 
 async function confirmDelete(habitId) {
-  
   if ( await promptSwal('Permanently delete this habit? This will also delete the associated fish.')) {
     try {
       await store.deleteHabit(habitId)
     } catch (err) {
-      console.error('Error deleting habit:', err)
     }
   }
 }

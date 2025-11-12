@@ -65,7 +65,6 @@ const userStore = useUserStore()
 const habitStore = useHabitStore()
 const vuecalRef = ref(null)
 
-// ADD THESE: New reactive variables
 const selectedDate = ref(new Date())
 const showModal = ref(false)
 const modalData = ref({})
@@ -77,13 +76,10 @@ onMounted(async () => {
     await habitStore.fetchHabits(userStore.currentUserId)
     if (habitStore.fetchProgress) {
       await habitStore.fetchProgress(userStore.currentUserId)
-    } else {
-      console.warn("⚠️ habitStore.fetchProgress not found – make sure it's implemented.")
     }
   }
 })
 
-// ADD THESE: Navigation functions
 function goToToday() {
   selectedDate.value = new Date()
   if (vuecalRef.value) {
@@ -109,13 +105,11 @@ function nextWeek() {
   }
 }
 
-// ADD THIS: Handle clicks on events
 function handleEventClick(event, e) {
   e.stopPropagation()
-  
-  // Find the habit from the event title
+
   const habit = habits.value.find(h => h.name === event.title)
-  
+
   modalData.value = {
     habitName: event.title,
     date: event.start,
@@ -125,19 +119,17 @@ function handleEventClick(event, e) {
   showModal.value = true
 }
 
-// ADD THIS: Handle clicks on empty cells
 function handleCellClick(date, e) {
-  // Only open modal if there's an event on this date
   const eventsOnDate = calendarEvents.value.filter(event => {
     const eventDate = new Date(event.start).toDateString()
     const clickedDate = new Date(date).toDateString()
     return eventDate === clickedDate
   })
-  
+
   if (eventsOnDate.length > 0) {
     const event = eventsOnDate[0]
     const habit = habits.value.find(h => h.name === event.title)
-    
+
     modalData.value = {
       habitName: event.title,
       date: event.start,
@@ -148,18 +140,16 @@ function handleCellClick(date, e) {
   }
 }
 
-// ADD THIS: Close modal
 function closeModal() {
   showModal.value = false
 }
 
-// ADD THIS: Format date for display
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return new Date(date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 }
 
@@ -238,7 +228,6 @@ watch(
   ([habits, progress]) => {
     if (habits && progress) {
       calendarEvents.value = generateEventsFromHabits(habits, progress)
-      console.log("calendarEvents updated:", calendarEvents.value.length)
     }
   },
   { deep: true, immediate: true }

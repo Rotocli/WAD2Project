@@ -107,8 +107,6 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   fetchComplete()
   document.addEventListener('click', handleClickOutside)
-  console.log('Initial completedHabits:', completedHabits.value) // This will show empty
-  // But in template it will update reactively when data loads!
 })
 
 onBeforeUnmount(() => {
@@ -131,12 +129,12 @@ async function deleteHabit(habitId) {
       await habitStore.deleteHabit(habitId)
       activeHabitId.value = null
     } catch (err) {
-      console.error('Error deleting habit:', err)
+      // Error handling
     }
   }
 }
+
 function viewMoreHabit(habitId){
-  console.log(habitId.description)
   activeHabitId.value = null
   openModal(habitId)
 }
@@ -144,11 +142,10 @@ function viewMoreHabit(habitId){
 const undoHabit = async (habitId) => {
   try {
     await habitStore.undoHabit(habitId)
-    // update completedHabits if needed
     completedHabits.value.delete(habitId)
     activeHabitId.value = null
   } catch (err) {
-    console.error(err)
+    // Error handling
   }
 }
 
@@ -169,18 +166,13 @@ const togglePopup = (habitId, event) => {
 async function toggleHabit(habitId) {
   try {
     if (completedHabits.value.has(habitId)) {
-      // Undo completion
       completedHabits.value.delete(habitId)
       await habitStore.undoHabit(habitId)
-      console.log('Habit undone:', habitId)
     } else {
-      // Complete habit
       completedHabits.value.add(habitId)
       await habitStore.completeHabit(habitId)
-      console.log('Habit completed:', habitId)
     }
   } catch (err) {
-    console.error('Error toggling habit:', err)
     error.value = err
   }
 }
@@ -189,9 +181,8 @@ const completeHabit = async (habitId) => {
   try {
     await habitStore.completeHabit(habitId)
     await fetchComplete()
-    activeHabitId.value = null // Refresh the completed list
+    activeHabitId.value = null
   } catch (err) {
-    console.error('Error completing habit:', err)
     error.value = err
   }
 }
@@ -202,9 +193,7 @@ const fetchComplete = async () => {
   try {
     const completedArray = await habitStore.getCompleted()
     completedHabits.value = new Set(completedArray.map(p => p.habitId))
-    console.log('Completed habits:', completedHabits.value)
   } catch (err) {
-    console.error('Error fetching completed habits:', err)
     error.value = err
   } finally {
     loading.value = false

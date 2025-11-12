@@ -232,13 +232,11 @@ const decorations = computed(() => {
     body: getDecoConfig('body', props.fish.decorations?.body),
     trail: getDecoConfig('trail', props.fish.decorations?.trail)
   }
-  
-  // ADD THIS DEBUG LINE:
-  console.log('Trail config:', deco.trail, 'Fish decorations:', props.fish.decorations?.trail)
+
   if (deco.trail) {
     deco.trail.history = trailHistory.value
   }
-  
+
   return deco
 })
 
