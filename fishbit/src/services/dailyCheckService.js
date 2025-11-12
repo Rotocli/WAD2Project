@@ -59,7 +59,6 @@ class DailyCheckService {
       
       return results
     } catch (error) {
-      console.error('❌ Error in daily checks:', error)
       return {
         error: error.message,
         timestamp: timeService.now().toISOString()
@@ -120,7 +119,6 @@ class DailyCheckService {
       }
 
     } catch (error) {
-      console.error('Error checking user streak:', error)
       return { broken: false, error: error.message }
     }
   }
@@ -181,7 +179,6 @@ class DailyCheckService {
       }
 
     } catch (error) {
-      console.error('Error checking habit streaks:', error)
       return {
         totalChecked: 0,
         brokenHabits: [],
@@ -244,7 +241,6 @@ class DailyCheckService {
       })
       devLog(`Streak broken for habit: ${habitId}`)
     } catch (error) {
-      console.error('Error breaking habit streak:', error)
       throw error
     }
   }

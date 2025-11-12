@@ -408,12 +408,9 @@ async function confirmEdit() {
     
     closeEdit()
   } catch (err) {
-    console.error('Failed to update fish', err)
     alertError('Unable to update fish. Try again.')
   }
 }
-
-// UPDATE confirmDeco for aquarium decorations:
 
 async function markAquariumDecoAsUsed(decoId) {
   if (!decoId) return

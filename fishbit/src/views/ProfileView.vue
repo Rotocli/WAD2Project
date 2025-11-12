@@ -62,25 +62,20 @@ const habitStore = useHabitStore()
 const fcmToken = ref(null)
 
 onMounted(async () => {
-  // load saved token
   if (userStore.currentUserId) {
     try {
       const { doc, getDoc } = await import('firebase/firestore')
       const { db } = await import('../services/firebase')
-      
+
       const userDoc = await getDoc(doc(db, 'users', userStore.currentUserId))
       if (userDoc.exists() && userDoc.data().fcmToken) {
         fcmToken.value = userDoc.data().fcmToken
-        console.log('Loaded saved FCM token')
       }
     } catch (error) {
-      console.error('Error loading token:', error)
     }
   }
 
-  // foreground messages
   notificationService.onMessageListener().then((payload) => {
-    console.log('Received foreground message:', payload)
     notificationService.sendNotification(
       payload.notification.title,
       { body: payload.notification.body }
@@ -108,7 +103,6 @@ async function enableNotifications() {
   }
 }
 
-// disabling notifs 
 async function disableNotifications() {
   const confirmed = await promptSwal('Are you sure you want to disable notifications?');
   if (!confirmed) return;
@@ -122,27 +116,21 @@ async function disableNotifications() {
         fcmToken: null
       })
       fcmToken.value = null
-      console.log('Firestore token cleared')
     }
 
-    // disabling notifs -> unregister firebase service worker
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
       if (registration) {
         await registration.unregister()
-        console.log('Firebase service worker unregistered')
       }
     }
 
-    // disabling notifs -> delete fcm token
     const { getMessaging, deleteToken } = await import('firebase/messaging')
     const messaging = getMessaging()
     await deleteToken(messaging)
-    console.log('FCM token deleted from device')
 
     alertSuccess('Notifications have been fully disabled.')
   } catch (error) {
-    console.error('Error disabling notifications:', error)
     alertError('Error disabling notifications.')
   }
 }

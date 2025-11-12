@@ -55,14 +55,12 @@ export const useJournalStore = defineStore('journal', () => {
 
       const entriesColRef = collection(db, 'journal', userStore.currentUserId, 'journalEntries')
       const docRef = await addDoc(entriesColRef, newEntry)
-      
+
       entries.value.push({ id: docRef.id, ...newEntry })
-      console.log('✅ Entry added:', entryData.entry)
-      
+
       return docRef.id
     } catch (err) {
       error.value = err.message
-      console.error('Error adding Entry', err)
       throw err
     } finally {
       loading.value = false
@@ -81,11 +79,10 @@ export const useJournalStore = defineStore('journal', () => {
       const snapshot = await getDocs(q)
       
       if (snapshot.empty) return null
-      
+
       const doc = snapshot.docs[0]
       return { id: doc.id, ...doc.data() }
     } catch (err) {
-      console.error('Error fetching today entry:', err)
       return null
     }
   }
@@ -98,10 +95,9 @@ export const useJournalStore = defineStore('journal', () => {
       const entriesColRef = collection(db, 'journal', userStore.currentUserId, 'journalEntries')
       const q = query(entriesColRef, orderBy('date', 'desc'), limit(7))
       const snapshot = await getDocs(q)
-      
+
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     } catch (err) {
-      console.error('Error fetching last 7 entries:', err)
       return []
     }
   }
@@ -114,10 +110,9 @@ export const useJournalStore = defineStore('journal', () => {
       const entriesColRef = collection(db, 'journal', userStore.currentUserId, 'journalEntries')
       const q = query(entriesColRef, orderBy('date', 'desc'), limit(30))
       const snapshot = await getDocs(q)
-      
+
       return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
     } catch (err) {
-      console.error('Error fetching last 30 entries:', err)
       return []
     }
   }
@@ -141,11 +136,8 @@ export const useJournalStore = defineStore('journal', () => {
       if (index !== -1) {
         entries.value[index] = { ...entries.value[index], ...entryData }
       }
-
-      console.log('✅ Entry updated')
     } catch (err) {
       error.value = err.message
-      console.error('Error updating entry:', err)
       throw err
     } finally {
       loading.value = false
@@ -170,11 +162,8 @@ export const useJournalStore = defineStore('journal', () => {
       if (index !== -1) {
         entries.value[index].summary = summaryData
       }
-
-      console.log('✅ Summary updated')
     } catch (err) {
       error.value = err.message
-      console.error('Error updating summary:', err)
       throw err
     } finally {
       loading.value = false
@@ -192,12 +181,10 @@ export const useJournalStore = defineStore('journal', () => {
       const entriesColRef = collection(db, 'journal', userStore.currentUserId, 'journalEntries')
       const q = query(entriesColRef, orderBy('date', 'desc'))
       const snapshot = await getDocs(q)
-      
+
       entries.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-      console.log('✅ Entries loaded:', entries.value.length)
     } catch (err) {
       error.value = err.message
-      console.error('Error fetching entries:', err)
     } finally {
       loading.value = false
     }

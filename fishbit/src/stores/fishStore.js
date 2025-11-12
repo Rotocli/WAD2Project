@@ -143,17 +143,13 @@ export const useFishStore = defineStore('fish', () => {
     return Math.max(0, Math.min(100, 100 - healthDecrease))
   }
 
-  // Actions
   async function fetchFish(userId) {
     if (!userId) {
       const userStore = useUserStore()
       userId = userStore.currentUserId
     }
-    
-    console.log('🐠 fishStore.fetchFish called with userId:', userId)
-    
+
     if (!userId) {
-      console.warn('⚠️ fishStore.fetchFish: No userId provided, aborting')
       return
     }
 
@@ -161,33 +157,26 @@ export const useFishStore = defineStore('fish', () => {
     error.value = null
 
     try {
-      console.log('📡 fishStore.fetchFish: Querying Firestore for fish...')
       const q = query(
         collection(db, 'fish'),
         where('userId', '==', userId),
         orderBy('createdAt', 'desc')
       )
-      
+
       const querySnapshot = await getDocs(q)
-      console.log('📦 fishStore.fetchFish: Query returned', querySnapshot.docs.length, 'documents')
-      
+
       fish.value = querySnapshot.docs.map(doc => {
         const data = doc.data()
-        console.log('🐟 Processing fish:', doc.id, data.customName, 'isAlive:', data.isAlive)
         return {
           id: doc.id,
           ...data,
-          // Calculate dynamic properties
           age: calculateFishAge(data.createdAt),
           currentSize: calculateFishSize(data.createdAt, data.species),
           health: calculateFishHealth(data.lastFed, data.createdAt)
         }
       })
-      
-      console.log('✅ fishStore.fetchFish: Fish array updated. Total fish:', fish.value.length, 'Active fish:', fish.value.filter(f => f.isAlive).length)
     } catch (err) {
       error.value = err.message
-      console.error('❌ fishStore.fetchFish: Error fetching fish:', err)
     } finally {
       loading.value = false
     }
@@ -312,18 +301,15 @@ export const useFishStore = defineStore('fish', () => {
       })
       return true
     } catch (err) {
-      console.error('Error feeding fish:', err)
       throw err
     }
   }
 
   async function customizeFish(fishId, customization) {
-    // Customization can include: baseColor, stripeColor, pattern, customName
     try {
       await updateFish(fishId, customization)
       return true
     } catch (err) {
-      console.error('Error customizing fish:', err)
       throw err
     }
   }

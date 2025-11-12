@@ -192,7 +192,6 @@ export const useAquariumStore = defineStore('aquarium', () => {
       if (docSnap.exists()) {
         settings.value = docSnap.data()
       } else {
-        // Create default settings
         const defaultSettings = {
           substrate: 'sand',
           lighting: 'bright',
@@ -204,7 +203,6 @@ export const useAquariumStore = defineStore('aquarium', () => {
       loadGridFromDecorations()
     } catch (err) {
       error.value = err.message
-      console.error('Error fetching aquarium settings:', err)
     } finally {
       loading.value = false
     }
@@ -250,12 +248,9 @@ export const useAquariumStore = defineStore('aquarium', () => {
     }
   }
 
-  // FIXED: Fill grid from decorations using gridIndex to preserve positions
   function loadGridFromDecorations() {
-    // Reset grid
     grid.value = Array.from({ length: 12 }, () => ({}))
-    
-    // Place decorations at their saved grid positions
+
     settings.value.decorations.forEach(decoration => {
       if (decoration.gridIndex !== undefined && decoration.gridIndex >= 0 && decoration.gridIndex < 12) {
         grid.value[decoration.gridIndex] = { decoration }
@@ -263,24 +258,22 @@ export const useAquariumStore = defineStore('aquarium', () => {
     })
   }
 
-  // FIXED: Sync grid to decorations while preserving gridIndex
   function syncGridToDecorations() {
     settings.value.decorations = grid.value
       .map((cell, index) => {
         if (cell.decoration) {
           return {
             ...cell.decoration,
-            gridIndex: index // Store the grid position
+            gridIndex: index
           }
         }
         return null
       })
-      .filter(Boolean) // Remove null entries
+      .filter(Boolean)
   }
 
   async function updateGridCell(idx, decoration) {
     try {
-      // Add gridIndex to the decoration
       grid.value[idx].decoration = {
         ...decoration,
         gridIndex: idx
@@ -295,8 +288,7 @@ export const useAquariumStore = defineStore('aquarium', () => {
       throw err
     }
   }
-  
-  // Remove decoration similarly
+
   async function removeDecoration(idx) {
     try {
       grid.value[idx].decoration = undefined

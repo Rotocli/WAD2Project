@@ -28,11 +28,7 @@ export const googleProvider = new GoogleAuthProvider()
 
 // Set auth persistence to LOCAL (survives browser reloads and closes)
 setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log('✅ Firebase auth persistence set to LOCAL')
-  })
-  .catch((error) => {
-    console.error('❌ Error setting auth persistence:', error)
-  })
+  .then(() => {})
+  .catch((error) => {})
 
 export default app

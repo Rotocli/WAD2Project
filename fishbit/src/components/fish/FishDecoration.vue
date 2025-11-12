@@ -458,7 +458,7 @@ const props = defineProps({
     type: String,
     default: '#FF6B6B'
   },
-  trailHistory: {  // ADD THIS
+  trailHistory: {
     type: Array,
     default: () => []
   }

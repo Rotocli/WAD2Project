@@ -4,15 +4,13 @@
 
 class TimeService {
   constructor() {
-    this.timeOffset = 0 // milliseconds to add to real time
-    this.callbacks = [] // Functions to call when time jumps
-    this.lastCheckDate = null // Track last daily check
-    
-    // Load saved offset from localStorage (persists across refreshes)
+    this.timeOffset = 0
+    this.callbacks = []
+    this.lastCheckDate = null
+
     const savedOffset = localStorage.getItem('fishbit_timeOffset')
     if (savedOffset) {
       this.timeOffset = parseInt(savedOffset, 10)
-      console.log('⏰ Loaded time offset from storage:', this.timeOffset, 'ms')
     }
   }
 
@@ -59,22 +57,15 @@ class TimeService {
    */
   fastForward(hours) {
     if (!hours || hours < 0) return
-    
+
     const oldTime = this.now()
     this.timeOffset += hours * 60 * 60 * 1000
     const newTime = this.now()
-    
-    // Save to localStorage
+
     localStorage.setItem('fishbit_timeOffset', this.timeOffset.toString())
-    
-    console.log(`⏰ Fast-forwarded ${hours} hours`)
-    console.log(`Old time: ${oldTime.toLocaleString()}`)
-    console.log(`New time: ${newTime.toLocaleString()}`)
-    
-    // Calculate how many days were crossed
+
     const daysCrossed = this.calculateDaysCrossed(oldTime, newTime)
-    
-    // Trigger time jump callbacks
+
     this.triggerTimeJump(hours, daysCrossed)
   }
 
@@ -104,9 +95,8 @@ class TimeService {
     const hadOffset = this.timeOffset !== 0
     this.timeOffset = 0
     localStorage.removeItem('fishbit_timeOffset')
-    
+
     if (hadOffset) {
-      console.log('🔄 Time reset to real time')
       this.triggerTimeJump(0, 0)
     }
   }
@@ -127,14 +117,10 @@ class TimeService {
    * @param {number} daysCrossed - Number of days crossed
    */
   triggerTimeJump(hoursJumped, daysCrossed) {
-    console.log(`🔔 Triggering ${this.callbacks.length} time jump callbacks`)
-    console.log(`Hours jumped: ${hoursJumped}, Days crossed: ${daysCrossed}`)
-    
     this.callbacks.forEach(callback => {
       try {
         callback(hoursJumped, daysCrossed)
       } catch (error) {
-        console.error('Error in time jump callback:', error)
       }
     })
   }
@@ -145,18 +131,17 @@ class TimeService {
    */
   isNewDay() {
     const today = this.getTodayString()
-    
+
     if (this.lastCheckDate === null) {
       this.lastCheckDate = today
       return false
     }
-    
+
     if (this.lastCheckDate !== today) {
-      console.log('📅 New day detected!', `Last: ${this.lastCheckDate}, Today: ${today}`)
       this.lastCheckDate = today
       return true
     }
-    
+
     return false
   }
 

@@ -95,34 +95,25 @@ const quotes = [
 ]
 
 function handleFishClick(fish) {
-  console.log('Fish clicked:', fish)
 }
 
 onMounted(() => {
-  console.log('🚀 Dashboard mounted')
-  
   motivationalQuote.value = quotes[Math.floor(Math.random() * quotes.length)]
-  
+
   let remindersScheduled = false
-  
+
   watch(
     () => [userStore.currentUserId, habitStore.activeHabits, habitStore.progress],
     async ([userId, habits, progress]) => {
-      // stop multiple schedules
       if (remindersScheduled) return
-      
+
       if (userId && habits.length > 0) {
-        
         if (!progress || progress.length === 0) {
-          console.log('⏳ Waiting for progress to load...')
           await habitStore.fetchProgress(userId)
-          console.log('✅ Progress loaded:', habitStore.progress.length, 'entries')
         }
-        
+
         if (notificationService.hasPermission()) {
-          console.log('✅ Scheduling daily reminders with', habits.length, 'habits and', habitStore.progress.length, 'progress entries')
           notificationService.scheduleDailyReminders(habits, habitStore.progress)
-          
           remindersScheduled = true
         }
       }
@@ -186,12 +177,10 @@ onMounted(() => {
     all 0.6s ease-in-out; 
 }
 
-/* hover expand inflate */
 .action-btn:hover {
   transform: scale(1.08);
 }
 
-/* click 'pop' */
 .action-btn:active {
   animation: bubble-pop 0.25s ease-out;
 }
@@ -202,7 +191,6 @@ onMounted(() => {
   100% { transform: scale(1); }
 }
 
-/* responsiveness */
 @media (max-width: 992px) {
   .bubble-container {
     grid-template-columns: repeat(2, 1fr);
