@@ -110,7 +110,7 @@
                       <option value="custom">Custom</option>
                     </select>
 
-                    <div class="d-flex align-items-center mx-3" v-if="editHabit.frequency === 'custom'"> 
+                    <div class="d-flex align-items-center " v-if="editHabit.frequency === 'custom'"> 
                       <label for="customFrequency" class="form-label me-1">Every </label>
                       <input
                         type="number"
@@ -124,9 +124,10 @@
                       />
                       <label for="customFrequency" class="form-label ms-1">Days</label>
                     </div>
-
-                    <button @click="handleUpdate(habit.id)" class="btn btn-sm btn-primary me-2">Save</button>
-                    <button @click="cancelEdit" class="btn btn-sm btn-secondary">Cancel</button>
+                    <div>
+                      <button @click="handleUpdate(habit.id)" class="btn btn-sm btn-primary me-2">Save</button>
+                      <button @click="cancelEdit" class="btn btn-sm btn-secondary">Cancel</button>
+                    </div>
                   </template>
                 </li>
               </ul>
@@ -152,6 +153,7 @@
               <ul class="habits-list">
                 <li v-for="habit in store.archivedHabits" :key="habit.id" class="habit-item">
                   <div class="habit-info">
+                    <span class="badge bg-secondary">Archived</span>
                     <span class="fw-bold">{{ habit.name }}</span>
                     <span v-if="habit.repeat===false" class="text-muted" >No repeat</span>
                     <span v-else-if="habit.repeat===true" class="text-muted">
@@ -159,7 +161,6 @@
                       <span v-if="habit.frequency === 'custom' && habit.customFrequency">: Every {{ habit.customFrequency }} Days</span>
                       )
                     </span>
-                    <span class="badge bg-secondary ms-2">Archived</span>
                   </div>
                   <div>
                     <button @click="handleUnarchive(habit.id)" class="btn btn-sm btn-success me-2">Restore</button>
@@ -330,12 +331,14 @@ p{
 
 .habit-item {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 12px;
   border-bottom: 1px solid #e9ecef;
   transition: background 0.2s;
   border-radius: 15px;
+  gap: 10px;
 }
 
 .habit-item:hover {
@@ -345,6 +348,15 @@ p{
 .habit-info {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 200px;
+}
+
+.habit-item > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 .nav-tabs .nav-link {
@@ -355,5 +367,30 @@ p{
 .nav-tabs .nav-link.active {
   font-weight: 600;
   color: #3d5976;
+}
+
+/* Responsive button wrapping */
+@media (max-width: 768px) {
+  .habit-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .habit-item > div:last-child {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+  
+  .habit-info {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .habit-item > div:last-child button {
+    flex: 1 1 auto;
+    min-width: calc(50% - 4px);
+  }
 }
 </style>
