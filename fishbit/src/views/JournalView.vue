@@ -11,13 +11,13 @@
 
 
     <div class="journal-container" v-else>
-      <div class="container">
+      <div class="container ">
         <button class="btn btn-outline-secondary mb-3 back-btn" @click="closeJournal">
           <i class="bi bi-arrow-left"></i> Back to Table
         </button>
         
         <div class="row g-4">
-          <div class="col-lg-7">
+          <div class="col-lg-7 order-lg-1 order-2 ">
             <div class="card shadow-sm h-100">
               <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h3 class="mb-0"> Past Journal Entries</h3>
@@ -58,7 +58,7 @@
           </div>
           
           <!-- Right: Today's Entry -->
-          <div class="col-lg-5">
+          <div class="col-lg-5 order-lg-2 order-1">
             <div class="card shadow-sm h-100">
               <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h3 class="mb-0"> Today's Entry</h3>
@@ -385,11 +385,13 @@ onMounted(async () => {
 .table_img {
   width: 100%;
   display: block;
+  position: absolute;
+  top: 350px;
 }
 
 .book-wrapper {
   position: absolute;
-  bottom: 60%;
+  top: 370px;
   left: 50%;
   transform: translateX(-50%) rotateX(60deg);
   transform-style: preserve-3d;
@@ -529,6 +531,15 @@ onMounted(async () => {
 
 
 @media (max-width: 600px) {
+  .journal-view {
+  padding: 0.5rem;
+  min-height: 100vh;
+  background: #547da7;
+  display: flex;
+  flex-direction: column;
+}
+
+
   .table-container {
     max-width: 300px;
   }

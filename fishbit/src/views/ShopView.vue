@@ -135,7 +135,7 @@
       </div>
 
       <!-- Inventory Section -->
-      <div class="inventory-section">
+      <div class="inventory-section ">
         <h2>Inventory</h2>
         <div class="inventory-grid">
           <div 
@@ -1041,8 +1041,24 @@ function saveInventory() {
   }
 
   .inventory-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 }
+
+@media (max-width: 300px) {
+  .carousel-nav-left {
+    left: 0.5rem;
+  }
+
+  .carousel-nav-right {
+    right: 0.5rem;
+  }
+
+  .inventory-grid {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 0.75rem;
+  }
+}
+
 </style>

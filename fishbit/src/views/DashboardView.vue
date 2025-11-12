@@ -216,6 +216,23 @@ onMounted(() => {
   }
   .action-btn {
   max-width: 120px;
+  
+
+  }
+}
+
+@media (max-width: 350px) {
+  .bubble-container {
+    grid-template-columns: repeat(2, minmax(100px, 1fr));
+    gap: 1rem;
+  }
+  .action-btn {
+  max-width: 90px;
+  
+
+  }
+  .card-body{
+    width: 100%;
   }
 }
 
@@ -268,6 +285,9 @@ onMounted(() => {
   }
   .action-btn {
     width: clamp(80px, 35vw, 120px);
+  }
+  .card-body{
+    width: 100%;
   }
 }
 </style>

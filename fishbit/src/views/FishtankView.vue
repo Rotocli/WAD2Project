@@ -675,7 +675,7 @@ async function handleDeleteDecoration(idx) {
     grid-template-columns: 1fr;
   }
   .fish-card {
-    max-width: 400px;
+    width: 95%;
     margin: 0 auto;
   }
 }
@@ -910,8 +910,8 @@ async function handleDeleteDecoration(idx) {
   padding: 2rem;
   background: #ffffff;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  min-width: 400px;
-  max-width: 500px;
+  min-width: 50vw;
+  max-width: 50vh;
   width: 90%;
   max-height: 85vh;
   overflow-y: auto;
