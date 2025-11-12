@@ -137,15 +137,29 @@ const decorationStyle = computed(() => {
   if (!decorationType) {
     return {
       left: props.decoration.x + '%',
-      bottom: '0px'
+      bottom: 'max(0px, 2vh)',
+      transform: 'translateX(-50%)'
     }
   }
 
+  // Use viewport-relative sizing with max constraints
+  const baseWidth = decorationType.size.width
+  const baseHeight = decorationType.size.height
+  
+  // Calculate responsive size (scales down on smaller screens)
+  const widthVw = Math.min(baseWidth / 10, baseWidth) // Use vw for smaller screens
+  const heightVw = Math.min(baseHeight / 10, baseHeight)
+  
+  // Scale bottom position proportionally on smaller screens
+  const baseBottom = props.decoration.y || 0
+  const responsiveBottom = `max(${baseBottom}px, calc(${baseBottom}px * 0.5))`
+
   return {
     left: props.decoration.x + '%',
-    bottom: (props.decoration.y || 0) + 'px',
-    width: decorationType.size.width + 'px',
-    height: decorationType.size.height + 'px'
+    bottom: baseBottom > 0 ? responsiveBottom : 'max(0px, 2vh)',
+    width: `min(${baseWidth}px, ${widthVw}vw)`,
+    height: `min(${baseHeight}px, ${heightVw}vw)`,
+    transform: 'translateX(-50%)' // Center decoration on its position
   }
 })
 
@@ -161,10 +175,11 @@ function onDecorationClick() {
   cursor: pointer;
   transition: transform 0.3s ease, filter 0.3s ease;
   filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+  transform-origin: bottom center;
 }
 
 .decoration-sprite:hover {
-  transform: scale(1.05);
+  transform: translateX(-50%) scale(1.05);
   filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.4));
 }
 
@@ -176,7 +191,6 @@ function onDecorationClick() {
 /* Swaying animation for plants */
 .swaying {
   animation: sway 4s ease-in-out infinite;
-  transform-origin: bottom center;
 }
 
 .seaweed-sway {
@@ -185,8 +199,8 @@ function onDecorationClick() {
 }
 
 @keyframes sway {
-  0%, 100% { transform: rotate(-3deg); }
-  50% { transform: rotate(3deg); }
+  0%, 100% { transform: translateX(-50%) rotate(-3deg); }
+  50% { transform: translateX(-50%) rotate(3deg); }
 }
 
 @keyframes seaweed-wave {
@@ -244,11 +258,30 @@ function onDecorationClick() {
 /* Responsive */
 @media (max-width: 768px) {
   .decoration-sprite {
-    transform: scale(0.8);
+    /* Additional scaling reduction for mobile */
+    max-width: 15vw;
+    max-height: 15vw;
   }
   
   .decoration-sprite:hover {
-    transform: scale(0.85);
+    transform: translateX(-50%) scale(1.05);
+  }
+  
+  .swaying:hover {
+    animation: sway-hover 4s ease-in-out infinite;
+  }
+  
+  @keyframes sway-hover {
+    0%, 100% { transform: translateX(-50%) rotate(-3deg) scale(1.05); }
+    50% { transform: translateX(-50%) rotate(3deg) scale(1.05); }
+  }
+}
+
+@media (max-width: 480px) {
+  .decoration-sprite {
+    /* Even smaller on very small screens */
+    max-width: 12vw;
+    max-height: 12vw;
   }
 }
 </style>
