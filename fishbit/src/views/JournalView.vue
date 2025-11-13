@@ -371,7 +371,6 @@ onMounted(async () => {
 }
 .table-container {
   position: relative;
-  width: 100%;
   max-width: 500px;
   perspective: 800px;
   margin: auto;
@@ -386,12 +385,12 @@ onMounted(async () => {
   width: 100%;
   display: block;
   position: absolute;
-  top: 350px;
+  bottom: 1vh;
 }
 
 .book-wrapper {
   position: absolute;
-  top: 370px;
+  bottom: 60vh;
   left: 50%;
   transform: translateX(-50%) rotateX(60deg);
   transform-style: preserve-3d;
@@ -548,7 +547,7 @@ onMounted(async () => {
     width: 90px;
   }
   .book-wrapper{
-    bottom: 53%;
+    bottom: 40vh;
   }
 
   .click-hint {
